@@ -80,7 +80,7 @@ test('mobile não cria overflow horizontal crítico', async ({ page }) => {
 test('gera card PNG da partida selecionada', async ({ page }) => {
   await page.locator('#demoBtn').click();
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: /Baixar card PNG/i }).click();
+  await page.locator('#downloadBtn').click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^lol-match-story-ahri\.png$/);
 });
@@ -726,7 +726,7 @@ test('ação principal de compartilhamento ocupa linha inteira no mobile', async
   const primary=await page.locator('#shareBtn').boundingBox();
   const tools=await page.locator('.share-tools').boundingBox();
   expect(primary.width).toBeGreaterThan(250);
-  expect(tools.y).toBeGreaterThan(primary.y + primary.height - 1);
+  expect(tools.y).toBeGreaterThanOrEqual(primary.y + primary.height);
 });
 
 

@@ -418,3 +418,13 @@
   .match-avatar{width:28px;height:28px;flex-basis:28px;border-radius:8px}
   .match-pill{min-width:202px}
 }
+
+/* CI/a11y hardening from screenshot review */
+.story-pager-position{color:#8b99ad}
+@media(max-width:640px){
+  .share-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  .share-primary{display:block!important;width:100%!important;position:static!important}
+  .share-tools{display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;position:static!important;margin-top:2px!important;gap:8px!important}
+  .share-tools .share-format{grid-column:1/-1!important;width:100%!important}
+  .share-tools .ghost{width:100%!important}
+}
