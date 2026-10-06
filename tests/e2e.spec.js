@@ -435,3 +435,18 @@ test('Arena usa métricas contextuais no capítulo de abertura', async ({ page }
   await expect(page.locator('#stat4Label')).toHaveText('Augments');
   await expect(page.locator('#goldValue')).toHaveText('5');
 });
+
+
+test('Tag do Riot ID é exibida em maiúsculas', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({
+      player:{gameName:'AlchemyFlames',tagLine:'br1'},
+      matches:[{id:'BR1_700',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}]
+    })
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#playerTitle')).toHaveText('AlchemyFlames#BR1');
+});
