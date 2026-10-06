@@ -318,3 +318,13 @@ test('rail de partidas aceita navegação por setas', async ({ page }) => {
   await page.keyboard.press('End');
   await expect(page.locator('.match-pill').last()).toBeFocused();
 });
+
+
+test('resumo da sessão abre a partida destacada', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const links=page.locator('[data-session-index]');
+  await expect(links.first()).toBeVisible();
+  const index=await links.first().getAttribute('data-session-index');
+  await links.first().click();
+  await expect(page.locator('.match-pill').nth(Number(index))).toHaveAttribute('aria-selected','true');
+});
