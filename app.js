@@ -13,6 +13,15 @@
   const $ = s => document.querySelector(s);
   const locale = () => state.locale;
   const t = k => dictionaries[locale()]?.[k] || dictionaries.pt?.[k] || k;
+  function resultTone(m){
+    if(m?.context==='ARENA' && m?.placement){
+      if(Number(m.placement)===1) return 'win';
+      if(Number(m.placement)<=4) return 'placement';
+      return 'loss';
+    }
+    return m?.win?'win':'loss';
+  }
+
   function modeLabel(value){
     const raw=String(value||'League of Legends').trim();
     const key=raw.toUpperCase().replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
@@ -365,7 +374,7 @@
   }
 
   function renderRail() {
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(modeLabel(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(modeLabel(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
     const pills=[...document.querySelectorAll('.match-pill')];
     pills.forEach((b,idx)=>{
       b.tabIndex=idx===state.selected?0:-1;
@@ -391,7 +400,7 @@
     $('#storyTitle').textContent=copy[0];$('#storySubtitle').textContent=copy[1];
     $('#archetypeBadge').textContent=locale()==='pt'?a.pt:a.en;
     $('#resultBadge').textContent=m.context==='ARENA' && m.placement ? `#${m.placement}` : (m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));
-    $('#resultBadge').className='result '+(m.win?'win':'loss');
+    $('#resultBadge').className='result '+resultTone(m);
     $('#championName').textContent=m.championName;$('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
     const statValues=[$('#csValue'),$('#visionValue'),$('#kpValue'),$('#goldValue')];
     const statLabels=[$('#stat1Label'),$('#stat2Label'),$('#stat3Label'),$('#stat4Label')];
