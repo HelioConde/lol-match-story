@@ -100,7 +100,6 @@
 
       <div id="matchRail" class="match-rail" role="tablist" aria-label="Partidas recentes"></div>
       <section id="sessionSummary" class="session-summary"></section>
-      <section id="historicalRecords" class="historical-records" aria-live="polite"></section>
 
       <article id="storyCard" class="story-card">
         <div class="story-cover">
@@ -120,10 +119,10 @@
 
         <div class="story-body">
           <nav class="chapter-nav" aria-label="Navegação da história">
-            <a href="#openingChapter"><span>01</span><b data-i18n="chapterOpening">ABERTURA</b></a>
-            <a href="#momentsChapter"><span>02</span><b data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</b></a>
-            <a href="#impactChapter"><span>03</span><b data-i18n="impact">SEU IMPACTO</b></a>
-            <a href="#finalChapter"><span>04</span><b data-i18n="finalChapter">CAPÍTULO FINAL</b></a>
+            <a href="#openingChapter" aria-label="Capítulo 1: Abertura"><span>01</span><b data-i18n="navOpening">Abertura</b></a>
+            <a href="#momentsChapter" aria-label="Capítulo 2: Momentos"><span>02</span><b data-i18n="navMoments">Momentos</b></a>
+            <a href="#impactChapter" aria-label="Capítulo 3: Impacto"><span>03</span><b data-i18n="navImpact">Impacto</b></a>
+            <a href="#finalChapter" aria-label="Capítulo 4: Final"><span>04</span><b data-i18n="navFinal">Final</b></a>
           </nav>
           <section id="openingChapter" class="chapter intro-grid">
             <div>
@@ -189,6 +188,8 @@
           </section>
         </div>
       </article>
+
+      <section id="historicalRecords" class="historical-records" aria-live="polite"></section>
 
       <aside class="ad-slot" data-ad-slot="story" aria-label="Publicidade">
         <span data-i18n="ad">Espaço reservado para anúncio</span>
