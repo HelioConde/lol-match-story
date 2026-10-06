@@ -285,7 +285,7 @@
   async function loadTimelineForSelected() {
     const m=state.matches[state.selected]; if(!m) return;
     const source=$('#timelineSource');
-    if(!state.live || m.context==='ARENA'){
+    if(!state.live){
       source.textContent=locale()==='pt'?'Narrativa contextual do modo.':'Mode-contextual narrative.';
       return;
     }
@@ -294,6 +294,24 @@
       const data=await fetchTimeline(m);
       if(!data){source.textContent='';return;}
       m.timelineGold=data.gold||null;
+      m.arenaRounds=Array.isArray(data.arenaRounds)?data.arenaRounds:[];
+      if(m.context==='ARENA' && m.arenaRounds.length){
+        const rounds=m.arenaRounds;
+        const best=rounds.slice().sort((a,b)=>(b.participation-b.playerDeaths)-(a.participation-a.playerDeaths))[0];
+        const chosen=[rounds[0],best,rounds[rounds.length-1]].filter((r,i,arr)=>r&&arr.findIndex(x=>x.round===r.round)===i).slice(0,3);
+        m.moments=chosen.map(r=>({
+          m:r.startTime===r.endTime?r.startTime:(r.startTime+'–'+r.endTime),
+          pt:'Janela de combate '+r.round,
+          en:'Combat window '+r.round,
+          dpt:(r.participation?('Você participou de '+r.participation+' eliminações'):'Você atravessou esta janela sem participação direta em abates')+(r.playerDeaths?' e caiu '+r.playerDeaths+' vez'+(r.playerDeaths>1?'es':'')+'.':'.'),
+          den:(r.participation?('You contributed to '+r.participation+' takedowns'):'You crossed this window without direct takedown participation')+(r.playerDeaths?' and died '+r.playerDeaths+' time'+(r.playerDeaths>1?'s':'')+'.':'.')
+        }));
+        m.timelineReal=true;
+        $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
+        source.textContent=locale()==='pt'?'Timeline real · janelas de combate detectadas na Arena.':'Real timeline · detected Arena combat windows.';
+        renderMatchDetails(m);
+        return;
+      }
       renderTurningChapter(data,m);
       const picks=[];
       if(data.firstBlood) picks.push(data.firstBlood);
@@ -416,6 +434,16 @@
     if(m.context==='ARENA' && m.teamChampions.length){
       const partners=m.teamChampions.filter(x=>x&&x!==m.championName);
       if(partners.length) groups.push([locale()==='pt'?'Dupla':'Duo',partners.map(x=>`<span class="detail-chip">${esc(x)}</span>`).join('')]);
+    }
+    if(m.context==='ARENA' && Array.isArray(m.arenaRounds) && m.arenaRounds.length){
+      const best=m.arenaRounds.slice().sort((a,b)=>(b.participation-b.playerDeaths)-(a.participation-a.playerDeaths))[0];
+      groups.push([locale()==='pt'?'Janelas de combate':'Combat windows',
+        [
+          `<span class="detail-chip">${m.arenaRounds.length} ${locale()==='pt'?'detectadas':'detected'}</span>`,
+          best?`<span class="detail-chip">${locale()==='pt'?'Melhor janela':'Best window'} #${best.round} · ${best.participation} ${locale()==='pt'?'participações':'takedowns'}</span>`:'',
+          `<span class="detail-chip">${locale()==='pt'?'Limites estimados pela timeline':'Boundaries estimated from timeline'}</span>`
+        ].join('')
+      ]);
     }
     const objectiveBits=[];
     if(m.dragonKills) objectiveBits.push((locale()==='pt'?'Dragões ':'Dragons ')+m.dragonKills);
