@@ -862,3 +862,23 @@ test('consulta real entra em modo de carregamento compacto', async ({ page }) =>
   await expect(page.locator('body')).toHaveClass(/results-mode/);
   await expect(page.locator('body')).not.toHaveClass(/loading-mode/);
 });
+
+
+test('dados secundários ficam recolhidos no mobile', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const details=page.locator('#sessionSummary details');
+  await expect(details).toBeVisible();
+  await expect(details).not.toHaveAttribute('open','');
+  await details.locator('summary').click();
+  await expect(details).toHaveAttribute('open','');
+});
+
+test('resumo da sessão permanece aberto no desktop', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#sessionSummary details')).toHaveAttribute('open','');
+});

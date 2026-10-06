@@ -370,3 +370,21 @@
   .loading-mode .hero{padding:12px 0 8px}
   .loading-mode .lookup-card{padding:9px}
 }
+
+.secondary-disclosure{width:100%}
+.secondary-disclosure>summary{list-style:none;cursor:pointer}
+.secondary-disclosure>summary::-webkit-details-marker{display:none}
+.secondary-disclosure>summary:after{content:"+";float:right;margin-top:-30px;width:26px;height:26px;display:grid;place-items:center;border-radius:999px;border:1px solid #334157;background:#111925;color:#d7b15d;font-weight:900}
+.secondary-disclosure[open]>summary:after{content:"−"}
+.secondary-content{padding-top:12px}
+.session-summary:has(.secondary-disclosure){padding:14px 16px}
+.historical-records:has(.secondary-disclosure){padding:14px 16px}
+.secondary-disclosure .session-title,.secondary-disclosure .records-title{margin-bottom:0}
+@media(max-width:600px){
+  .session-summary,.historical-records{border-radius:14px!important}
+  .secondary-disclosure>summary{padding-right:36px}
+  .secondary-disclosure .session-title{margin:0}
+  .secondary-disclosure .records-title{padding-bottom:0;border-bottom:0}
+  .secondary-disclosure[open] .records-title{padding-bottom:10px;border-bottom:1px solid #202a39}
+  .secondary-content{padding-top:10px}
+}

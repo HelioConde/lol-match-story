@@ -600,7 +600,8 @@
       [locale()==='pt'?'Melhor KDA':'Best KDA',bestKda?bestKda.championName+' · '+(((bestKda.kills+bestKda.assists)/Math.max(1,bestKda.deaths)).toFixed(1)):'—',indexOf(bestKda)],
       [locale()==='pt'?'Melhor Arena':'Best Arena',arena?arena.championName+' · #'+arena.placement:'—',indexOf(arena)]
     ];
-    box.innerHTML=`<div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Clique em um destaque para abrir a partida':'Select a highlight to open that match'}</small></div><div class="session-grid">${cards.map(([a,b,idx])=>idx>=0?`<button type="button" class="session-stat session-link" data-session-index="${idx}"><span>${esc(a)}</span><strong>${esc(b)}</strong><small>↗ ${locale()==='pt'?'Abrir história':'Open story'}</small></button>`:`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+    const compact=matchMedia('(max-width:600px)').matches;
+    box.innerHTML=`<details class="secondary-disclosure session-disclosure" ${compact?'':'open'}><summary><div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Destaques das partidas carregadas':'Highlights from loaded matches'}</small></div></summary><div class="secondary-content"><div class="session-grid">${cards.map(([a,b,idx])=>idx>=0?`<button type="button" class="session-stat session-link" data-session-index="${idx}"><span>${esc(a)}</span><strong>${esc(b)}</strong><small>↗ ${locale()==='pt'?'Abrir história':'Open story'}</small></button>`:`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div></div></details>`;
     box.querySelectorAll('[data-session-index]').forEach(btn=>btn.addEventListener('click',()=>{
       state.selected=Number(btn.dataset.sessionIndex);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
       $('#storyCard')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -625,7 +626,8 @@
       ? `${storyCount} ${storyCount===1?'história publicada':'histórias publicadas'}`
       : `${storyCount} published ${storyCount===1?'story':'stories'}`;
     const pentaLabel=`${pentaCount} ${pentaCount===1?'pentakill':'pentakills'}`;
-    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${storyLabel} · ${pentaLabel}</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}`;
+    const compact=matchMedia('(max-width:600px)').matches;
+    box.innerHTML=`<details class="secondary-disclosure records-disclosure" ${compact?'':'open'}><summary><div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${storyLabel} · ${pentaLabel}</span></div></summary><div class="secondary-content"><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}</div></details>`;
   }
 
   async function loadHistoricalRecords(){
