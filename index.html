@@ -39,7 +39,8 @@
       <form id="lookupForm" class="lookup-card">
         <label>
           <span data-i18n="gameName">Riot ID / Game Name</span>
-          <input id="gameName" name="gameName" placeholder="Nome#TAG" autocomplete="off" maxlength="22" required>
+          <input id="gameName" name="gameName" placeholder="Ex.: AlchemyFlames#BR1" autocomplete="off" maxlength="22" aria-describedby="riotIdHint" required>
+          <small id="riotIdHint" class="field-hint" data-i18n="riotIdHint">Pode colar Nome#TAG completo.</small>
         </label>
         <label class="tag-field">
           <span>Tag</span>
