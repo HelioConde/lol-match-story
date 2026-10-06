@@ -705,7 +705,27 @@
     }));
   }
 
+  function splitRiotId(raw){
+    const value=String(raw||'').trim();
+    const hash=value.lastIndexOf('#');
+    if(hash<=0||hash===value.length-1)return null;
+    const gameName=value.slice(0,hash).trim();
+    const tagLine=value.slice(hash+1).trim();
+    if(!gameName||!tagLine)return null;
+    return {gameName,tagLine};
+  }
+
+  function syncCombinedRiotId(){
+    const game=$('#gameName'),tag=$('#tagLine');
+    const parsed=splitRiotId(game?.value);
+    if(!parsed)return false;
+    game.value=parsed.gameName;
+    tag.value=parsed.tagLine.toUpperCase();
+    return true;
+  }
+
   async function runLookup(useDemo=false,requestedMatchId=null) {
+    syncCombinedRiotId();
     let gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#','');
     const platform=$('#platform').value;
     if(useDemo){
@@ -800,7 +820,17 @@
     canvas.toBlob(blob=>{if(!blob)return;const a=document.createElement('a');a.href=URL.createObjectURL(blob);const m=state.matches[state.selected];const champion=String(m.championName||'match').toLowerCase().replace(/[^a-z0-9]+/g,'-');a.download=`lol-match-story-${champion}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(locale()==='pt'?'Card PNG gerado.':'PNG card generated.');},'image/png');
   }
 
-  $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
+  $('#gameName').addEventListener('paste',e=>{
+    const value=e.clipboardData?.getData('text')||'';
+    const parsed=splitRiotId(value);
+    if(!parsed)return;
+    e.preventDefault();
+    $('#gameName').value=parsed.gameName;
+    $('#tagLine').value=parsed.tagLine.toUpperCase();
+    $('#platform').focus();
+  });
+  $('#gameName').addEventListener('blur',syncCombinedRiotId);
+    $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   document.querySelector('.preview-demo')?.addEventListener('click',()=>runLookup(true));
   const previewCard=document.querySelector('.preview-demo-card');
