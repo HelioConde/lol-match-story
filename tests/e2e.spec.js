@@ -1195,3 +1195,21 @@ test('tablet mantém CTA de criação em uma linha', async ({ page }) => {
   const nowrap=await button.evaluate(el=>getComputedStyle(el).whiteSpace);
   expect(nowrap).toBe('nowrap');
 });
+
+
+test('pack visual Riot está aplicado sem depender do layout principal', async ({ page }) => {
+  const heroArt=await page.locator('.hero').evaluate(el=>getComputedStyle(el,'::before').backgroundImage);
+  expect(heroArt).toContain('riot-legacy/assets/ui/hero.png');
+
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+
+  const frame=await page.locator('#storyCard').evaluate(el=>getComputedStyle(el,'::after').backgroundImage);
+  expect(frame).toContain('riot-legacy/assets/ui/panel-frame.png');
+
+  const shareIcon=await page.locator('#shareBtn').evaluate(el=>getComputedStyle(el,'::before').backgroundImage);
+  const downloadIcon=await page.locator('#downloadBtn').evaluate(el=>getComputedStyle(el,'::before').backgroundImage);
+  expect(shareIcon).toContain('icon-share.png');
+  expect(downloadIcon).toContain('icon-download.png');
+});
