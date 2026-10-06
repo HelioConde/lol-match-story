@@ -1,7 +1,7 @@
 (() => {
   const backend = window.LOL_MATCH_STORY_BACKEND || {};
   const dictionaries = window.MATCH_STORY_I18N || {};
-  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, player: null, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
+  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, explicitDemo: false, player: null, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
   let chapterObserver=null;
 
   const demoMatches = [
@@ -682,7 +682,10 @@
     $('#sourceState').classList.add('results-source-hidden');
     $('#resultSourceState').hidden=false;
     $('#storyApp').classList.remove('hidden');
-    $('#playerTitle').textContent=`${state.lookup.gameName}#${String(state.lookup.tagLine||'').toUpperCase()}`;
+    $('#playerTitle').textContent=state.explicitDemo
+      ? (locale()==='pt'?'História demonstrativa':'Demo story')
+      : `${state.lookup.gameName}#${String(state.lookup.tagLine||'').toUpperCase()}`;
+    $('#refreshBtn').hidden=state.explicitDemo;
     renderPlayerHeader();
     renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();setupChapterNav();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
@@ -730,6 +733,7 @@
     let gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#','');
     const platform=$('#platform').value;
     if(useDemo){
+      state.explicitDemo=true;
       gameName=gameName||'Demo Player';
       tagLine=tagLine||'DEMO';
     }else if(!gameName||!tagLine){
@@ -743,7 +747,7 @@
     try{
       const data=await fetchLive(state.lookup),matches=adaptResponse(data);
       if(!matches.length)throw new Error('empty_matches');
-      state.matches=matches;state.live=true;state.player=data?.player||null;
+      state.explicitDemo=false;state.matches=matches;state.live=true;state.player=data?.player||null;
       const canonical=data?.player;if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
       const requestedIndex=requestedMatchId?matches.findIndex(x=>String(x.id)===String(requestedMatchId)):-1;
       if(requestedIndex>=0) state.selected=requestedIndex;
@@ -756,10 +760,10 @@
       const empty=String(err?.message||'')==='empty_matches';
       const notFound=!rate && (/não encontrado|not found/i.test(String(err?.message||'')) || err?.code==='player');
       if(empty||notFound){
-        state.player=null;state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#sourceState').classList.remove('results-source-hidden');$('#resultSourceState').hidden=true;$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
+        state.explicitDemo=false;state.player=null;state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#sourceState').classList.remove('results-source-hidden');$('#resultSourceState').hidden=true;$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
         setSource('error',locale()==='pt'?(empty?'Nenhuma partida recente compatível foi encontrada para este Riot ID.':'Riot ID não encontrado. Confira Game Name, Tag e servidor.'):(empty?'No compatible recent matches were found for this Riot ID.':'Riot ID not found. Check Game Name, Tag, and server.'));
       }else{
-        state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
+        state.explicitDemo=false;state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
         setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
         showStory();
       }
@@ -842,6 +846,8 @@
   });
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#newSearchBtn').addEventListener('click',()=>{
+    state.explicitDemo=false;
+    $('#refreshBtn').hidden=false;
     document.body.classList.remove('results-mode');
     $('#sourceState').classList.remove('results-source-hidden');
     $('#resultSourceState').hidden=true;
