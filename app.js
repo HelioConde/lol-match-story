@@ -597,7 +597,7 @@
         if(active)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');
       });
     };
-    links.forEach(a=>a.addEventListener('click',()=>setCurrent(String(a.getAttribute('href')||'').replace('#',''))));
+    links.forEach(a=>{a.onclick=()=>setCurrent(String(a.getAttribute('href')||'').replace('#',''));});
     if(sections[0])setCurrent(sections[0].id);
     chapterObserver?.disconnect();
     if(!('IntersectionObserver' in window))return;
