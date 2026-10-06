@@ -87,3 +87,29 @@
 .session-link small{display:block;margin-top:8px;color:#8c9aaf;font-size:10px;font-weight:700;opacity:0;transform:translateY(2px);transition:.16s}
 .session-link:hover,.session-link:focus-visible{border-color:#9b7938;background:linear-gradient(145deg,#151b24,#0d131c)}
 .session-link:hover small,.session-link:focus-visible small{opacity:1;transform:none}
+
+/* Results mode: remove marketing repetition once a story is open */
+.results-mode .hero{padding:22px 0 18px}
+.results-mode .hero>.eyebrow,
+.results-mode .hero>h1,
+.results-mode .hero>p,
+.results-mode .hero-proof,
+.results-mode .product-preview{display:none}
+.results-mode .lookup-card{margin-top:0}
+.results-mode .source-state{margin:8px 0 0}
+.results-mode .search-history{margin-top:8px}
+.results-mode .story-app{padding-top:8px}
+.story-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:640px){
+  .results-mode .hero{padding-top:14px}
+  .results-mode .lookup-card{padding:9px}
+  .story-head-actions{width:100%}
+  .story-head-actions .ghost{flex:1}
+  .share-actions{display:grid;grid-template-columns:1fr}
+  .share-actions .share-format,
+  .share-actions .ghost,
+  .share-actions .primary{width:100%}
+  .share-block{padding:20px}
+  .story-cover{min-height:440px}
+  .cover-copy{padding:24px 22px}
+}
