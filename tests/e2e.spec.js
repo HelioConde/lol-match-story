@@ -207,7 +207,7 @@ test('publica snapshot seguro antes de copiar link', async ({ page }) => {
   });
   await page.getByRole('button',{name:/Criar minha história/i}).click();
   await page.locator('#copyLinkBtn').click();
-  await expect.poll(()=>page.evaluate(()=>navigator.clipboard.readText())).toContain('story.html?match=BR1_99');
+  await expect.poll(()=>page.evaluate(()=>navigator.clipboard.readText())).toContain('public-lol-story-page?match=BR1_99');
 });
 
 test('página pública renderiza snapshot persistido', async ({ page }) => {
