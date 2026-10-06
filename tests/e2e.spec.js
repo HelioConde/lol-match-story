@@ -485,3 +485,23 @@ test('recordes persistentes usam pluralização correta', async ({ page }) => {
   await expect(page.locator('#historicalRecords')).toContainText('1 história publicada');
   await expect(page.locator('#historicalRecords')).toContainText('1 pentakill');
 });
+
+
+test('timeline da Arena pluraliza eliminações corretamente', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[{
+      id:'BR1_777',champion:'Gragas',context:'ARENA',queue:'ARENA',placement:2,win:false,duration:26,kills:4,deaths:6,assists:21
+    }]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({events:[],arenaRounds:[
+      {round:1,startTime:'01:00',endTime:'01:20',participation:1,playerKills:0,playerDeaths:0,playerAssists:1}
+    ]})
+  }));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#moments')).toContainText('1 eliminação');
+  await expect(page.locator('#moments')).not.toContainText('1 eliminações');
+});
