@@ -126,3 +126,18 @@
   .chapter-nav a{min-width:max-content}
   #openingChapter,#momentsChapter,#impactChapter,#finalChapter{scroll-margin-top:118px}
 }
+
+.match-details{padding:0!important;overflow:hidden}
+.match-details-panel summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;cursor:pointer;list-style:none}
+.match-details-panel summary::-webkit-details-marker{display:none}
+.match-details-panel summary span{font-weight:850;color:#e2e7ef}
+.match-details-panel summary small{color:#8290a4;font-size:11px;text-align:right}
+.match-details-panel summary:after{content:"+";display:grid;place-items:center;flex:0 0 26px;width:26px;height:26px;border-radius:999px;background:#151d2a;border:1px solid #334056;color:#d7b15d;font-weight:900}
+.match-details-panel[open] summary:after{content:"−"}
+.match-details-panel[open] summary{border-bottom:1px solid #263247}
+.match-details-content{padding:6px 18px 18px}
+.match-details-content section{padding-top:14px}
+@media(max-width:600px){
+  .match-details-panel summary{align-items:flex-start}
+  .match-details-panel summary small{display:none}
+}
