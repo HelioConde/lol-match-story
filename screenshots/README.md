@@ -16,6 +16,10 @@ O estado da consulta (`live`, `fallback-demo` ou `error`) fica registrado em `me
 
 ![História desktop completa](./latest-story-full.png)
 
+## Home — mobile
+
+![Home mobile completa](./latest-mobile-home-full.png)
+
 ## História — mobile
 
 ![História mobile completa](./latest-mobile-full.png)
@@ -25,6 +29,7 @@ O estado da consulta (`live`, `fallback-demo` ou `error`) fica registrado em `me
 - `latest-home-full.png` — página inicial inteira em desktop.
 - `latest-alchemy-full.png` — consulta automática do perfil real `AlchemyFlames#BR1`.
 - `latest-story-full.png` — página inteira com uma história demo aberta em desktop.
+- `latest-mobile-home-full.png` — home inteira em viewport mobile.
 - `latest-mobile-full.png` — história demo inteira em viewport mobile.
 - `metadata.json` — commit, data, URL-base e viewports usados.
 
@@ -47,6 +52,7 @@ Após gerar as imagens, o CI valida automaticamente limites para evitar regress�
 - home desktop: até **1800 px** de altura;
 - perfil real AlchemyFlames desktop: até **4300 px**;
 - história desktop: até **3800 px**;
+- home mobile: até **2400 px**;
 - história mobile: até **5600 px**;
 - também valida largura esperada e tamanho máximo dos PNGs.
 
