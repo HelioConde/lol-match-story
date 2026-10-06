@@ -882,3 +882,17 @@ test('resumo da sessão permanece aberto no desktop', async ({ page }) => {
   await page.locator('#demoBtn').click();
   await expect(page.locator('#sessionSummary details')).toHaveAttribute('open','');
 });
+
+
+test('fim da história navega entre partidas sem voltar ao rail', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#storyPagerPosition')).toHaveText('1 de 3');
+  await expect(page.locator('#prevMatchBtn')).toBeDisabled();
+  await expect(page.locator('#nextMatchBtn')).toContainText('Jinx');
+  await page.locator('#nextMatchBtn').click();
+  await expect(page.locator('#championName')).toHaveText('Jinx');
+  await expect(page.locator('#storyPagerPosition')).toHaveText('2 de 3');
+  await expect(page.locator('#prevMatchBtn')).toContainText('Ahri');
+});

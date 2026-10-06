@@ -419,7 +419,7 @@
     }
     pills.forEach((b,idx)=>{
       b.tabIndex=idx===state.selected?0:-1;
-      b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();});
+      b.addEventListener('click',()=>selectMatch(Number(b.dataset.index),{scroll:false}));
       b.addEventListener('keydown',e=>{
         if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;
         e.preventDefault();
@@ -428,6 +428,30 @@
         document.querySelectorAll('.match-pill')[next]?.focus();
       });
     });
+  }
+
+  function renderMatchPager(){
+    const prev=$('#prevMatchBtn'),next=$('#nextMatchBtn'),pos=$('#storyPagerPosition');
+    if(!prev||!next||!pos||!state.matches.length)return;
+    const prevIndex=state.selected-1,nextIndex=state.selected+1;
+    const prevMatch=state.matches[prevIndex],nextMatch=state.matches[nextIndex];
+    prev.disabled=!prevMatch;next.disabled=!nextMatch;
+    prev.innerHTML=prevMatch
+      ? `<span>← ${locale()==='pt'?'Anterior':'Previous'}</span><strong>${esc(prevMatch.championName)}</strong>`
+      : `<span>← ${locale()==='pt'?'Anterior':'Previous'}</span><strong>—</strong>`;
+    next.innerHTML=nextMatch
+      ? `<span>${locale()==='pt'?'Próxima':'Next'} →</span><strong>${esc(nextMatch.championName)}</strong>`
+      : `<span>${locale()==='pt'?'Próxima':'Next'} →</span><strong>—</strong>`;
+    pos.textContent=locale()==='pt'
+      ? `${state.selected+1} de ${state.matches.length}`
+      : `${state.selected+1} of ${state.matches.length}`;
+  }
+
+  function selectMatch(index,{scroll=true}={}){
+    if(index<0||index>=state.matches.length)return;
+    state.selected=index;
+    renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
+    if(scroll) $('#storyCard')?.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
   function renderSelected() {
@@ -471,6 +495,7 @@
     }
     openingStats.forEach(([value,label],i)=>{statValues[i].textContent=String(value);statLabels[i].textContent=String(label);});
     $('#impactScore').textContent=m.score;
+    renderMatchPager();
     $('#impactRing').style.setProperty('--score',m.score);
     $('#storyCard').style.setProperty('--cover',`url("${championSplash(m.championName)}")`);
     $('#openingTitle').textContent=m.context==='ARENA' ? (locale()==='pt'?'A campanha começou pela adaptação.':'The run started with adaptation.') : (locale()==='pt'?(m.firstBloodKill?'Você abriu o placar.':m.deaths<=3?'Você construiu espaço sem entregar cedo.':'O começo exigiu recuperação.'):(m.firstBloodKill?'You opened the scoreboard.':m.deaths<=3?'You built space without giving the game away early.':'The opening demanded recovery.'));
@@ -603,8 +628,7 @@
     const compact=matchMedia('(max-width:600px)').matches;
     box.innerHTML=`<details class="secondary-disclosure session-disclosure" ${compact?'':'open'}><summary><div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Destaques das partidas carregadas':'Highlights from loaded matches'}</small></div></summary><div class="secondary-content"><div class="session-grid">${cards.map(([a,b,idx])=>idx>=0?`<button type="button" class="session-stat session-link" data-session-index="${idx}"><span>${esc(a)}</span><strong>${esc(b)}</strong><small>↗ ${locale()==='pt'?'Abrir história':'Open story'}</small></button>`:`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div></div></details>`;
     box.querySelectorAll('[data-session-index]').forEach(btn=>btn.addEventListener('click',()=>{
-      state.selected=Number(btn.dataset.sessionIndex);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
-      $('#storyCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+      selectMatch(Number(btn.dataset.sessionIndex));
     }));
   }
 
@@ -865,6 +889,8 @@
     e.preventDefault();runLookup(true);
   });
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
+  $('#prevMatchBtn').addEventListener('click',()=>selectMatch(state.selected-1));
+  $('#nextMatchBtn').addEventListener('click',()=>selectMatch(state.selected+1));
   $('#newSearchBtn').addEventListener('click',()=>{
     state.explicitDemo=false;
     $('#refreshBtn').hidden=false;
