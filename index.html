@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="Transforme uma partida de League of Legends em uma história visual, clara e compartilhável.">
+  <title>LoL Match Story — Sua partida virou história</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="LoL Match Story"><span class="brand-mark">MS</span><span>LoL Match Story</span></a>
+    <nav class="top-actions">
+      <button id="langBtn" class="ghost" type="button">EN</button>
+      <button id="demoBtn" class="ghost" type="button" data-i18n="demo">Ver demo</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="eyebrow" data-i18n="eyebrow">SUA PARTIDA. SUA HISTÓRIA.</div>
+      <h1 data-i18n="heroTitle">Pare de olhar só números.<br><span>Reviva o que aconteceu.</span></h1>
+      <p data-i18n="heroText">Busque seu Riot ID, escolha uma partida e veja o jogo contado em capítulos: começo, viradas, impacto e resultado.</p>
+
+      <form id="lookupForm" class="lookup-card">
+        <label>
+          <span data-i18n="gameName">Game Name</span>
+          <input id="gameName" name="gameName" value="HelioConde" autocomplete="off" maxlength="16" required>
+        </label>
+        <label class="tag-field">
+          <span>Tag</span>
+          <input id="tagLine" name="tagLine" value="BR1" autocomplete="off" maxlength="5" required>
+        </label>
+        <label>
+          <span data-i18n="server">Servidor</span>
+          <select id="platform" name="platform">
+            <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
+            <option value="eun1">EUNE</option><option value="kr">KR</option><option value="jp1">JP</option>
+            <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
+          </select>
+        </label>
+        <button class="primary" type="submit"><span data-i18n="createStory">Criar minha história</span><span>→</span></button>
+      </form>
+      <div id="sourceState" class="source-state" aria-live="polite"></div>
+    </section>
+
+    <section id="storyApp" class="story-app shell hidden">
+      <div class="story-head">
+        <div>
+          <div class="eyebrow" data-i18n="recentMatches">PARTIDAS RECENTES</div>
+          <h2 id="playerTitle">HelioConde#BR1</h2>
+        </div>
+        <button id="refreshBtn" class="ghost" type="button" data-i18n="refresh">Atualizar dados</button>
+      </div>
+
+      <div id="matchRail" class="match-rail" aria-label="Partidas recentes"></div>
+
+      <article id="storyCard" class="story-card">
+        <div class="story-cover">
+          <div class="cover-shade"></div>
+          <div class="cover-copy">
+            <div class="story-kicker" id="storyKicker">RANKED SOLO • 34:12</div>
+            <h2 id="storyTitle">A partida em que você não desistiu.</h2>
+            <p id="storySubtitle">Um começo difícil, um mid game paciente e uma luta que virou tudo.</p>
+            <div class="cover-meta">
+              <span id="resultBadge" class="result win">VITÓRIA</span>
+              <span id="championName">Ahri</span>
+              <span id="kda">10 / 3 / 11</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="story-body">
+          <section class="chapter intro-grid">
+            <div>
+              <div class="chapter-number">01</div>
+              <p class="chapter-label" data-i18n="chapterOpening">ABERTURA</p>
+              <h3 id="openingTitle">Você entrou para controlar o ritmo.</h3>
+              <p id="openingText">Os primeiros minutos foram estáveis. Você priorizou farm, evitou trocas ruins e construiu espaço para chegar forte no primeiro objetivo.</p>
+            </div>
+            <div class="score-panel">
+              <div><strong id="csValue">228</strong><span>CS</span></div>
+              <div><strong id="visionValue">31</strong><span data-i18n="vision">Visão</span></div>
+              <div><strong id="kpValue">61%</strong><span>KP</span></div>
+              <div><strong id="goldValue">12.8k</strong><span>Gold</span></div>
+            </div>
+          </section>
+
+          <section class="chapter">
+            <div class="chapter-number">02</div>
+            <p class="chapter-label" data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</p>
+            <div id="moments" class="timeline"></div>
+          </section>
+
+          <section class="chapter impact">
+            <div>
+              <div class="chapter-number">03</div>
+              <p class="chapter-label" data-i18n="impact">SEU IMPACTO</p>
+              <h3 id="impactTitle">Você apareceu quando a partida ficou apertada.</h3>
+              <p id="impactText">Seu melhor trecho veio nas lutas por objetivo. Participação alta, poucas mortes e pressão suficiente para transformar uma vantagem pequena em controle do mapa.</p>
+            </div>
+            <div class="impact-ring" id="impactRing"><span id="impactScore">84</span><small>/100</small></div>
+          </section>
+
+          <section class="chapter">
+            <div class="chapter-number">04</div>
+            <p class="chapter-label" data-i18n="finalChapter">CAPÍTULO FINAL</p>
+            <h3 id="endingTitle">A vitória veio porque você converteu o momento certo.</h3>
+            <p id="endingText">Nem toda vantagem precisa nascer cedo. Nesta partida, o ponto decisivo foi sobreviver ao começo e acelerar quando o time finalmente encontrou a luta certa.</p>
+            <div id="highlights" class="highlight-grid"></div>
+          </section>
+
+          <section class="share-block">
+            <div>
+              <span class="eyebrow" data-i18n="shareEyebrow">GUARDE ESSA PARTIDA</span>
+              <h3 data-i18n="shareTitle">Uma história que cabe em um card.</h3>
+              <p data-i18n="shareText">Compartilhe o resumo sem transformar sua partida em uma planilha.</p>
+            </div>
+            <button id="shareBtn" class="primary" type="button" data-i18n="share">Compartilhar história</button>
+          </section>
+        </div>
+      </article>
+
+      <aside class="ad-slot" aria-label="Publicidade">
+        <span data-i18n="ad">Espaço reservado para anúncio</span>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <span>LoL Match Story</span>
+    <span data-i18n="footer">Produto independente. Não afiliado à Riot Games.</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./backend-config.js"></script>
+  <script src="./i18n.js"></script>
+  <script src="./app.js"></script>
+  <script src="./live-update.js"></script>
+</body>
+</html>
