@@ -388,3 +388,11 @@ test('PT-BR traduz o nome do modo e ouro na história', async ({ page }) => {
   await expect(page.locator('#storyKicker')).toContainText('RANQUEADA SOLO');
   await expect(page.locator('[data-i18n="gold"]')).toHaveText('Ouro');
 });
+
+
+test('navegação de capítulos indica o capítulo atual', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('.chapter-nav a').first()).toHaveAttribute('aria-current','step');
+  await page.locator('.chapter-nav a[href="#finalChapter"]').click();
+  await expect(page.locator('.chapter-nav a[href="#finalChapter"]')).toHaveAttribute('aria-current','step');
+});
