@@ -1,0 +1,90 @@
+:root{
+  --ms-art-hero:url("https://helioconde.github.io/riot-legacy/assets/ui/hero.png");
+  --ms-art-hero-mobile:url("https://helioconde.github.io/riot-legacy/assets/ui/hero-mobile.png");
+  --ms-art-frame:url("https://helioconde.github.io/riot-legacy/assets/ui/panel-frame.png");
+  --ms-art-card-frame:url("https://helioconde.github.io/riot-legacy/assets/ui/card-frame.png");
+  --ms-art-share:url("https://helioconde.github.io/riot-legacy/assets/ui/share-bg.png");
+  --ms-icon-share:url("https://helioconde.github.io/riot-legacy/assets/ui/icon-share.png");
+  --ms-icon-download:url("https://helioconde.github.io/riot-legacy/assets/ui/icon-download.png");
+  --ms-icon-history:url("https://helioconde.github.io/riot-legacy/assets/ui/icon-history.png");
+  --ms-icon-trophy:url("https://helioconde.github.io/riot-legacy/assets/ui/icon-trophy.png");
+  --ms-icon-stats:url("https://helioconde.github.io/riot-legacy/assets/ui/icon-stats-bars.png");
+  --ms-icon-live:url("https://helioconde.github.io/riot-legacy/assets/ui/status-live.png");
+}
+
+/* Decorative image pack integration. Every layer is optional: layout remains valid if an asset fails. */
+.hero{position:relative;isolation:isolate}
+.hero::before{
+  content:"";position:absolute;z-index:-1;inset:-18px -8vw -24px;
+  background:
+    radial-gradient(circle at 50% 15%,rgba(215,177,93,.08),transparent 46%),
+    linear-gradient(180deg,rgba(8,11,18,.28),rgba(8,11,18,.94) 88%),
+    var(--ms-art-hero) center 38%/cover no-repeat;
+  opacity:.32;filter:saturate(.78) contrast(1.08);
+  mask-image:linear-gradient(180deg,#000 0,#000 72%,transparent 100%);
+  pointer-events:none
+}
+.product-preview{position:relative}
+.product-preview::before{
+  content:"";position:absolute;inset:12% 42% 8% -8%;z-index:-1;
+  background:var(--ms-art-frame) center/100% 100% no-repeat;
+  opacity:.16;pointer-events:none
+}
+.preview-card,.story-card{position:relative}
+.preview-card::after,.story-card::after{
+  content:"";position:absolute;inset:0;z-index:8;pointer-events:none;
+  background:var(--ms-art-card-frame) center/100% 100% no-repeat;
+  opacity:.2;mix-blend-mode:screen
+}
+.story-card::after{background-image:var(--ms-art-frame);opacity:.14}
+.preview-card:hover::after,.preview-card:focus-visible::after{opacity:.34}
+
+.share-block{position:relative;overflow:hidden;isolation:isolate}
+.share-block::before{
+  content:"";position:absolute;z-index:-1;inset:0;
+  background:
+    linear-gradient(90deg,rgba(20,18,11,.96) 0%,rgba(16,25,37,.9) 58%,rgba(10,15,23,.66) 100%),
+    var(--ms-art-share) right center/cover no-repeat;
+  opacity:.92
+}
+.share-block>*{position:relative;z-index:1}
+
+#shareBtn,#downloadBtn{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+#shareBtn::before,#downloadBtn::before{
+  content:"";width:17px;height:17px;flex:0 0 17px;background:center/contain no-repeat;opacity:.92
+}
+#shareBtn::before{background-image:var(--ms-icon-share)}
+#downloadBtn::before{background-image:var(--ms-icon-download)}
+
+.session-title>div>span,.historical-records .records-title h3{
+  display:flex;align-items:center;gap:8px
+}
+.session-title>div>span::before,.historical-records .records-title h3::before{
+  content:"";width:18px;height:18px;flex:0 0 18px;background:center/contain no-repeat;opacity:.9
+}
+.session-title>div>span::before{background-image:var(--ms-icon-trophy)}
+.historical-records .records-title h3::before{background-image:var(--ms-icon-history)}
+
+.comparison-card:not(:empty){position:relative}
+.comparison-card:not(:empty)::before{
+  content:"";display:inline-block;width:18px;height:18px;margin:0 7px -4px 0;
+  background:var(--ms-icon-stats) center/contain no-repeat;opacity:.8
+}
+
+.result-source-state.live{padding-left:28px;background-image:var(--ms-icon-live);background-repeat:no-repeat;background-size:14px 14px;background-position:9px center}
+
+@media(max-width:700px){
+  .hero::before{
+    inset:-8px -24px -20px;
+    background:
+      linear-gradient(180deg,rgba(8,11,18,.18),rgba(8,11,18,.95) 86%),
+      var(--ms-art-hero-mobile) center 28%/cover no-repeat;
+    opacity:.28
+  }
+  .product-preview::before{display:none}
+  .preview-card::after,.story-card::after{opacity:.12}
+  .share-block::before{background-position:68% center;opacity:.72}
+}
+@media(prefers-reduced-motion:reduce){
+  .preview-card::after,.story-card::after{mix-blend-mode:normal}
+}
