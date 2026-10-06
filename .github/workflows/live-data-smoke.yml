@@ -45,7 +45,9 @@ jobs:
           }
           if (!story.r.ok) throw new Error('timeline HTTP ' + story.r.status + ': ' + JSON.stringify(story.data));
           if (!Array.isArray(story.data?.events)) throw new Error('timeline response missing events');
-          console.log('Timeline OK:', first.id, 'events=', story.data.events.length, 'cacheHit=', story.data.cacheHit);
+          if (first.context === 'ARENA' && !Array.isArray(story.data?.arenaRounds)) throw new Error('Arena timeline missing combat windows');
+          if (first.context === 'ARENA' && story.data.arenaRounds.length < 2) throw new Error('Arena combat-window detection returned too little data');
+          console.log('Timeline OK:', first.id, 'events=', story.data.events.length, 'arenaWindows=', story.data.arenaRounds?.length || 0, 'cacheHit=', story.data.cacheHit);
 
           const publish = await post(base + '/public-lol-story', { action:'publish', ...lookup, matchId:first.id, locale:'pt-BR' });
           if (!publish.r.ok) throw new Error('publish HTTP ' + publish.r.status + ': ' + JSON.stringify(publish.data));
