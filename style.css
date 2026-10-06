@@ -673,5 +673,5 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
     padding-top:16px;
     gap:22px;
   }
-  body:not(.results-mode) .product-preview .preview-card{order:0}
+  body:not(.results-mode) .product-preview .preview-card{order:-1}
 }
