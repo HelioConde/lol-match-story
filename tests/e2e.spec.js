@@ -771,3 +771,37 @@ test('home não repete botão demo na seção de preview', async ({ page }) => {
   await expect(page.locator('#demoBtn')).toBeVisible();
   await expect(page.locator('.preview-open')).toBeVisible();
 });
+
+
+test('mobile prioriza história antes do resumo da sessão', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const story=await page.locator('#storyCard').boundingBox();
+  const summary=await page.locator('#sessionSummary').boundingBox();
+  expect(story.y).toBeLessThan(summary.y);
+});
+
+test('compartilhamento mobile usa controles com largura útil', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const format=await page.locator('#cardFormat').boundingBox();
+  const copy=await page.locator('#copyLinkBtn').boundingBox();
+  expect(format.width).toBeGreaterThan(copy.width);
+});
+
+test('história pública da Arena não repete impacto na grade de métricas', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_777',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082,augments:[1,2,3,4,5]}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_777');
+  await expect(page.locator('#publicStats')).toContainText('Aprimoramentos');
+  await expect(page.locator('#publicStats')).not.toContainText('Impacto');
+});

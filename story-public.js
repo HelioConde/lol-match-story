@@ -61,7 +61,7 @@
       : `Esta história pública foi gerada a partir dos dados reais da partida: ${damage}, ${n(m.deaths)} mortes e ${n(m.killParticipation)}% de participação em abates.`;
     escText($('#publicImpactText'),arenaImpact);
     const stats=m.context==='ARENA'
-      ? [['Colocação',m.placement?'#'+m.placement:'—'],['Participações',n(m.kills)+n(m.assists)],['DPM',m.damagePerMin?Math.round(n(m.damagePerMin)):'—'],['Impacto',impact]]
+      ? [['Colocação',m.placement?'#'+m.placement:'—'],['Participações',n(m.kills)+n(m.assists)],['DPM',m.damagePerMin?Math.round(n(m.damagePerMin)):'—'],['Aprimoramentos',Array.isArray(m.augments)&&m.augments.length?m.augments.length:'—']]
       : [['CS',m.cs||'—'],['Visão',m.vision||'—'],['KP',(m.killParticipation??0)+'%'],['Impacto',impact]];
     $('#publicStats').replaceChildren(...stats.map(([label,value])=>{const d=document.createElement('div'),strong=document.createElement('strong'),span=document.createElement('span');strong.textContent=String(value);span.textContent=label;d.append(strong,span);return d;}));
     const chips=m.context==='ARENA'
