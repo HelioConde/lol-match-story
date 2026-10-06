@@ -21,6 +21,8 @@ function pngSize(file) {
   };
 }
 
+let failed = false;
+
 const metadataPath = path.resolve(process.cwd(), 'screenshots/metadata.json');
 if (!fs.existsSync(metadataPath)) {
   console.error('screenshots/metadata.json is missing');
