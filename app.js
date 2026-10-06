@@ -239,7 +239,16 @@
   }
 
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
-  function setSource(type,message){const el=$('#sourceState');el.className='source-state '+type;el.textContent=message;}
+  function setSource(type,message){
+    const el=$('#sourceState');
+    const result=$('#resultSourceState');
+    el.className='source-state '+type;el.textContent=message;
+    if(result){
+      result.className='result-source-state '+type;
+      result.textContent=message;
+      result.hidden=!document.body.classList.contains('results-mode');
+    }
+  }
   function setLookupBusy(busy){const btn=$('#lookupForm button[type="submit"]');if(!btn)return;btn.disabled=busy;btn.setAttribute('aria-busy',String(busy));$('#storyApp')?.setAttribute('aria-busy',String(busy));}
   function track(event,extra={}){
     try{
@@ -663,6 +672,8 @@
 
   function showStory(){
     document.body.classList.add('results-mode');
+    $('#sourceState').classList.add('results-source-hidden');
+    $('#resultSourceState').hidden=false;
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${String(state.lookup.tagLine||'').toUpperCase()}`;
     renderPlayerHeader();
@@ -711,7 +722,7 @@
       const empty=String(err?.message||'')==='empty_matches';
       const notFound=!rate && (/não encontrado|not found/i.test(String(err?.message||'')) || err?.code==='player');
       if(empty||notFound){
-        state.player=null;state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
+        state.player=null;state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#sourceState').classList.remove('results-source-hidden');$('#resultSourceState').hidden=true;$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
         setSource('error',locale()==='pt'?(empty?'Nenhuma partida recente compatível foi encontrada para este Riot ID.':'Riot ID não encontrado. Confira Game Name, Tag e servidor.'):(empty?'No compatible recent matches were found for this Riot ID.':'Riot ID not found. Check Game Name, Tag, and server.'));
       }else{
         state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
@@ -782,6 +793,8 @@
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#newSearchBtn').addEventListener('click',()=>{
     document.body.classList.remove('results-mode');
+    $('#sourceState').classList.remove('results-source-hidden');
+    $('#resultSourceState').hidden=true;
     $('#storyApp').classList.add('hidden');
     $('#sourceState').textContent='';
     window.scrollTo({top:0,behavior:'smooth'});
