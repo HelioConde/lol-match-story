@@ -163,3 +163,11 @@
 .player-heading h2{margin-bottom:2px}
 .player-meta{display:block;color:#8290a4;font-size:11px;font-weight:700}
 @media(max-width:520px){.player-icon{width:42px;height:42px;flex-basis:42px;border-radius:11px}}
+
+@media(max-width:430px){
+  .session-grid{grid-template-columns:1fr 1fr}
+  .session-stat{min-height:82px;padding:12px}
+  .session-stat strong{font-size:16px}
+  .session-link small{opacity:.72;transform:none}
+}
+@media(max-width:340px){.session-grid{grid-template-columns:1fr}}
