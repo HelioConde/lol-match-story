@@ -254,3 +254,22 @@ test('mostra recordes persistentes das histórias publicadas', async ({ page }) 
   await expect(page.locator('#historicalRecords')).toContainText('1012');
   await expect(page.locator('#historicalRecords')).toContainText('#1');
 });
+
+
+test('estrutura principal é navegável por teclado e possui semântica acessível', async ({ page }) => {
+  await expect(page.locator('.skip-link')).toHaveAttribute('href','#mainContent');
+  await page.locator('.skip-link').focus();
+  await expect(page.locator('.skip-link')).toBeFocused();
+  await expect(page.locator('#sourceState')).toHaveAttribute('role','status');
+  await expect(page.locator('#gameName')).toHaveAccessibleName(/Game Name/i);
+  await expect(page.locator('#platform')).toHaveAccessibleName(/Servidor/i);
+});
+
+test('rail de partidas expõe seleção como tabs', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('.match-pill').first()).toHaveAttribute('role','tab');
+  await expect(page.locator('.match-pill').first()).toHaveAttribute('aria-selected','true');
+  await page.locator('.match-pill').nth(1).click();
+  await expect(page.locator('.match-pill').nth(1)).toHaveAttribute('aria-selected','true');
+  await expect(page.locator('.match-pill').first()).toHaveAttribute('aria-selected','false');
+});
