@@ -4,7 +4,10 @@
   const slots=cfg.slots||{};
   const consentKey='lms-ads-consent';
   const configured=publisher.startsWith('ca-pub-') && Object.values(slots).some(Boolean);
-  if(!configured)return;
+  if(!configured){
+    document.querySelectorAll('[data-ad-slot]').forEach(host=>host.classList.add('hidden'));
+    return;
+  }
 
   function loadAds(){
     if(document.querySelector('script[data-lms-adsense]'))return;
