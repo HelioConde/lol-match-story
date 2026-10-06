@@ -56,3 +56,10 @@ Já contém:
 - atualização automática de versão.
 
 Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora usa sinais reais como dano/min, participação, first blood, multi-kills, spree, objetivos, torres e visão para classificar o arquétipo da partida e enriquecer a narrativa. Card PNG e cobertura E2E também foram adicionados. Próximo passo: consumir eventos reais do Match-V5 Timeline para substituir os timestamps heurísticos.
+
+
+## Conta padrão de teste
+- Riot ID: `AlchemyFlames#BR1`
+- Plataforma: `br1`
+- Região Match-V5: `americas`
+- A conta é usada apenas para validação funcional; a Riot API key continua somente no backend.
