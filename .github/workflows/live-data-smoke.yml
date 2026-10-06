@@ -11,7 +11,7 @@ jobs:
   live-data:
     runs-on: ubuntu-latest
     steps:
-      - name: Test AlchemyFlames profile and timeline
+      - name: Test AlchemyFlames profile timeline and public story
         env:
           BASE: https://bieihhaobdztjyoweewa.supabase.co/functions/v1
         run: |
@@ -43,4 +43,12 @@ jobs:
           if (!story.r.ok) throw new Error('timeline HTTP ' + story.r.status + ': ' + JSON.stringify(story.data));
           if (!Array.isArray(story.data?.events)) throw new Error('timeline response missing events');
           console.log('Timeline OK:', first.id, 'events=', story.data.events.length, 'cacheHit=', story.data.cacheHit);
+
+          const publish = await post(base + '/public-lol-story', { action:'publish', ...lookup, matchId:first.id, locale:'pt-BR' });
+          if (!publish.r.ok) throw new Error('publish HTTP ' + publish.r.status + ': ' + JSON.stringify(publish.data));
+          if (!publish.data?.ok) throw new Error('public story was not persisted');
+          const saved = await post(base + '/public-lol-story', { action:'get', matchId:first.id });
+          if (!saved.r.ok) throw new Error('public story get HTTP ' + saved.r.status + ': ' + JSON.stringify(saved.data));
+          if (saved.data?.story?.match_id !== first.id) throw new Error('persisted story mismatch');
+          console.log('Public story OK:', first.id, saved.data.story.riot_id);
           NODE
