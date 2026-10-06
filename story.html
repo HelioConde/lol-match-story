@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="Uma história de partida compartilhada no LoL Match Story.">
+  <meta property="og:title" content="LoL Match Story — História compartilhada">
+  <meta property="og:description" content="Veja uma partida de League of Legends contada como uma história.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>História compartilhada — LoL Match Story</title>
+  <link rel="canonical" href="https://helioconde.github.io/lol-match-story/story.html">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="LoL Match Story"><span class="brand-mark">MS</span><span>LoL Match Story</span></a>
+    <a class="ghost public-back" href="./">Criar minha história</a>
+  </header>
+  <main class="shell public-story-page">
+    <div id="publicStatus" class="source-state loading" role="status" aria-live="polite">Carregando história…</div>
+    <article id="publicStory" class="story-card hidden">
+      <div id="publicCover" class="story-cover public-cover">
+        <div class="cover-shade"></div>
+        <div class="cover-copy">
+          <div id="publicKicker" class="story-kicker"></div>
+          <h1 id="publicTitle"></h1>
+          <p id="publicSubtitle"></p>
+          <div class="cover-meta">
+            <span id="publicResult" class="result"></span>
+            <span id="publicArchetype" class="archetype-badge"></span>
+            <span id="publicChampion"></span>
+            <span id="publicKda"></span>
+          </div>
+        </div>
+      </div>
+      <div class="story-body">
+        <section class="chapter intro-grid">
+          <div>
+            <div class="chapter-number">01</div>
+            <p class="chapter-label">O RETRATO DA PARTIDA</p>
+            <h3 id="publicImpactTitle"></h3>
+            <p id="publicImpactText"></p>
+          </div>
+          <div id="publicStats" class="score-panel"></div>
+        </section>
+        <section class="chapter">
+          <div class="chapter-number">02</div>
+          <p class="chapter-label">DESTAQUES</p>
+          <div id="publicHighlights" class="highlight-grid"></div>
+        </section>
+        <section class="share-block">
+          <div>
+            <span class="eyebrow">LOL MATCH STORY</span>
+            <h3>Quer transformar sua própria partida em história?</h3>
+            <p>Busque seu Riot ID e gere uma narrativa visual das suas partidas recentes.</p>
+          </div>
+          <a class="primary public-cta" href="./">Criar minha história →</a>
+        </section>
+      </div>
+    </article>
+  </main>
+  <footer class="shell footer">
+    <span>LoL Match Story</span>
+    <span>Produto independente. Não afiliado à Riot Games.</span>
+  </footer>
+  <script src="./backend-config.js"></script>
+  <script src="./story-public.js"></script>
+  <script src="./live-update.js"></script>
+</body>
+</html>
