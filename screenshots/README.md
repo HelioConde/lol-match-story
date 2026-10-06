@@ -6,6 +6,12 @@ Estas imagens são geradas pelo workflow **Capture Full Page Screenshots** sempr
 
 ![Home desktop completa](./latest-home-full.png)
 
+## Perfil real — AlchemyFlames#BR1
+
+![Perfil real AlchemyFlames](./latest-alchemy-full.png)
+
+O estado da consulta (`live`, `fallback-demo` ou `error`) fica registrado em `metadata.json`.
+
 ## História — desktop
 
 ![História desktop completa](./latest-story-full.png)
@@ -17,6 +23,7 @@ Estas imagens são geradas pelo workflow **Capture Full Page Screenshots** sempr
 ## Arquivos
 
 - `latest-home-full.png` — página inicial inteira em desktop.
+- `latest-alchemy-full.png` — consulta automática do perfil real `AlchemyFlames#BR1`.
 - `latest-story-full.png` — página inteira com uma história demo aberta em desktop.
 - `latest-mobile-full.png` — história demo inteira em viewport mobile.
 - `metadata.json` — commit, data, URL-base e viewports usados.
@@ -38,6 +45,7 @@ As capturas são feitas com Playwright usando `fullPage: true`.
 Após gerar as imagens, o CI valida automaticamente limites para evitar regressões de comprimento e peso:
 
 - home desktop: até **1800 px** de altura;
+- perfil real AlchemyFlames desktop: até **4300 px**;
 - história desktop: até **3800 px**;
 - história mobile: até **5600 px**;
 - também valida largura esperada e tamanho máximo dos PNGs.
