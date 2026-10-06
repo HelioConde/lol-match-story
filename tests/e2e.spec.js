@@ -536,6 +536,7 @@ test('fonte dos dados aparece junto ao perfil no modo resultado', async ({ page 
 
 
 test('rail centraliza automaticamente a partida selecionada', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
   await page.locator('#demoBtn').click();
   const rail=page.locator('#matchRail');
   await page.locator('.match-pill').last().click();
