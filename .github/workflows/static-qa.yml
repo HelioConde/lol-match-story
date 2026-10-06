@@ -1,0 +1,41 @@
+name: Static QA
+
+on:
+  push:
+    branches: [main, "split/lol-match-story"]
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax
+        run: npm run check
+      - name: Required product markers
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f app.js
+          test -f i18n.js
+          test -f backend-config.js
+          test -f README.md
+          test -f FULLSTACK.md
+          test -f ADS_SETUP.md
+          test -f RIOT_API.md
+          test -f version.json
+          grep -qi 'lang="pt-BR"' index.html
+          grep -qi 'id="lookupForm"' index.html
+          grep -qi 'id="storyApp"' index.html
+          grep -qi 'public-lol-profile' backend-config.js
+          grep -qi 'navigator.share' app.js
+          grep -qi 'LoL Match Story' README.md
+          grep -qi 'PT-BR' README.md
+          grep -qi 'English' README.md
+          grep -qi 'anúncios' README.md
+      - name: No secrets
+        run: |
+          ! grep -RniE 'RGAPI-[A-Za-z0-9_-]{20,}|SUPABASE_SERVICE_ROLE_KEY|service_role.*eyJ' . --exclude-dir=.git --include='*.js' --include='*.html' --include='*.json' --exclude='package*.json'
