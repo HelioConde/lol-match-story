@@ -19,3 +19,11 @@ O MVP já possui um slot reservado após o card principal.
 - mobile deve manter anúncio fora da timeline crítica;
 - não ativar cookies/trackers de publicidade antes do mecanismo de consentimento exigido pelo provedor;
 - o produto pode funcionar integralmente sem anúncios carregados.
+
+
+## Implementação atual
+- `ads-config.js` centraliza `publisherId` e IDs de slots.
+- `ads.js` só carrega o provedor quando existe um `ca-pub-*`, existe ao menos um slot configurado e o usuário aceitou o carregamento.
+- Sem configuração, nenhum banner de consentimento é exibido e nenhum script externo de anúncios é carregado.
+- A escolha fica armazenada localmente em `lms-ads-consent`.
+- Para ativar, preencher `publisherId` e `slots.story` em `ads-config.js`.
