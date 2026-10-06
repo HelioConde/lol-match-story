@@ -396,3 +396,20 @@ test('navegação de capítulos indica o capítulo atual', async ({ page }) => {
   await page.locator('.chapter-nav a[href="#finalChapter"]').click();
   await expect(page.locator('.chapter-nav a[href="#finalChapter"]')).toHaveAttribute('aria-current','step');
 });
+
+
+test('perfil real mostra ícone e nível do invocador', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({
+      player:{gameName:'AlchemyFlames',tagLine:'BR1',profileIconId:123,level:77,platform:'BR1'},
+      matches:[{id:'BR1_123',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}]
+    })
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#playerIcon')).toBeVisible();
+  await expect(page.locator('#playerIcon')).toHaveAttribute('src',/profileicon\/123\.png/);
+  await expect(page.locator('#playerMeta')).toContainText('Nível 77');
+});
