@@ -470,6 +470,19 @@
     $('#resultBadge').textContent=m.context==='ARENA' && m.placement ? `#${m.placement}` : (m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));
     $('#resultBadge').className='result '+resultTone(m);
     $('#championName').textContent=m.championName;$('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
+    const contextBadge=$('#contextBadge');
+    let contextText='';
+    if(m.context==='ARENA'){
+      const partner=(m.teamChampions||[]).find(x=>x&&x!==m.championName);
+      if(partner) contextText=(locale()==='pt'?'Dupla: ':'Duo: ')+partner;
+    }else if(m.position){
+      const pos=String(m.position).toUpperCase();
+      const pt={TOP:'Topo',JUNGLE:'Selva',MIDDLE:'Meio',MID:'Meio',BOTTOM:'ADC',UTILITY:'Suporte',SUPPORT:'Suporte'};
+      const en={TOP:'Top',JUNGLE:'Jungle',MIDDLE:'Mid',MID:'Mid',BOTTOM:'ADC',UTILITY:'Support',SUPPORT:'Support'};
+      contextText=(locale()==='pt'?pt[pos]:en[pos])||pos;
+    }
+    contextBadge.textContent=contextText;
+    contextBadge.classList.toggle('hidden',!contextText);
     const statValues=[$('#csValue'),$('#visionValue'),$('#kpValue'),$('#goldValue')];
     const statLabels=[$('#stat1Label'),$('#stat2Label'),$('#stat3Label'),$('#stat4Label')];
     let openingStats;
