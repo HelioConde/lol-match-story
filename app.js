@@ -1,7 +1,7 @@
 (() => {
   const backend = window.LOL_MATCH_STORY_BACKEND || {};
   const dictionaries = window.MATCH_STORY_I18N || {};
-  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1' };
+  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
 
   const demoMatches = [
     {id:'demo-1',win:true,championName:'Ahri',queue:'Ranked Solo',durationSeconds:2052,kills:10,deaths:3,assists:11,cs:228,vision:31,kp:61,gold:12840,damage:27600,damagePerMin:807,teamDamageShare:28.4,firstBloodAssist:true,soloKills:2,doubleKills:1,largestKillingSpree:6,turretDamage:3200,objectiveDamage:5100,score:86},
@@ -147,7 +147,9 @@
       riftHeraldTakedowns:safeNumber(p?.riftHeraldTakedowns,raw?.riftHeraldTakedowns),
       csPerMin:safeNumber(p?.csPerMin,raw?.csPerMin),
       visionPerMin:safeNumber(p?.visionPerMin,raw?.visionPerMin),
-      goldPerMin:safeNumber(p?.goldPerMin,raw?.goldPerMin)
+      goldPerMin:safeNumber(p?.goldPerMin,raw?.goldPerMin),
+      teamChampions:Array.isArray(p?.teamChampions)?p.teamChampions:(Array.isArray(raw?.teamChampions)?raw.teamChampions:[]),
+      enemyChampions:Array.isArray(p?.enemyChampions)?p.enemyChampions:(Array.isArray(raw?.enemyChampions)?raw.enemyChampions:[])
     };
     m.score=safeNumber(raw?.score)||computeScore(m);
     m.moments=buildMoments(m);
@@ -331,14 +333,49 @@
     box.innerHTML=`<div class="chapter-label">${locale()==='pt'?'COMPARAÇÃO COM PARTIDAS DO MESMO MODO':'COMPARISON WITH SAME-MODE MATCHES'}</div><div class="comparison-grid">${items.map(([a,b])=>`<div class="comparison-item"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
   }
 
-  const spellNames={4:'Flash',14:'Ignite',12:'Teleport',7:'Heal',3:'Exhaust',11:'Smite',6:'Ghost',21:'Barrier'};
+  async function loadGameAssets(){
+    const lang=locale()==='pt'?'pt_BR':'en_US';
+    if(state.assetLocale===lang && Object.keys(state.itemMap).length) return;
+    try{
+      const versions=await fetch('https://ddragon.leagueoflegends.com/api/versions.json',{cache:'force-cache'}).then(r=>r.ok?r.json():[]);
+      if(Array.isArray(versions)&&versions[0]) state.ddVersion=versions[0];
+      const base=`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/data/${lang}`;
+      const [items,spells,runes]=await Promise.all([
+        fetch(base+'/item.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null),
+        fetch(base+'/summoner.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null),
+        fetch(base+'/runesReforged.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null)
+      ]);
+      state.itemMap={};Object.entries(items?.data||{}).forEach(([id,v])=>state.itemMap[id]={name:v.name,image:v.image?.full});
+      state.spellMap={};Object.values(spells?.data||{}).forEach(v=>state.spellMap[String(v.key)]={name:v.name,image:v.image?.full});
+      state.runeMap={};(Array.isArray(runes)?runes:[]).forEach(r=>state.runeMap[String(r.id)]={name:r.name,icon:r.icon});
+      state.assetLocale=lang;
+      if(state.matches.length) renderMatchDetails(state.matches[state.selected]);
+    }catch{}
+  }
+
   function renderMatchDetails(m){
     const box=$('#matchDetails');
     const groups=[];
-    if(m.items.length) groups.push([locale()==='pt'?'Itens':'Items',m.items.map(id=>`<span class="detail-chip"><img alt="" loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/item/${id}.png">#${id}</span>`).join('')]);
-    if(m.summonerSpells.length) groups.push([locale()==='pt'?'Feitiços':'Summoner spells',m.summonerSpells.map(id=>`<span class="detail-chip">${esc(spellNames[id]||('Spell '+id))}</span>`).join('')]);
-    if(m.runeStyles.length) groups.push([locale()==='pt'?'Runas':'Runes',m.runeStyles.map(r=>`<span class="detail-chip">Style ${esc(r.style||'—')}</span>`).join('')]);
+    if(m.items.length) groups.push([locale()==='pt'?'Itens':'Items',m.items.map(id=>{
+      const meta=state.itemMap[String(id)]||{};
+      const src=meta.image?`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/item/${meta.image}`:`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/item/${id}.png`;
+      return `<span class="detail-chip"><img alt="" loading="lazy" src="${src}">${esc(meta.name||('#'+id))}</span>`;
+    }).join('')]);
+    if(m.summonerSpells.length) groups.push([locale()==='pt'?'Feitiços':'Summoner spells',m.summonerSpells.map(id=>{
+      const meta=state.spellMap[String(id)]||{};
+      const icon=meta.image?`<img alt="" loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/spell/${meta.image}">`:'';
+      return `<span class="detail-chip">${icon}${esc(meta.name||('Spell '+id))}</span>`;
+    }).join('')]);
+    if(m.runeStyles.length) groups.push([locale()==='pt'?'Runas':'Runes',m.runeStyles.map(r=>{
+      const meta=state.runeMap[String(r.style)]||{};
+      const icon=meta.icon?`<img alt="" loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/img/${meta.icon}">`:'';
+      return `<span class="detail-chip">${icon}${esc(meta.name||('Style '+(r.style||'—')))}</span>`;
+    }).join('')]);
     if(m.augments.length) groups.push(['Augments',m.augments.map(id=>`<span class="detail-chip">#${esc(id)}</span>`).join('')]);
+    if(m.context==='ARENA' && m.teamChampions.length){
+      const partners=m.teamChampions.filter(x=>x&&x!==m.championName);
+      if(partners.length) groups.push([locale()==='pt'?'Dupla':'Duo',partners.map(x=>`<span class="detail-chip">${esc(x)}</span>`).join('')]);
+    }
     const objectiveBits=[];
     if(m.dragonKills) objectiveBits.push((locale()==='pt'?'Dragões ':'Dragons ')+m.dragonKills);
     if(m.baronKills) objectiveBits.push('Baron '+m.baronKills);
@@ -492,13 +529,13 @@
   $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
-  $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();});
+  $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();loadGameAssets();});
   $('#downloadBtn').addEventListener('click',downloadCard);
   $('#copyLinkBtn').addEventListener('click',async()=>{try{track('copy_link',{mode:state.matches[state.selected]?.context});await navigator.clipboard.writeText(shareUrl());toast(locale()==='pt'?'Link da partida copiado.':'Match link copied.');}catch{}});
   $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;track('share',{mode:m.context});const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:shareUrl()});else{await navigator.clipboard.writeText(text+' '+shareUrl());toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
 
   renderSearchHistory();
-  fetch('https://ddragon.leagueoflegends.com/api/versions.json',{cache:'force-cache'}).then(r=>r.ok?r.json():[]).then(v=>{if(Array.isArray(v)&&v[0]){state.ddVersion=v[0];if(state.matches.length)renderMatchDetails(state.matches[state.selected]);}}).catch(()=>{});
+  loadGameAssets();
   applyI18n();
 
   const params=new URLSearchParams(location.search);
