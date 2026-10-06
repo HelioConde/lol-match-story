@@ -235,6 +235,7 @@
     document.documentElement.lang=locale()==='pt'?'pt-BR':'en';
     document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(key==='heroTitle')el.innerHTML=t(key);else el.textContent=t(key);});
     $('#langBtn').textContent=locale()==='pt'?'EN':'PT';
+    $('#gameName').placeholder=t('gameNamePlaceholder');
     if(state.matches.length){renderRail();renderSessionSummary();renderSelected();}
   }
 
