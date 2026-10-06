@@ -554,3 +554,13 @@ test('home mobile compacta diferenciais e remove CTA demo redundante', async ({ 
   await expect(page.locator('.product-copy .preview-demo')).toBeHidden();
   await expect(page.locator('#demoBtn')).toBeVisible();
 });
+
+
+test('home mobile mantém identidade curta e prioriza preview visual', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator('.brand-short')).toBeVisible();
+  await expect(page.locator('.brand-short')).toHaveText('Match Story');
+  await expect(page.locator('.brand-long')).toBeHidden();
+  const cardOrder=await page.locator('.preview-card').evaluate(el=>getComputedStyle(el).order);
+  expect(Number(cardOrder)).toBeLessThan(0);
+});
