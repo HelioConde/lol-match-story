@@ -41,6 +41,12 @@
   }
 
   function archetype(m) {
+    if (m.context==='ARENA') {
+      if (m.placement===1) return {key:'arena-champion',pt:'CAMPEÃO DA ARENA',en:'ARENA CHAMPION'};
+      if (m.placement>0 && m.placement<=4) return {key:'arena-top4',pt:'TOP 4 NA ARENA',en:'ARENA TOP 4'};
+      if (m.kills+m.assists>=20) return {key:'arena-brawler',pt:'BRIGA ATÉ O FIM',en:'FIGHT TO THE END'};
+      return {key:'arena-run',pt:'CORRIDA DE ARENA',en:'ARENA RUN'};
+    }
     if (m.pentaKills) return {key:'legendary',pt:'NOITE LENDÁRIA',en:'LEGENDARY NIGHT'};
     if (m.win && m.deaths >= 6 && m.kills + m.assists >= 16) return {key:'comeback',pt:'COMEBACK',en:'COMEBACK'};
     if (m.win && m.deaths <= 2 && m.score >= 85) return {key:'control',pt:'CONTROLE TOTAL',en:'TOTAL CONTROL'};
@@ -62,7 +68,11 @@
       resistance:{pt:['Você resistiu mais do que o resultado mostra.','A derrota esconde uma partida em que você ainda encontrou maneiras de manter o jogo vivo.'],en:['You held on longer than the result suggests.','The loss hides a game where you still found ways to keep it alive.']},
       pressure:{pt:['Você teve impacto. Faltou transformar pressão em mapa.','Os números mostram presença, mas o jogo terminou antes dessa força virar controle.'],en:['You had impact. The missing piece was converting pressure into map control.','The numbers show presence, but the game ended before that strength became control.']},
       'steady-win':{pt:['Você transformou consistência em vitória.','Sem depender de um único lance, sua partida foi construída por decisões que se acumularam.'],en:['You turned consistency into a win.','Without relying on one play, your match was built by decisions that accumulated.']},
-      'learning-loss':{pt:['A partida acelerou antes de você estabilizar.','Nem toda derrota nasce em um único erro; aqui, o ritmo foi escapando em pequenas janelas.'],en:['The match accelerated before you stabilized.','Not every loss comes from one mistake; here, the pace slipped through smaller windows.']}
+      'learning-loss':{pt:['A partida acelerou antes de você estabilizar.','Nem toda derrota nasce em um único erro; aqui, o ritmo foi escapando em pequenas janelas.'],en:['The match accelerated before you stabilized.','Not every loss comes from one mistake; here, the pace slipped through smaller windows.']},
+      'arena-champion':{pt:['Você terminou no topo da Arena.','Rounds agressivos, adaptação e sobrevivência convergiram para o primeiro lugar.'],en:['You finished on top of the Arena.','Aggressive rounds, adaptation, and survival converged into first place.']},
+      'arena-top4':{pt:['Você foi longe na Arena.','A run se sustentou por rounds suficientes para transformar consistência em Top 4.'],en:['You made a deep Arena run.','The run held through enough rounds to turn consistency into a Top 4 finish.']},
+      'arena-brawler':{pt:['Você transformou a Arena em guerra de atrito.','Mesmo sem o topo, sua participação em eliminações mostra uma run de combate constante.'],en:['You turned the Arena into a war of attrition.','Even without the top finish, your takedown involvement shows a constant fighting run.']},
+      'arena-run':{pt:['Cada round contou uma parte da run.','Na Arena, a história não é sobre rota ou torres: é sobre sobreviver, adaptar e vencer confrontos.'],en:['Every round told part of the run.','In Arena, the story is not about lanes or towers: it is about surviving, adapting, and winning fights.']}
     };
     return copies[a.key][locale()];
   }
@@ -112,7 +122,10 @@
       wardsKilled:safeNumber(p?.wardsKilled,raw?.wardsKilled),
       controlWards:safeNumber(p?.controlWards,raw?.controlWards),
       ccSeconds:safeNumber(p?.ccSeconds,raw?.ccSeconds,p?.timeCCingOthers),
-      position:p?.position || raw?.position || null
+      position:p?.position || raw?.position || null,
+      context:String(p?.context || raw?.context || raw?.queue || '').toUpperCase(),
+      placement:safeNumber(p?.placement,raw?.placement),
+      augments:Array.isArray(p?.augments)?p.augments:(Array.isArray(raw?.augments)?raw.augments:[])
     };
     m.score=safeNumber(raw?.score)||computeScore(m);
     m.moments=buildMoments(m);
@@ -123,6 +136,12 @@
     const total=Math.max(900,m.durationSeconds||1800);
     const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.round(s)%60).padStart(2,'0');
     const moments=[];
+    if(m.context==='ARENA') {
+      moments.push({m:fmt(total*.22),pt:'Primeiros rounds',en:'Opening rounds',dpt:'A Arena começou testando dano, sobrevivência e a sinergia da dupla.',den:'Arena opened by testing damage, survival, and duo synergy.'});
+      moments.push({m:fmt(total*.58),pt:'A run ganhou forma',en:'The run took shape',dpt:m.kills+m.assists>=20?'Sua presença em eliminações manteve pressão alta conforme os rounds ficaram mais difíceis.':'A adaptação entre rounds passou a valer mais do que qualquer vantagem inicial.',den:m.kills+m.assists>=20?'Your takedown involvement kept pressure high as rounds became harder.':'Adapting between rounds started to matter more than any early edge.'});
+      moments.push({m:fmt(total*.84),pt:m.placement===1?'Último round, primeiro lugar':m.placement>0?`Fim da run: #${m.placement}`:'Fim da run',en:m.placement===1?'Final round, first place':m.placement>0?`Run ended: #${m.placement}`:'End of the run',dpt:m.placement===1?'A run fechou no topo: sobrevivência e conversão até o último confronto.':m.placement>0?`Você encerrou a Arena na colocação #${m.placement}.`:'A run terminou depois de uma sequência de confrontos progressivamente mais difíceis.',den:m.placement===1?'The run finished on top: survival and conversion through the last fight.':m.placement>0?`You finished Arena in place #${m.placement}.`:'The run ended after a sequence of progressively harder fights.'});
+      return moments;
+    }
     if(m.firstBloodKill||m.firstBloodAssist) moments.push({m:fmt(total*.12),pt:'Você apareceu no primeiro sangue',en:'You were there for first blood',dpt:m.firstBloodKill?'A primeira eliminação da partida foi sua.':'Você participou da primeira eliminação e ajudou a abrir o placar.',den:m.firstBloodKill?'The first kill of the match was yours.':'You contributed to first blood and helped open the game.'});
     else moments.push({m:fmt(total*.24),pt:'Primeiro retrato da partida',en:'First snapshot of the match',dpt:m.deaths<=2?'Você manteve risco baixo e preservou recursos.':'O começo exigiu recuperação antes das lutas maiores.',den:m.deaths<=2?'You kept risk low and preserved resources.':'The opening demanded recovery before larger fights.'});
 
@@ -178,26 +197,26 @@
     $('#storyKicker').textContent=`${String(m.queue).toUpperCase()} • ${mins}:${secs}`;
     $('#storyTitle').textContent=copy[0];$('#storySubtitle').textContent=copy[1];
     $('#archetypeBadge').textContent=locale()==='pt'?a.pt:a.en;
-    $('#resultBadge').textContent=m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT');
+    $('#resultBadge').textContent=m.context==='ARENA' && m.placement ? `#${m.placement}` : (m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));
     $('#resultBadge').className='result '+(m.win?'win':'loss');
     $('#championName').textContent=m.championName;$('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
     $('#csValue').textContent=m.cs||'—';$('#visionValue').textContent=m.vision||'—';$('#kpValue').textContent=(m.kp||0)+'%';$('#goldValue').textContent=m.gold?(m.gold/1000).toFixed(1)+'k':'—';$('#impactScore').textContent=m.score;
     $('#impactRing').style.setProperty('--score',m.score);
     $('#storyCard').style.setProperty('--cover',`url("${championSplash(m.championName)}")`);
-    $('#openingTitle').textContent=locale()==='pt'?(m.firstBloodKill?'Você abriu o placar.':m.deaths<=3?'Você construiu espaço sem entregar cedo.':'O começo exigiu recuperação.'):(m.firstBloodKill?'You opened the scoreboard.':m.deaths<=3?'You built space without giving the game away early.':'The opening demanded recovery.');
+    $('#openingTitle').textContent=m.context==='ARENA' ? (locale()==='pt'?'A run começou pela adaptação.':'The run started with adaptation.') : (locale()==='pt'?(m.firstBloodKill?'Você abriu o placar.':m.deaths<=3?'Você construiu espaço sem entregar cedo.':'O começo exigiu recuperação.'):(m.firstBloodKill?'You opened the scoreboard.':m.deaths<=3?'You built space without giving the game away early.':'The opening demanded recovery.'));
     const pace=m.damagePerMin? `${Math.round(m.damagePerMin)} DPM` : `${m.kills+m.assists} participações`;
-    $('#openingText').textContent=locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`;
+    $('#openingText').textContent=m.context==='ARENA' ? (locale()==='pt'?`Na Arena, ${m.kills+m.assists} participações e ${m.augments.length||0} augments ajudam a contar como a run ganhou força.`:`In Arena, ${m.kills+m.assists} takedown contributions and ${m.augments.length||0} augments help tell how the run built momentum.`) : (locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`);
     $('#impactTitle').textContent=locale()==='pt'?`Impacto geral: ${m.score}/100.`:`Overall impact: ${m.score}/100.`;
     const damageK=m.damage?(m.damage/1000).toFixed(1):null;
     $('#impactText').textContent=locale()==='pt'
       ? (damageK?`Você terminou com ${m.kills+m.assists} participações, ${m.deaths} mortes e ${damageK}k de dano a campeões.`:`Você terminou com ${m.kills+m.assists} participações e ${m.deaths} mortes, com impacto distribuído ao longo da partida.`)
       : (damageK?`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and ${damageK}k champion damage.`:`You finished with ${m.kills+m.assists} takedown contributions and ${m.deaths} deaths, with impact spread across the match.`);
-    $('#endingTitle').textContent=locale()==='pt'?(m.win?'O último capítulo foi de conversão.':'O último capítulo mostra onde a recuperação parou.'):(m.win?'The final chapter was about conversion.':'The final chapter shows where the recovery stopped.');
-    $('#endingText').textContent=locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, estruturas ou objetivo. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, structures, or objectives. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.');
+    $('#endingTitle').textContent=m.context==='ARENA' ? (locale()==='pt'?(m.placement===1?'A run terminou no topo.':`A run terminou em #${m.placement||'—'}.`):(m.placement===1?'The run ended on top.':`The run ended at #${m.placement||'—'}.`)) : (locale()==='pt'?(m.win?'O último capítulo foi de conversão.':'O último capítulo mostra onde a recuperação parou.'):(m.win?'The final chapter was about conversion.':'The final chapter shows where the recovery stopped.'));
+    $('#endingText').textContent=m.context==='ARENA' ? (locale()==='pt'?'Na Arena, o resultado resume uma sequência de rounds: composição, augments, sobrevivência e execução pesaram até o fim.':'In Arena, the result summarizes a sequence of rounds: composition, augments, survival, and execution mattered until the end.') : (locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, estruturas ou objetivo. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, structures, or objectives. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.'));
     $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
     const chips=locale()==='pt'
-      ? [`${m.kills+m.assists} participações`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Vitória convertida':'Derrota revisável']
-      : [`${m.kills+m.assists} takedowns`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} vision`,m.largestKillingSpree>=3?`Streak x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Converted win':'Reviewable loss'];
+      ? (m.context==='ARENA' ? [`#${m.placement||'—'} colocação`,`${m.kills+m.assists} participações`,`${m.augments.length||0} augments`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:'Run de Arena'] : [`${m.kills+m.assists} participações`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Vitória convertida':'Derrota revisável'])
+      : (m.context==='ARENA' ? [`#${m.placement||'—'} placement`,`${m.kills+m.assists} takedowns`,`${m.augments.length||0} augments`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:'Arena run'] : [`${m.kills+m.assists} takedowns`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} vision`,m.largestKillingSpree>=3?`Streak x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Converted win':'Reviewable loss']);
     $('#highlights').innerHTML=chips.map(x=>`<div class="highlight">${esc(x)}</div>`).join('');
   }
 
