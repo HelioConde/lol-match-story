@@ -701,3 +701,20 @@ test('entrada principal usa rótulo curto de Riot ID', async ({ page }) => {
   await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Nome#TAG');
   await expect(page.locator('[data-i18n="gameName"]')).toHaveText('Riot ID / Game Name');
 });
+
+
+test('bloco de compartilhamento prioriza ação principal', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const order=await page.locator('.share-actions').evaluate(el =>
+    [...el.children].map(x=>x.id||x.className)
+  );
+  expect(order[0]).toBe('shareBtn');
+  await expect(page.locator('.share-primary')).toBeVisible();
+});
+
+test('ferramentas de compartilhamento cabem no mobile', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  const overflow=await page.locator('.share-block').evaluate(el=>el.scrollWidth-el.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
