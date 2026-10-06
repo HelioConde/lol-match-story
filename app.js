@@ -356,10 +356,28 @@
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
-  async function runLookup(useDemo=false) {
+  function readHistory(){
+    try{return JSON.parse(localStorage.getItem('lms-search-history')||'[]');}catch{return [];}
+  }
+  function saveHistory(lookup){
+    const next=[lookup,...readHistory().filter(x=>!(x.gameName.toLowerCase()===lookup.gameName.toLowerCase()&&x.tagLine.toLowerCase()===lookup.tagLine.toLowerCase()&&x.platform===lookup.platform))].slice(0,6);
+    localStorage.setItem('lms-search-history',JSON.stringify(next));
+    renderSearchHistory();
+  }
+  function renderSearchHistory(){
+    const el=$('#searchHistory');if(!el)return;
+    const rows=readHistory();
+    el.innerHTML=rows.map((x,i)=>`<button type="button" data-history="${i}">${esc(x.gameName)}#${esc(x.tagLine)} · ${esc(x.platform.toUpperCase())}</button>`).join('');
+    el.querySelectorAll('[data-history]').forEach(btn=>btn.addEventListener('click',()=>{
+      const row=rows[Number(btn.dataset.history)];if(!row)return;
+      $('#gameName').value=row.gameName;$('#tagLine').value=row.tagLine;$('#platform').value=row.platform;runLookup(false);
+    }));
+  }
+
+  async function runLookup(useDemo=false,requestedMatchId=null) {
     const gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#',''),platform=$('#platform').value;
     if(!gameName||!tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
-    state.lookup={gameName,tagLine,platform};state.selected=0;
+    state.lookup={gameName,tagLine,platform};state.selected=0;state.requestedMatchId=requestedMatchId;
     if(useDemo){state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
@@ -367,6 +385,9 @@
       if(!matches.length)throw new Error('empty_matches');
       state.matches=matches;state.live=true;
       const canonical=data?.player;if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
+      const requestedIndex=requestedMatchId?matches.findIndex(x=>String(x.id)===String(requestedMatchId)):-1;
+      if(requestedIndex>=0) state.selected=requestedIndex;
+      saveHistory(state.lookup);
       setSource('live',locale()==='pt'?`Dados Riot carregados: ${matches.length} partidas recentes.`:`Riot data loaded: ${matches.length} recent matches.`);
       showStory();
     }catch(err){
@@ -410,10 +431,21 @@
 
   $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
-  $('#refreshBtn').addEventListener('click',()=>runLookup(false));
+  $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();});
   $('#downloadBtn').addEventListener('click',downloadCard);
-  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Vitória':'Derrota'} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Victory':'Defeat'} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:location.href});else{await navigator.clipboard.writeText(text+' '+location.href);toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
+  $('#copyLinkBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(shareUrl());toast(locale()==='pt'?'Link da partida copiado.':'Match link copied.');}catch{}});
+  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:shareUrl()});else{await navigator.clipboard.writeText(text+' '+shareUrl());toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
 
+  renderSearchHistory();
+  fetch('https://ddragon.leagueoflegends.com/api/versions.json',{cache:'force-cache'}).then(r=>r.ok?r.json():[]).then(v=>{if(Array.isArray(v)&&v[0]){state.ddVersion=v[0];if(state.matches.length)renderMatchDetails(state.matches[state.selected]);}}).catch(()=>{});
   applyI18n();
+
+  const params=new URLSearchParams(location.search);
+  if(params.get('gameName')&&params.get('tagLine')){
+    $('#gameName').value=params.get('gameName');
+    $('#tagLine').value=params.get('tagLine');
+    if(params.get('platform')) $('#platform').value=params.get('platform');
+    runLookup(false,params.get('match'));
+  }
 })();
