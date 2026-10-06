@@ -86,6 +86,7 @@ jobs:
             screenshots/latest-alchemy-full.png
             screenshots/latest-story-full.png
             screenshots/latest-public-story-full.png
+            screenshots/latest-public-story-mobile-full.png
             screenshots/latest-mobile-home-full.png
             screenshots/latest-mobile-full.png
             screenshots/metadata.json
@@ -94,7 +95,7 @@ jobs:
       - name: Commit screenshots
         run: |
           mkdir -p /tmp/lms-captures
-          cp screenshots/latest-home-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-mobile-home-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
+          cp screenshots/latest-home-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-public-story-mobile-full.png screenshots/latest-mobile-home-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
 
           git fetch origin main
           git reset --hard origin/main

@@ -280,3 +280,10 @@
   .share-tools{grid-template-columns:1fr 1fr}
   .share-format{grid-column:1/-1}
 }
+
+/* Share layout override: keep the primary action full-width on small screens */
+@media(max-width:700px){
+  .share-actions{grid-template-columns:1fr!important}
+  .share-primary{grid-column:1/-1}
+  .share-tools{width:100%}
+}

@@ -26,6 +26,10 @@ O estado da consulta (`live`, `fallback-demo` ou `error`) fica registrado em `me
 
 A captura usa uma história real persistida e registra em `metadata.json` se a página carregou ou ficou temporariamente indisponível.
 
+## História pública — mobile
+
+![História pública mobile](./latest-public-story-mobile-full.png)
+
 ## História — mobile
 
 ![História mobile completa](./latest-mobile-full.png)
@@ -35,7 +39,8 @@ A captura usa uma história real persistida e registra em `metadata.json` se a p
 - `latest-home-full.png` — página inicial inteira em desktop.
 - `latest-alchemy-full.png` — consulta automática do perfil real `AlchemyFlames#BR1`.
 - `latest-story-full.png` — página inteira com uma história demo aberta em desktop.
-- `latest-public-story-full.png` — página pública de uma história persistida.
+- `latest-public-story-full.png` — página pública de uma história persistida em desktop.
+- `latest-public-story-mobile-full.png` — mesma história pública em viewport mobile.
 - `latest-mobile-home-full.png` — home inteira em viewport mobile.
 - `latest-mobile-full.png` — história demo inteira em viewport mobile.
 - `metadata.json` — commit, data, URL-base e viewports usados.
@@ -59,7 +64,8 @@ Após gerar as imagens, o CI valida automaticamente limites para evitar regress�
 - home desktop: até **1800 px** de altura;
 - perfil real AlchemyFlames desktop: até **4300 px**;
 - história desktop: até **3800 px**;
-- história pública: até **3200 px**;
+- história pública desktop: até **3200 px**;
+- história pública mobile: até **4200 px**;
 - home mobile: até **2400 px**;
 - história mobile: até **5600 px**;
 - também valida largura esperada e tamanho máximo dos PNGs.

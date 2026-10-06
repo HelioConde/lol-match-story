@@ -718,3 +718,13 @@ test('ferramentas de compartilhamento cabem no mobile', async ({ page }) => {
   const overflow=await page.locator('.share-block').evaluate(el=>el.scrollWidth-el.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });
+
+
+test('ação principal de compartilhamento ocupa linha inteira no mobile', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  const primary=await page.locator('#shareBtn').boundingBox();
+  const tools=await page.locator('.share-tools').boundingBox();
+  expect(primary.width).toBeGreaterThan(250);
+  expect(tools.y).toBeGreaterThan(primary.y + primary.height - 1);
+});
