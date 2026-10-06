@@ -393,12 +393,43 @@
     $('#resultBadge').textContent=m.context==='ARENA' && m.placement ? `#${m.placement}` : (m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));
     $('#resultBadge').className='result '+(m.win?'win':'loss');
     $('#championName').textContent=m.championName;$('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
-    $('#csValue').textContent=m.cs||'—';$('#visionValue').textContent=m.vision||'—';$('#kpValue').textContent=(m.kp||0)+'%';$('#goldValue').textContent=m.gold?(m.gold/1000).toFixed(1)+'k':'—';$('#impactScore').textContent=m.score;
+    const statValues=[$('#csValue'),$('#visionValue'),$('#kpValue'),$('#goldValue')];
+    const statLabels=[$('#stat1Label'),$('#stat2Label'),$('#stat3Label'),$('#stat4Label')];
+    let openingStats;
+    if(m.context==='ARENA'){
+      openingStats=[
+        [m.placement?'#'+m.placement:'—',locale()==='pt'?'Colocação':'Placement'],
+        [m.kills+m.assists,locale()==='pt'?'Participações':'Takedowns'],
+        [m.damagePerMin?Math.round(m.damagePerMin):'—','DPM'],
+        [m.augments.length||'—','Augments']
+      ];
+    }else if(m.context==='ARAM'){
+      const kdaRatio=((m.kills+m.assists)/Math.max(1,m.deaths)).toFixed(1);
+      openingStats=[
+        [m.kills+m.assists,locale()==='pt'?'Participações':'Takedowns'],
+        [(m.kp||0)+'%','KP'],
+        [m.damagePerMin?Math.round(m.damagePerMin):'—','DPM'],
+        [kdaRatio,'KDA']
+      ];
+    }else{
+      openingStats=[
+        [m.cs||'—','CS'],
+        [m.vision||'—',locale()==='pt'?'Visão':'Vision'],
+        [(m.kp||0)+'%','KP'],
+        [m.gold?(m.gold/1000).toFixed(1)+'k':'—',locale()==='pt'?'Ouro':'Gold']
+      ];
+    }
+    openingStats.forEach(([value,label],i)=>{statValues[i].textContent=String(value);statLabels[i].textContent=String(label);});
+    $('#impactScore').textContent=m.score;
     $('#impactRing').style.setProperty('--score',m.score);
     $('#storyCard').style.setProperty('--cover',`url("${championSplash(m.championName)}")`);
     $('#openingTitle').textContent=m.context==='ARENA' ? (locale()==='pt'?'A run começou pela adaptação.':'The run started with adaptation.') : (locale()==='pt'?(m.firstBloodKill?'Você abriu o placar.':m.deaths<=3?'Você construiu espaço sem entregar cedo.':'O começo exigiu recuperação.'):(m.firstBloodKill?'You opened the scoreboard.':m.deaths<=3?'You built space without giving the game away early.':'The opening demanded recovery.'));
     const pace=m.damagePerMin? `${Math.round(m.damagePerMin)} DPM` : `${m.kills+m.assists} participações`;
-    $('#openingText').textContent=m.context==='ARENA' ? (locale()==='pt'?`Na Arena, ${m.kills+m.assists} participações e ${m.augments.length||0} augments ajudam a contar como a run ganhou força.`:`In Arena, ${m.kills+m.assists} takedown contributions and ${m.augments.length||0} augments help tell how the run built momentum.`) : (locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`);
+    $('#openingText').textContent=m.context==='ARENA'
+      ? (locale()==='pt'?`Na Arena, ${m.kills+m.assists} participações e ${m.augments.length||0} augments ajudam a contar como a run ganhou força.`:`In Arena, ${m.kills+m.assists} takedown contributions and ${m.augments.length||0} augments help tell how the run built momentum.`)
+      : m.context==='ARAM'
+        ? (locale()==='pt'?`No ARAM, ${m.kills+m.assists} participações, ${m.kp||0}% de KP e ${m.damagePerMin?Math.round(m.damagePerMin)+' DPM':'o ritmo das lutas'} mostram como você entrou nas trocas coletivas.`:`In ARAM, ${m.kills+m.assists} takedowns, ${m.kp||0}% KP and ${m.damagePerMin?Math.round(m.damagePerMin)+' DPM':'the fight tempo'} show how you contributed to team fights.`)
+        : (locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`);
     $('#impactTitle').textContent=locale()==='pt'?`Impacto geral: ${m.score}/100.`:`Overall impact: ${m.score}/100.`;
     const damageK=m.damage?(m.damage/1000).toFixed(1):null;
     const roleReason=m.position==='SUPPORT' ? (locale()==='pt'?`visão ${m.vision}, ${m.assists} assistências e ${m.ccSeconds}s de controle`:`${m.vision} vision, ${m.assists} assists and ${m.ccSeconds}s CC`) : m.position==='JUNGLE' ? (locale()==='pt'?`${m.dragonKills+m.baronKills+m.riftHeraldTakedowns} objetivos diretos e ${Math.round(m.objectiveDamage||0)} dano em objetivos`:`${m.dragonKills+m.baronKills+m.riftHeraldTakedowns} direct objectives and ${Math.round(m.objectiveDamage||0)} objective damage`) : (m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.kills+m.assists} takedowns`);
