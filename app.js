@@ -392,7 +392,13 @@
 
   function renderRail() {
     $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(modeLabel(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
+    const rail=$('#matchRail');
     const pills=[...document.querySelectorAll('.match-pill')];
+    const active=pills[state.selected];
+    if(active&&rail){
+      const target=Math.max(0,active.offsetLeft-(rail.clientWidth-active.clientWidth)/2);
+      rail.scrollTo({left:target,behavior:'smooth'});
+    }
     pills.forEach((b,idx)=>{
       b.tabIndex=idx===state.selected?0:-1;
       b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();});
