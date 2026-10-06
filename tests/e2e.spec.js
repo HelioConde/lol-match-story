@@ -306,3 +306,15 @@ test('anúncios ficam desativados sem configuração real', async ({ page }) => 
   await expect(page.locator('[data-ad-slot="story"]')).toHaveCount(1);
   await expect(page.locator('[data-ad-slot="story"]')).toBeHidden();
 });
+
+
+test('rail de partidas aceita navegação por setas', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const first=page.locator('.match-pill').first();
+  await first.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.match-pill').nth(1)).toBeFocused();
+  await expect(page.locator('.match-pill').nth(1)).toHaveAttribute('aria-selected','true');
+  await page.keyboard.press('End');
+  await expect(page.locator('.match-pill').last()).toBeFocused();
+});
