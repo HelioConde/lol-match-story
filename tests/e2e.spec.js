@@ -674,3 +674,13 @@ test('história pública da Arena usa métricas contextuais e Tag normalizada', 
   await expect(page.locator('#publicHighlights')).toContainText('5 aprimoramentos');
   await expect(page.locator('#publicImpactText')).not.toContainText('% de participação em abates');
 });
+
+
+test('demo explícita usa título amigável e esconde atualização de dados', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#playerTitle')).toHaveText('História demonstrativa');
+  await expect(page.locator('#refreshBtn')).toBeHidden();
+  await expect(page.locator('#newSearchBtn')).toBeVisible();
+});
