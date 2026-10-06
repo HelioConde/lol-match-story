@@ -459,6 +459,28 @@
     const u=new URL(shareUrl());
     history.replaceState(null,'',u.pathname+u.search+u.hash);
   }
+
+  async function publishCurrentStory(){
+    const m=state.matches[state.selected];
+    if(!state.live || !m?.id || String(m.id).startsWith('demo-') || !backend.lolStory || !state.lookup) return null;
+    try{
+      const res=await fetch(backend.lolStory,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'publish',
+        matchId:m.id,
+        gameName:state.lookup.gameName,
+        tagLine:state.lookup.tagLine,
+        platform:state.lookup.platform,
+        region:platformRegion(state.lookup.platform),
+        locale:locale()==='pt'?'pt-BR':'en'
+      })});
+      const data=await res.json().catch(()=>null);
+      if(!res.ok||!data?.ok) return null;
+      const u=new URL('./story.html',location.href);
+      u.searchParams.set('match',m.id);
+      track('story_published',{mode:m.context});
+      return u.toString();
+    }catch{return null;}
+  }
   function showStory(){
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
@@ -578,8 +600,8 @@
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();loadGameAssets();});
   $('#downloadBtn').addEventListener('click',downloadCard);
-  $('#copyLinkBtn').addEventListener('click',async()=>{try{track('copy_link',{mode:state.matches[state.selected]?.context});await navigator.clipboard.writeText(shareUrl());toast(locale()==='pt'?'Link da partida copiado.':'Match link copied.');}catch{}});
-  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;track('share',{mode:m.context});const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:shareUrl()});else{await navigator.clipboard.writeText(text+' '+shareUrl());toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
+  $('#copyLinkBtn').addEventListener('click',async()=>{try{track('copy_link',{mode:state.matches[state.selected]?.context});const url=await publishCurrentStory()||shareUrl();await navigator.clipboard.writeText(url);toast(locale()==='pt'?'Link público da partida copiado.':'Public match link copied.');}catch{}});
+  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;track('share',{mode:m.context});const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{const url=await publishCurrentStory()||shareUrl();if(navigator.share)await navigator.share({title:'LoL Match Story',text,url});else{await navigator.clipboard.writeText(text+' '+url);toast(locale()==='pt'?'Resumo e link público copiados.':'Summary and public link copied.');}}catch{}});
 
   renderSearchHistory();
   loadGameAssets();
