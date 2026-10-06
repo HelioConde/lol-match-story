@@ -2,7 +2,9 @@ name: Live version
 on:
   push:
     branches: [main]
-    paths-ignore: [version.json]
+    paths-ignore:
+      - version.json
+      - "screenshots/**"
 permissions: { contents: write }
 jobs:
   version:
