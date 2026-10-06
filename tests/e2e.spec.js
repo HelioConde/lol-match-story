@@ -1020,3 +1020,42 @@ test('comparação mobile permanece em três colunas sem overflow', async ({ pag
   expect(info.columns).toBe(3);
   expect(info.overflow).toBeLessThanOrEqual(1);
 });
+
+
+test('timeline de Arena usa rótulos narrativos sem sugerir rounds oficiais', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[{
+      id:'BR1_777',champion:'Gragas',context:'ARENA',queue:'ARENA',placement:2,win:false,duration:26,kills:4,deaths:6,assists:21
+    }]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({events:[],arenaRounds:[
+      {round:1,startTime:'01:20',endTime:'02:00',participation:2,playerDeaths:0},
+      {round:9,startTime:'17:40',endTime:'18:20',participation:5,playerDeaths:1},
+      {round:14,startTime:'25:20',endTime:'25:40',participation:1,playerDeaths:0}
+    ]})
+  }));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#moments')).toContainText('Abertura da Arena');
+  await expect(page.locator('#moments')).toContainText('Pico de combate');
+  await expect(page.locator('#moments')).toContainText('Janela final');
+  await expect(page.locator('#moments')).not.toContainText(/Janela de combate 9|Janela de combate 14/);
+});
+
+test('loading mantém skeleton compacto após as etapas explicativas', async ({ page }) => {
+  await page.route('**/public-lol-profile', async route => {
+    await new Promise(r=>setTimeout(r,450));
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+      player:{gameName:'AlchemyFlames',tagLine:'BR1'},
+      matches:[{id:'BR1_778',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}]
+    })});
+  });
+  const pending=page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#storyLoading')).toBeVisible();
+  const coverHeight=await page.locator('.loading-cover').evaluate(el=>el.getBoundingClientRect().height);
+  expect(coverHeight).toBeLessThanOrEqual(220);
+  await pending;
+});

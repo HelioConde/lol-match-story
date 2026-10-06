@@ -365,14 +365,18 @@
       if(m.context==='ARENA' && m.arenaRounds.length){
         const rounds=m.arenaRounds;
         const best=rounds.slice().sort((a,b)=>(b.participation-b.playerDeaths)-(a.participation-a.playerDeaths))[0];
-        const chosen=[rounds[0],best,rounds[rounds.length-1]].filter((r,i,arr)=>r&&arr.findIndex(x=>x.round===r.round)===i).slice(0,3);
+        const first=rounds[0],last=rounds[rounds.length-1];
+        const chosen=[first,best,last].filter((r,i,arr)=>r&&arr.findIndex(x=>x.round===r.round)===i).slice(0,3);
         m.moments=chosen.map(r=>{
           const elimLabel=r.participation===1?'eliminação':'eliminações';
           const takedownLabel=r.participation===1?'takedown':'takedowns';
+          const role=r.round===first?.round?'opening':r.round===last?.round?'final':'peak';
+          const ptTitle=role==='opening'?'Abertura da Arena':role==='final'?'Janela final':'Pico de combate';
+          const enTitle=role==='opening'?'Arena opening':role==='final'?'Final window':'Combat peak';
           return {
             m:r.startTime===r.endTime?r.startTime:(r.startTime+'–'+r.endTime),
-            pt:'Janela de combate '+r.round,
-            en:'Combat window '+r.round,
+            pt:ptTitle,
+            en:enTitle,
             dpt:(r.participation?('Você participou de '+r.participation+' '+elimLabel):'Você atravessou esta janela sem participação direta em abates')+(r.playerDeaths?' e caiu '+r.playerDeaths+' vez'+(r.playerDeaths>1?'es':'')+'.':'.'),
             den:(r.participation?('You contributed to '+r.participation+' '+takedownLabel):'You crossed this window without direct takedown participation')+(r.playerDeaths?' and died '+r.playerDeaths+' time'+(r.playerDeaths>1?'s':'')+'.':'.')
           };
@@ -628,7 +632,7 @@
       groups.push([locale()==='pt'?'Janelas de combate':'Combat windows',
         [
           `<span class="detail-chip">${m.arenaRounds.length} ${locale()==='pt'?'detectadas':'detected'}</span>`,
-          best?`<span class="detail-chip">${locale()==='pt'?'Melhor janela':'Best window'} #${best.round} · ${best.participation} ${locale()==='pt'?'participações':'takedowns'}</span>`:'',
+          best?`<span class="detail-chip">${locale()==='pt'?'Melhor janela detectada':'Best detected window'} · ${best.participation} ${locale()==='pt'?'participações':'takedowns'}</span>`:'',
           `<span class="detail-chip">${locale()==='pt'?'Limites estimados pela timeline':'Boundaries estimated from timeline'}</span>`
         ].join('')
       ]);

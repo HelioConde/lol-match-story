@@ -486,3 +486,10 @@
     padding-top:10px;
   }
 }
+
+/* Screenshot-driven loading density */
+.loading-cover{height:220px}
+@media(max-width:600px){
+  .loading-cover{height:170px}
+  .story-loading>p{margin-top:12px}
+}
