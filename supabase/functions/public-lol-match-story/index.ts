@@ -114,16 +114,21 @@ Deno.serve(async(req:Request)=>{
 
   const events:any[]=[];
   const kills:any[]=[];
+  const allChampionKills:any[]=[];
   let firstChampionKill:any=null;
   for(const frame of frames){
     for(const e of (frame?.events||[])){
       const ts=Number(e.timestamp||frame.timestamp||0);
       if(e.type==="CHAMPION_KILL"){
         const assists=Array.isArray(e.assistingParticipantIds)?e.assistingParticipantIds.map(Number):[];
-        const playerKilled=Number(e.killerId)===participantId;
-        const playerDied=Number(e.victimId)===participantId;
+        const killerId=Number(e.killerId||0),victimId=Number(e.victimId||0);
+        const playerKilled=killerId===participantId;
+        const playerDied=victimId===participantId;
         const playerAssisted=assists.includes(participantId);
-        if(!firstChampionKill) firstChampionKill={timestamp:ts,time:mmss(ts),killerId:Number(e.killerId||0),victimId:Number(e.victimId||0),assists};
+        const killerTeam=participantTeam.get(killerId)||0;
+        const victimTeam=participantTeam.get(victimId)||0;
+        allChampionKills.push({timestamp:ts,time:mmss(ts),killerId,victimId,assists,killerTeam,victimTeam});
+        if(!firstChampionKill) firstChampionKill={timestamp:ts,time:mmss(ts),killerId,victimId,assists};
         if(playerKilled||playerDied||playerAssisted){
           const kind=playerKilled?"KILL":playerDied?"DEATH":"ASSIST";
           kills.push({type:kind,timestamp:ts,time:mmss(ts),killerId:Number(e.killerId||0),victimId:Number(e.victimId||0)});
@@ -159,6 +164,43 @@ Deno.serve(async(req:Request)=>{
   }
   if(bestMulti?.count<2) bestMulti=null;
 
+  const rawMode=String(mc?.match_data?.info?.gameMode||"").toUpperCase();
+  const queueId=Number(mc?.match_data?.info?.queueId||0);
+  const isArena=rawMode==="CHERRY" || [1700,1710,1740,1750].includes(queueId);
+  const arenaRounds:any[]=[];
+  if(isArena && allChampionKills.length){
+    const ordered=[...allChampionKills].sort((a:any,b:any)=>a.timestamp-b.timestamp);
+    let bucket:any[]=[];
+    const flush=()=>{
+      if(!bucket.length)return;
+      const start=bucket[0].timestamp,end=bucket[bucket.length-1].timestamp;
+      const playerKills=bucket.filter((x:any)=>x.killerId===participantId).length;
+      const playerDeaths=bucket.filter((x:any)=>x.victimId===participantId).length;
+      const playerAssists=bucket.filter((x:any)=>x.assists.includes(participantId)).length;
+      const teamKills=bucket.filter((x:any)=>x.killerTeam===teamId).length;
+      const teamDeaths=bucket.filter((x:any)=>x.victimTeam===teamId).length;
+      arenaRounds.push({
+        round:arenaRounds.length+1,
+        startTimestamp:start,
+        endTimestamp:end,
+        startTime:mmss(start),
+        endTime:mmss(end),
+        playerKills,playerDeaths,playerAssists,teamKills,teamDeaths,
+        participation:playerKills+playerAssists,
+        survived:playerDeaths===0,
+        estimated:true,
+        basis:"champion_kill_clusters"
+      });
+      bucket=[];
+    };
+    for(const k of ordered){
+      const prev=bucket.at(-1);
+      if(prev && k.timestamp-prev.timestamp>35000) flush();
+      bucket.push(k);
+    }
+    flush();
+  }
+
   const combined=[...kills,...events].sort((a:any,b:any)=>a.timestamp-b.timestamp);
   const candidates=combined.map((e:any)=>{
     let weight=1;
@@ -188,6 +230,8 @@ Deno.serve(async(req:Request)=>{
     firstBlood,
     bestMulti,
     turningPoint,
+    arenaRounds,
+    arenaRoundDetection:isArena?{estimated:true,basis:"champion_kill_clusters",gapMs:35000}:null,
     gold:{
       phases:{early,mid,late},
       biggestSwing
