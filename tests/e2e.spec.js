@@ -617,7 +617,6 @@ test('submit aceita Riot ID completo digitado no primeiro campo', async ({ page 
   await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
   await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
   await page.locator('#gameName').fill('RealPlayer#br1');
-  await page.locator('#tagLine').fill('');
   await page.locator('#lookupForm button[type="submit"]').click();
   await expect(page.locator('#playerTitle')).toHaveText('RealPlayer#BR1');
 });
