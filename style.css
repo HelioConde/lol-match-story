@@ -113,3 +113,16 @@
   .story-cover{min-height:440px}
   .cover-copy{padding:24px 22px}
 }
+
+.chapter-nav{position:sticky;top:72px;z-index:18;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 -12px;padding:10px 12px;background:linear-gradient(180deg,#0d121cf2,#0d121cd9);backdrop-filter:blur(16px);border-bottom:1px solid #202a39}
+.chapter-nav a{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 10px;border:1px solid transparent;border-radius:10px;text-decoration:none;color:#8d9aad;font-size:10px;letter-spacing:.05em}
+.chapter-nav a:hover,.chapter-nav a:focus-visible{color:#f2f5f9;border-color:#3a4659;background:#111925}
+.chapter-nav span{color:#d7b15d;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.chapter-nav b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+#openingChapter,#momentsChapter,#impactChapter,#finalChapter{scroll-margin-top:132px}
+@media(max-width:700px){
+  .chapter-nav{top:60px;display:flex;overflow-x:auto;scrollbar-width:none;margin:0 -24px;padding-inline:24px}
+  .chapter-nav::-webkit-scrollbar{display:none}
+  .chapter-nav a{min-width:max-content}
+  #openingChapter,#momentsChapter,#impactChapter,#finalChapter{scroll-margin-top:118px}
+}
