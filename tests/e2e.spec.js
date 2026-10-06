@@ -4,6 +4,9 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
+  await page.locator('#gameName').fill('AlchemyFlames');
+  await page.locator('#tagLine').fill('BR1');
+  await page.locator('#platform').selectOption('br1');
 });
 
 test('abre em PT-BR e mostra a proposta principal', async ({ page }) => {
@@ -83,10 +86,11 @@ test('gera card PNG da partida selecionada', async ({ page }) => {
 });
 
 
-test('Riot ID padrão de teste é AlchemyFlames#BR1', async ({ page }) => {
-  await expect(page.locator('#gameName')).toHaveValue('AlchemyFlames');
-  await expect(page.locator('#tagLine')).toHaveValue('BR1');
-  await expect(page.locator('#platform')).toHaveValue('br1');
+test('home pública não embute Riot ID no HTML', async ({ page }) => {
+  await expect(page.locator('#gameName')).not.toHaveAttribute('value', /AlchemyFlames/i);
+  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Seu Game Name');
+  await expect(page.locator('#tagLine')).not.toHaveAttribute('value', /BR1/i);
+  await expect(page.locator('#tagLine')).toHaveAttribute('placeholder','BR1');
 });
 
 
@@ -579,4 +583,13 @@ test('card visual da home também abre demo pelo teclado', async ({ page }) => {
   await card.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#storyApp')).toBeVisible();
+});
+
+
+test('demo funciona com Riot ID vazio', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#storyApp')).toBeVisible();
+  await expect(page.locator('#resultSourceState')).toContainText('Modo demonstrativo');
 });
