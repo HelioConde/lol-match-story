@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#080b12">
   <meta name="description" content="Transforme uma partida de League of Legends em uma história visual, clara e compartilhável.">
   <title>LoL Match Story — Sua partida virou história</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">\n  <meta property="og:title" content="LoL Match Story — Sua partida virou história">\n  <meta property="og:description" content="Transforme uma partida de League of Legends em uma história visual e compartilhável.">\n  <meta property="og:type" content="website">\n  <meta property="og:url" content="https://helioconde.github.io/lol-match-story/">\n  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
@@ -43,7 +43,7 @@
         </label>
         <button class="primary" type="submit"><span data-i18n="createStory">Criar minha história</span><span>→</span></button>
       </form>
-      <div id="sourceState" class="source-state" aria-live="polite"></div>
+      <div id="sourceState" class="source-state" aria-live="polite"></div>\n      <div id="searchHistory" class="search-history" aria-label="Histórico de pesquisas"></div>
     </section>
 
     <section id="storyApp" class="story-app shell hidden">
@@ -91,7 +91,7 @@
           <section class="chapter">
             <div class="chapter-number">02</div>
             <p class="chapter-label" data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</p>
-            <div id="moments" class="timeline"></div>
+            <div id="timelineSource" class="timeline-source"></div>\n            <div id="moments" class="timeline"></div>
           </section>
 
           <section class="chapter impact">
@@ -109,7 +109,7 @@
             <p class="chapter-label" data-i18n="finalChapter">CAPÍTULO FINAL</p>
             <h3 id="endingTitle">A vitória veio porque você converteu o momento certo.</h3>
             <p id="endingText">Nem toda vantagem precisa nascer cedo. Nesta partida, o ponto decisivo foi sobreviver ao começo e acelerar quando o time finalmente encontrou a luta certa.</p>
-            <div id="highlights" class="highlight-grid"></div>
+            <div id="highlights" class="highlight-grid"></div>\n            <div id="comparison" class="comparison-card"></div>\n            <div id="matchDetails" class="match-details"></div>
           </section>
 
           <section class="share-block">
@@ -118,7 +118,7 @@
               <h3 data-i18n="shareTitle">Uma história que cabe em um card.</h3>
               <p data-i18n="shareText">Compartilhe o resumo sem transformar sua partida em uma planilha.</p>
             </div>
-            <div class="share-actions">\n              <button id="downloadBtn" class="ghost" type="button" data-i18n="download">Baixar card PNG</button>\n              <button id="shareBtn" class="primary" type="button" data-i18n="share">Compartilhar história</button>\n            </div>
+            <div class="share-actions">\n              <button id="copyLinkBtn" class="ghost" type="button" data-i18n="copyLink">Copiar link</button>\n              <button id="downloadBtn" class="ghost" type="button" data-i18n="download">Baixar card PNG</button>\n              <button id="shareBtn" class="primary" type="button" data-i18n="share">Compartilhar história</button>\n            </div>
           </section>
         </div>
       </article>
@@ -131,7 +131,7 @@
 
   <footer class="shell footer">
     <span>LoL Match Story</span>
-    <span data-i18n="footer">Produto independente. Não afiliado à Riot Games.</span>
+    <span><a href="./privacy.html">Privacidade</a> · <a href="./terms.html">Termos</a> · <a href="./about.html">Sobre</a> · <a href="./contact.html">Contato</a></span>\n    <span data-i18n="footer">Produto independente. Não afiliado à Riot Games.</span>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
