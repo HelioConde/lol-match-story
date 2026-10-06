@@ -103,6 +103,17 @@ test('Arena usa colocação e narrativa específica', async ({ page }) => {
       }]
     })
   }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({
+      events:[],
+      arenaRounds:[
+        {round:1,startTime:'01:25',endTime:'02:08',participation:2,playerKills:1,playerDeaths:0,playerAssists:1},
+        {round:2,startTime:'03:54',endTime:'04:38',participation:4,playerKills:1,playerDeaths:1,playerAssists:3},
+        {round:3,startTime:'06:03',endTime:'06:42',participation:3,playerKills:0,playerDeaths:0,playerAssists:3}
+      ]
+    })
+  }));
 
   await page.getByRole('button', { name: /Criar minha história/i }).click();
   await expect(page.locator('#championName')).toHaveText('Gragas');
@@ -110,6 +121,9 @@ test('Arena usa colocação e narrativa específica', async ({ page }) => {
   await expect(page.locator('#archetypeBadge')).toHaveText('CAMPEÃO DA ARENA');
   await expect(page.locator('#storyTitle')).toContainText(/topo da Arena/i);
   await expect(page.locator('#highlights')).toContainText('4 augments');
+  await expect(page.locator('#timelineSource')).toContainText('janelas de combate');
+  await expect(page.locator('#moments')).toContainText('01:25');
+  await expect(page.locator('#matchDetails')).toContainText('3 detectadas');
 });
 
 
