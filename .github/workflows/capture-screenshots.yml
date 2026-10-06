@@ -72,6 +72,7 @@ jobs:
           name: full-page-screenshots
           path: |
             screenshots/latest-home-full.png
+            screenshots/latest-alchemy-full.png
             screenshots/latest-story-full.png
             screenshots/latest-mobile-full.png
             screenshots/metadata.json
@@ -80,7 +81,7 @@ jobs:
       - name: Commit screenshots
         run: |
           mkdir -p /tmp/lms-captures
-          cp screenshots/latest-home-full.png screenshots/latest-story-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
+          cp screenshots/latest-home-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
 
           git fetch origin main
           git reset --hard origin/main
@@ -90,7 +91,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add screenshots/latest-home-full.png screenshots/latest-story-full.png screenshots/latest-mobile-full.png screenshots/metadata.json
+          git add screenshots/latest-home-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-mobile-full.png screenshots/metadata.json
           if git diff --cached --quiet; then
             echo "No screenshot changes."
             exit 0
