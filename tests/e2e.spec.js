@@ -38,7 +38,7 @@ test('dados reais substituem demo quando public-lol-profile responde', async ({ 
       matches: [{
         id: 'BR1_1', championName: 'Lux', championId: 99, win: true,
         kills: 9, deaths: 2, assists: 14, cs: 220, visionScore: 36,
-        goldEarned: 13200, gameDuration: 1920
+        goldEarned: 13200, duration: 32, damage: 31200, damagePerMin: 975, teamDamageShare: 31.5,\n        largestKillingSpree: 7, tripleKills: 1, firstBloodAssist: true
       }]
     })
   }));
@@ -50,7 +50,7 @@ test('dados reais substituem demo quando public-lol-profile responde', async ({ 
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('#playerTitle')).toHaveText('RealPlayer#BR1');
   await expect(page.locator('#championName')).toHaveText('Lux');
-  await expect(page.locator('#sourceState')).toContainText('Dados Riot carregados');
+  await expect(page.locator('#sourceState')).toContainText('Dados Riot carregados');\n  await expect(page.locator('#storyKicker')).toContainText('32:00');\n  await expect(page.locator('#archetypeBadge')).toHaveText('CARRY');
 });
 
 test('falha do backend mantém fallback demonstrativo identificado', async ({ page }) => {
@@ -69,4 +69,12 @@ test('mobile não cria overflow horizontal crítico', async ({ page }) => {
   await page.goto('/');
   const bodyWidth = await page.locator('body').evaluate(el => el.scrollWidth);
   expect(bodyWidth).toBeLessThanOrEqual(361);
+});
+
+test('gera card PNG da partida selecionada', async ({ page }) => {
+  await page.getByRole('button', { name: /Ver demo/i }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Baixar card PNG/i }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^lol-match-story-ahri\.png$/);
 });
