@@ -79,6 +79,7 @@ async function capture(page, file) {
     const mobilePage = await mobile.newPage();
     await mobilePage.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
     await settle(mobilePage);
+    await capture(mobilePage, 'latest-mobile-home-full.png');
     await mobilePage.locator('#demoBtn').click();
     await mobilePage.locator('#storyApp:not(.hidden)').waitFor({ state: 'visible' });
     await settle(mobilePage);
@@ -93,6 +94,7 @@ async function capture(page, file) {
         { file: 'latest-home-full.png', viewport: '1440x1000', state: 'home' },
         { file: 'latest-alchemy-full.png', viewport: '1440x1000', state: 'alchemy-' + liveCaptureState },
         { file: 'latest-story-full.png', viewport: '1440x1000', state: 'demo-story' },
+        { file: 'latest-mobile-home-full.png', viewport: '390x844', state: 'home-mobile' },
         { file: 'latest-mobile-full.png', viewport: '390x844', state: 'demo-story-mobile' }
       ]
     };
