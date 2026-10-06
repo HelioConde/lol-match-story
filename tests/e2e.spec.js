@@ -197,6 +197,10 @@ test('publica snapshot seguro antes de copiar link', async ({ page }) => {
   await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
   await page.route('**/public-lol-story', async route => {
     const body=route.request().postDataJSON();
+    if(body.action==='records'){
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})});
+      return;
+    }
     expect(body.action).toBe('publish');
     expect(body.matchId).toBe('BR1_99');
     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,matchId:'BR1_99',publicPath:'story.html?match=BR1_99'})});
@@ -221,4 +225,32 @@ test('página pública renderiza snapshot persistido', async ({ page }) => {
   await expect(page.locator('#publicChampion')).toHaveText('Ahri');
   await expect(page.locator('#publicKicker')).toContainText('AlchemyFlames#BR1');
   await expect(page.locator('#publicResult')).toHaveText('VITÓRIA');
+});
+
+
+test('mostra recordes persistentes das histórias publicadas', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
+      {id:'BR1_77',champion:'Ahri',context:'RANKED',queue:'RANKED',win:true,duration:30,kills:10,deaths:2,assists:9}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', async route => {
+    const body=route.request().postDataJSON();
+    expect(body.action).toBe('records');
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+      publishedStories:4,pentakills:1,
+      records:{
+        damagePerMin:{champion:'Ahri',value:1012},
+        kda:{champion:'Lux',value:8.5},
+        kills:{champion:'Jinx',value:19},
+        arena:{champion:'Gragas',value:1}
+      }
+    })});
+  });
+  await page.getByRole('button',{name:/Criar minha história/i}).click();
+  await expect(page.locator('#historicalRecords')).toContainText('Recordes persistentes');
+  await expect(page.locator('#historicalRecords')).toContainText('1012');
+  await expect(page.locator('#historicalRecords')).toContainText('#1');
 });
