@@ -60,6 +60,10 @@ Deno.serve(async(req:Request)=>{
   }
   if(!puuid) return out({error:"player_puuid"},502);
 
+  const {data:mc}=await db.from("lol_match_cache").select("match_data").eq("match_id",matchId).maybeSingle();
+  const own=mc?.match_data?.info?.participants?.find((x:any)=>String(x.puuid)===puuid);
+  if(!mc?.match_data || !own) return out({error:"match_not_available_for_player",matchId},404);
+
   let timeline:any=null, cacheHit=false;
   const {data:cached}=await db.from("lol_timeline_cache").select("timeline_data,expires_at").eq("match_id",matchId).maybeSingle();
   if(cached && new Date(cached.expires_at).getTime()>Date.now()){
@@ -78,10 +82,7 @@ Deno.serve(async(req:Request)=>{
   const participantId=participants.findIndex((x:any)=>String(x)===puuid)+1;
   if(participantId<=0) return out({error:"participant_not_found",matchId},404);
 
-  let teamId=participantId<=5?100:200;
-  const {data:mc}=await db.from("lol_match_cache").select("match_data").eq("match_id",matchId).maybeSingle();
-  const own=mc?.match_data?.info?.participants?.find((x:any)=>String(x.puuid)===puuid);
-  if(own?.teamId) teamId=Number(own.teamId);
+  let teamId=Number(own.teamId||0)||(participantId<=5?100:200);
 
   const frames=Array.isArray(timeline?.info?.frames)?timeline.info.frames:[];
   const events:any[]=[];
