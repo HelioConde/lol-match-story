@@ -896,3 +896,28 @@ test('fim da história navega entre partidas sem voltar ao rail', async ({ page 
   await expect(page.locator('#storyPagerPosition')).toHaveText('2 de 3');
   await expect(page.locator('#prevMatchBtn')).toContainText('Ahri');
 });
+
+
+test('mobile mantém Riot ID longo dentro do cabeçalho', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'VeryLongPlayerName',tagLine:'BR123'},matches:[
+      {id:'BR1_912',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#gameName').fill('VeryLongPlayerName');
+  await page.locator('#tagLine').fill('BR123');
+  await page.locator('#lookupForm button[type="submit"]').click();
+  const box=await page.locator('.player-heading').boundingBox();
+  expect(box.x+box.width).toBeLessThanOrEqual(390);
+});
+
+test('ação de download usa rótulo curto', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#downloadBtn')).toHaveText('Baixar PNG');
+});
