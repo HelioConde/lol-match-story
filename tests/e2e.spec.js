@@ -345,3 +345,13 @@ test('nova busca restaura a home completa', async ({ page }) => {
   await expect(page.locator('.product-preview')).toBeVisible();
   await expect(page.locator('#storyApp')).toBeHidden();
 });
+
+
+test('história possui navegação direta entre capítulos', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const nav=page.locator('.chapter-nav');
+  await expect(nav).toBeVisible();
+  await expect(nav.locator('a')).toHaveCount(4);
+  await expect(nav.locator('a').nth(0)).toHaveAttribute('href','#openingChapter');
+  await expect(nav.locator('a').nth(3)).toHaveAttribute('href','#finalChapter');
+});
