@@ -54,7 +54,17 @@ Deno.serve(async(req:Request)=>{
         kills:mostKills?{...safeRecord(mostKills),value:num(mostKills.kills)}:null,
         arena:arena?{...safeRecord(arena),value:num(arena.placement)}:null,
         monthly:bestMonthly?{...safeRecord(bestMonthly),value:num(bestMonthly.damagePerMin)}:null
-      }
+      },
+      monthlyStories:month.slice(0,5).map((m:any)=>({
+        matchId:m.matchId,
+        champion:m.champion||m.championName||"Champion",
+        context:m.context||null,
+        placement:m.placement||null,
+        win:!!m.win,
+        publishedAt:m.publishedAt,
+        kda:+kda(m).toFixed(2),
+        damagePerMin:num(m.damagePerMin)
+      }))
     });
   }
 
