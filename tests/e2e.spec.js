@@ -111,3 +111,62 @@ test('Arena usa colocação e narrativa específica', async ({ page }) => {
   await expect(page.locator('#storyTitle')).toContainText(/topo da Arena/i);
   await expect(page.locator('#highlights')).toContainText('4 augments');
 });
+
+
+test('timeline real substitui momentos estimados', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({
+      player:{gameName:'AlchemyFlames',tagLine:'BR1'},
+      matches:[
+        {id:'BR1_42',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO/DUO',win:true,duration:30,kills:8,deaths:3,assists:10,damagePerMin:700,killParticipation:62,items:[3089],summonerSpells:[4,14]},
+        {id:'BR1_41',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO/DUO',win:false,duration:29,kills:5,deaths:5,assists:8,damagePerMin:600,killParticipation:50}
+      ]
+    })
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({
+      matchId:'BR1_42',
+      firstBlood:{type:'ASSIST',timestamp:101000,time:'01:41',isFirstBlood:true},
+      turningPoint:{type:'OBJECTIVE',timestamp:1200000,time:'20:00',objective:'Baron Nashor'},
+      events:[{type:'STRUCTURE',timestamp:1500000,time:'25:00',structure:'Tower'}]
+    })
+  }));
+  await page.getByRole('button',{name:/Criar minha história/i}).click();
+  await expect(page.locator('#timelineSource')).toContainText('Timeline real');
+  await expect(page.locator('#moments')).toContainText('20:00');
+  await expect(page.locator('#comparison')).toContainText('COMPARAÇÃO');
+  await expect(page.locator('#matchDetails')).toContainText('Itens');
+});
+
+test('link compartilhável abre diretamente a partida solicitada', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'SharePlayer',tagLine:'BR1'},matches:[
+      {id:'BR1_1',champion:'Lux',context:'RANKED',queue:'RANKED',win:true,duration:28,kills:4,deaths:2,assists:10},
+      {id:'BR1_2',champion:'Jinx',context:'RANKED',queue:'RANKED',win:false,duration:31,kills:9,deaths:7,assists:4}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.goto('/?gameName=SharePlayer&tagLine=BR1&platform=br1&match=BR1_2');
+  await expect(page.locator('#championName')).toHaveText('Jinx');
+  await expect(page).toHaveURL(/match=BR1_2/);
+});
+
+test('salva histórico local de Riot IDs pesquisados', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[{id:'BR1_9',champion:'Gragas',context:'ARENA',queue:'ARENA',placement:1,win:true,duration:26,kills:4,deaths:6,assists:21}]})
+  }));
+  await page.getByRole('button',{name:/Criar minha história/i}).click();
+  await expect(page.locator('#searchHistory')).toContainText('AlchemyFlames#BR1');
+});
+
+test('manifest PWA está disponível', async ({ page }) => {
+  const response=await page.request.get('/manifest.webmanifest');
+  expect(response.ok()).toBeTruthy();
+  const manifest=await response.json();
+  expect(manifest.name).toBe('LoL Match Story');
+  expect(manifest.icons.length).toBeGreaterThan(0);
+});
