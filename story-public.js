@@ -7,6 +7,11 @@
     return map[name]||String(name||'Ahri').replace(/[^A-Za-z0-9]/g,'');
   };
   const splash=name=>`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championAssetName(name)}_0.jpg`;
+  const formatRiotId=value=>{
+    const raw=String(value||'');
+    const i=raw.lastIndexOf('#');
+    return i>0?`${raw.slice(0,i)}#${raw.slice(i+1).toUpperCase()}`:raw;
+  };
   const n=v=>Number(v||0);
   let currentMatchId=null,currentContext=null;
 
@@ -44,19 +49,29 @@
     if(!m)throw new Error('invalid_story');
     const champ=m.champion||'Champion',arc=archetype(m),impact=score(m),seconds=n(m.durationSeconds),mins=Math.floor(seconds/60),secs=String(seconds%60).padStart(2,'0');
     $('#publicCover').style.setProperty('--cover',`url("${splash(champ)}")`);
-    escText($('#publicKicker'),`${String(m.context||m.mode||'LEAGUE OF LEGENDS').toUpperCase()} • ${mins}:${secs} • ${story.riot_id}`);
+    escText($('#publicKicker'),`${String(m.context||m.mode||'LEAGUE OF LEGENDS').toUpperCase()} • ${mins}:${secs} • ${formatRiotId(story.riot_id)}`);
     escText($('#publicTitle'),arc[1]);escText($('#publicSubtitle'),arc[2]);
     const result=m.context==='ARENA'&&m.placement?`#${m.placement}`:(m.win?'VITÓRIA':'DERROTA');
     escText($('#publicResult'),result);$('#publicResult').className='result '+resultTone(m);
     escText($('#publicArchetype'),arc[0]);escText($('#publicChampion'),champ);escText($('#publicKda'),`${n(m.kills)} / ${n(m.deaths)} / ${n(m.assists)}`);
     escText($('#publicImpactTitle'),`Impacto contextual: ${impact}/100`);
     const damage=m.damage?`${(n(m.damage)/1000).toFixed(1)}k de dano`:`${n(m.kills)+n(m.assists)} participações`;
-    escText($('#publicImpactText'),`Esta história pública foi gerada a partir dos dados reais da partida: ${damage}, ${n(m.deaths)} mortes e ${n(m.killParticipation)}% de participação em abates.`);
+    const arenaImpact=m.context==='ARENA'
+      ? `Esta história pública usa os dados reais da Arena: #${m.placement||'—'}, ${n(m.kills)+n(m.assists)} participações, ${m.damagePerMin?Math.round(n(m.damagePerMin))+' DPM':'ritmo de combate'}${Array.isArray(m.augments)&&m.augments.length?', '+m.augments.length+' aprimoramentos':''}.`
+      : `Esta história pública foi gerada a partir dos dados reais da partida: ${damage}, ${n(m.deaths)} mortes e ${n(m.killParticipation)}% de participação em abates.`;
+    escText($('#publicImpactText'),arenaImpact);
     const stats=m.context==='ARENA'
-      ? [['Colocação',m.placement?'#'+m.placement:'—'],['K+A',n(m.kills)+n(m.assists)],['DPM',m.damagePerMin?Math.round(n(m.damagePerMin)):'—'],['Impacto',impact]]
+      ? [['Colocação',m.placement?'#'+m.placement:'—'],['Participações',n(m.kills)+n(m.assists)],['DPM',m.damagePerMin?Math.round(n(m.damagePerMin)):'—'],['Impacto',impact]]
       : [['CS',m.cs||'—'],['Visão',m.vision||'—'],['KP',(m.killParticipation??0)+'%'],['Impacto',impact]];
     $('#publicStats').replaceChildren(...stats.map(([label,value])=>{const d=document.createElement('div'),strong=document.createElement('strong'),span=document.createElement('span');strong.textContent=String(value);span.textContent=label;d.append(strong,span);return d;}));
-    const chips=[`${n(m.kills)+n(m.assists)} participações`,m.damagePerMin?`${Math.round(n(m.damagePerMin))} DPM`:`${m.vision||0} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:(m.position||m.context||'LoL'),m.context==='ARENA'&&m.placement?`#${m.placement} Arena`:(m.win?'Vitória':'Derrota')];
+    const chips=m.context==='ARENA'
+      ? [
+          `#${m.placement||'—'} colocação`,
+          `${n(m.kills)+n(m.assists)} participações`,
+          m.damagePerMin?`${Math.round(n(m.damagePerMin))} DPM`:'Arena',
+          Array.isArray(m.augments)&&m.augments.length?`${m.augments.length} aprimoramentos`:'Campanha de Arena'
+        ]
+      : [`${n(m.kills)+n(m.assists)} participações`,m.damagePerMin?`${Math.round(n(m.damagePerMin))} DPM`:`${m.vision||0} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:(m.position||m.context||'LoL'),m.win?'Vitória':'Derrota'];
     $('#publicHighlights').replaceChildren(...chips.map(value=>{const d=document.createElement('div');d.className='highlight';d.textContent=value;return d;}));
     document.title=`${champ} • ${result} — LoL Match Story`;
     document.querySelector('meta[property="og:title"]')?.setAttribute('content',document.title);
