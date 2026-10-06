@@ -723,10 +723,20 @@ test('ferramentas de compartilhamento cabem no mobile', async ({ page }) => {
 test('ação principal de compartilhamento ocupa linha inteira no mobile', async ({ page }) => {
   await page.setViewportSize({width:390,height:844});
   await page.locator('#demoBtn').click();
-  const primary=await page.locator('#shareBtn').boundingBox();
-  const tools=await page.locator('.share-tools').boundingBox();
-  expect(primary.width).toBeGreaterThan(250);
-  expect(tools.y).toBeGreaterThanOrEqual(primary.y + primary.height);
+  const actions=page.locator('.share-actions');
+  const primary=page.locator('#shareBtn');
+  const tools=page.locator('.share-tools');
+  await expect(primary).toBeVisible();
+  await expect(tools).toBeVisible();
+  const layout=await actions.evaluate(el=>({
+    direction:getComputedStyle(el).flexDirection,
+    width:el.getBoundingClientRect().width
+  }));
+  const primaryWidth=await primary.evaluate(el=>el.getBoundingClientRect().width);
+  const toolsWidth=await tools.evaluate(el=>el.getBoundingClientRect().width);
+  expect(layout.direction).toBe('column');
+  expect(primaryWidth).toBeGreaterThan(layout.width*.95);
+  expect(toolsWidth).toBeGreaterThan(layout.width*.95);
 });
 
 

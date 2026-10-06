@@ -479,3 +479,10 @@
   .comparison-item strong{font-size:15px;line-height:1.15;overflow-wrap:anywhere}
   .comparison-item span{font-size:8px;line-height:1.2;letter-spacing:.05em}
 }
+
+@media(max-width:640px){
+  .share-tools{
+    border-top:1px solid #263247;
+    padding-top:10px;
+  }
+}
