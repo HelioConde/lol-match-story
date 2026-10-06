@@ -435,25 +435,49 @@
     lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+lines.length*lineHeight;
   }
 
-  function drawShareCard() {
+  async function loadCardImage(src){
+    return new Promise(resolve=>{
+      const img=new Image();img.crossOrigin='anonymous';
+      const timer=setTimeout(()=>resolve(null),1200);
+      img.onload=()=>{clearTimeout(timer);resolve(img)};
+      img.onerror=()=>{clearTimeout(timer);resolve(null)};
+      img.src=src;
+    });
+  }
+
+  async function drawShareCard() {
     const m=state.matches[state.selected];if(!m)return null;
-    const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');
-    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#111a2b');g.addColorStop(.55,'#080b12');g.addColorStop(1,'#17130b');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
-    ctx.fillStyle='#d7b15d';ctx.font='800 28px system-ui';ctx.fillText('LOL MATCH STORY',70,90);
-    ctx.fillStyle='#74829a';ctx.font='600 24px system-ui';ctx.fillText(state.lookup?`${state.lookup.gameName}#${state.lookup.tagLine}`:'',70,132);
-    const a=archetype(m);ctx.fillStyle='#2a2214';roundedRect(ctx,70,190,420,62,18);ctx.fillStyle='#e2bd65';ctx.font='900 27px system-ui';ctx.fillText(locale()==='pt'?a.pt:a.en,94,231);
-    ctx.fillStyle='#f5f7fb';ctx.font='900 72px system-ui';const copy=storyCopy(m);let next=wrapText(ctx,copy[0],70,350,940,84,3);
-    ctx.fillStyle='#aab4c4';ctx.font='500 32px system-ui';next=wrapText(ctx,copy[1],70,next+32,900,46,3);
-    ctx.fillStyle=m.win?'#63e5cd':'#ff8e98';ctx.font='900 30px system-ui';ctx.fillText(m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'),70,next+72);
-    ctx.fillStyle='#f5f7fb';ctx.font='800 48px system-ui';ctx.fillText(m.championName,70,next+135);ctx.font='700 34px system-ui';ctx.fillText(`${m.kills} / ${m.deaths} / ${m.assists}`,70,next+185);
-    const stats=[['CS',m.cs||'—'],[locale()==='pt'?'VISÃO':'VISION',m.vision||'—'],['KP',(m.kp||0)+'%'],['IMPACT',m.score+'/100']];
-    stats.forEach((s,i)=>{const x=70+i*235;ctx.fillStyle='#111927';roundedRect(ctx,x,970,210,130,20);ctx.fillStyle='#77859a';ctx.font='700 20px system-ui';ctx.fillText(s[0],x+22,1010);ctx.fillStyle='#f5f7fb';ctx.font='900 38px system-ui';ctx.fillText(String(s[1]),x+22,1068);});
-    ctx.fillStyle='#526078';ctx.font='500 22px system-ui';ctx.fillText(locale()==='pt'?'Sua partida. Sua história.':'Your match. Your story.',70,1235);ctx.fillStyle='#d7b15d';ctx.font='800 24px system-ui';ctx.fillText('LoL Match Story',70,1280);
+    const format=$('#cardFormat')?.value||'4:5';
+    const size=format==='9:16'?[1080,1920]:format==='1:1'?[1080,1080]:[1080,1350];
+    const [w,h]=size,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#111a2b');g.addColorStop(.55,'#080b12');g.addColorStop(1,'#17130b');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    const img=await loadCardImage(championSplash(m.championName));
+    if(img){
+      const coverH=Math.round(h*.42),scale=Math.max(w/img.width,coverH/img.height),iw=img.width*scale,ih=img.height*scale;
+      ctx.globalAlpha=.62;ctx.drawImage(img,(w-iw)/2,0,iw,ih);ctx.globalAlpha=1;
+      const shade=ctx.createLinearGradient(0,0,0,coverH);shade.addColorStop(0,'rgba(8,11,18,.1)');shade.addColorStop(1,'#080b12');ctx.fillStyle=shade;ctx.fillRect(0,0,w,coverH);
+    }
+    const pad=70;
+    ctx.fillStyle='#d7b15d';ctx.font='800 28px system-ui';ctx.fillText('LOL MATCH STORY',pad,90);
+    ctx.fillStyle='#c6cfdd';ctx.font='600 24px system-ui';ctx.fillText(state.lookup?`${state.lookup.gameName}#${state.lookup.tagLine}`:'',pad,132);
+    const a=archetype(m);ctx.fillStyle='#2a2214';roundedRect(ctx,pad,190,420,62,18);ctx.fillStyle='#e2bd65';ctx.font='900 27px system-ui';ctx.fillText(locale()==='pt'?a.pt:a.en,pad+24,231);
+    const headlineY=Math.max(350,Math.round(h*.35));
+    ctx.fillStyle='#f5f7fb';ctx.font='900 68px system-ui';const copy=storyCopy(m);let next=wrapText(ctx,copy[0],pad,headlineY,w-pad*2,80,3);
+    ctx.fillStyle='#aab4c4';ctx.font='500 30px system-ui';next=wrapText(ctx,copy[1],pad,next+26,w-pad*2,44,3);
+    ctx.fillStyle=m.win?'#63e5cd':'#ff8e98';ctx.font='900 28px system-ui';const result=m.context==='ARENA'&&m.placement?`#${m.placement}`:(m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));ctx.fillText(result,pad,next+62);
+    ctx.fillStyle='#f5f7fb';ctx.font='800 46px system-ui';ctx.fillText(m.championName,pad,next+122);ctx.font='700 32px system-ui';ctx.fillText(`${m.kills} / ${m.deaths} / ${m.assists}`,pad,next+168);
+    const stats=m.context==='ARENA'
+      ? [[locale()==='pt'?'COLOCAÇÃO':'PLACEMENT',m.placement?'#'+m.placement:'—'],['K+A',m.kills+m.assists],['DPM',m.damagePerMin?Math.round(m.damagePerMin):'—'],['IMPACT',m.score+'/100']]
+      : [['CS',m.cs||'—'],[locale()==='pt'?'VISÃO':'VISION',m.vision||'—'],['KP',(m.kp||0)+'%'],['IMPACT',m.score+'/100']];
+    const statY=h-270,cardW=(w-pad*2-30)/4;
+    stats.forEach((s,i)=>{const x=pad+i*(cardW+10);ctx.fillStyle='#111927';roundedRect(ctx,x,statY,cardW,125,20);ctx.fillStyle='#77859a';ctx.font='700 18px system-ui';ctx.fillText(s[0],x+18,statY+38);ctx.fillStyle='#f5f7fb';ctx.font='900 34px system-ui';ctx.fillText(String(s[1]),x+18,statY+88);});
+    ctx.fillStyle='#526078';ctx.font='500 21px system-ui';ctx.fillText(locale()==='pt'?'Sua partida. Sua história.':'Your match. Your story.',pad,h-82);ctx.fillStyle='#d7b15d';ctx.font='800 23px system-ui';ctx.fillText('LoL Match Story',pad,h-42);
     return canvas;
   }
 
-  function downloadCard(){
-    const canvas=drawShareCard();if(!canvas)return;track('png_download',{mode:state.matches[state.selected]?.context});
+  async function downloadCard(){
+    track('png_download',{mode:state.matches[state.selected]?.context});
+    const canvas=await drawShareCard();if(!canvas)return;
     canvas.toBlob(blob=>{if(!blob)return;const a=document.createElement('a');a.href=URL.createObjectURL(blob);const m=state.matches[state.selected];const champion=String(m.championName||'match').toLowerCase().replace(/[^a-z0-9]+/g,'-');a.download=`lol-match-story-${champion}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(locale()==='pt'?'Card PNG gerado.':'PNG card generated.');},'image/png');
   }
 
