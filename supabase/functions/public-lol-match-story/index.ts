@@ -86,6 +86,7 @@ Deno.serve(async(req:Request)=>{
   const frames=Array.isArray(timeline?.info?.frames)?timeline.info.frames:[];
   const events:any[]=[];
   const kills:any[]=[];
+  let firstChampionKill:any=null;
   for(const frame of frames){
     for(const e of (frame?.events||[])){
       const ts=Number(e.timestamp||frame.timestamp||0);
@@ -94,6 +95,7 @@ Deno.serve(async(req:Request)=>{
         const playerKilled=Number(e.killerId)===participantId;
         const playerDied=Number(e.victimId)===participantId;
         const playerAssisted=assists.includes(participantId);
+        if(!firstChampionKill) firstChampionKill={timestamp:ts,time:mmss(ts),killerId:Number(e.killerId||0),victimId:Number(e.victimId||0),assists};
         if(playerKilled||playerDied||playerAssisted){
           const kind=playerKilled?"KILL":playerDied?"DEATH":"ASSIST";
           kills.push({type:kind,timestamp:ts,time:mmss(ts),killerId:Number(e.killerId||0),victimId:Number(e.victimId||0)});
@@ -111,7 +113,15 @@ Deno.serve(async(req:Request)=>{
     }
   }
 
-  const firstBlood=kills.find((x:any)=>x.type==="KILL"||x.type==="ASSIST")||null;
+  let firstBlood:any=null;
+  if(firstChampionKill){
+    const involvedKill=firstChampionKill.killerId===participantId;
+    const involvedDeath=firstChampionKill.victimId===participantId;
+    const involvedAssist=Array.isArray(firstChampionKill.assists)&&firstChampionKill.assists.includes(participantId);
+    if(involvedKill||involvedDeath||involvedAssist){
+      firstBlood={type:involvedKill?"KILL":involvedDeath?"DEATH":"ASSIST",timestamp:firstChampionKill.timestamp,time:firstChampionKill.time,isFirstBlood:true};
+    }
+  }
   let bestMulti:any=null;
   const ownKills=kills.filter((x:any)=>x.type==="KILL").sort((a:any,b:any)=>a.timestamp-b.timestamp);
   for(let i=0;i<ownKills.length;i++){
