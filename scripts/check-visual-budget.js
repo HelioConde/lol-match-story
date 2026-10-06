@@ -3,6 +3,7 @@ const path = require('node:path');
 
 const budgets = [
   { file: 'screenshots/latest-home-full.png', maxHeight: 1800, expectedWidth: 1440, maxBytes: 2_500_000 },
+  { file: 'screenshots/latest-alchemy-full.png', maxHeight: 4300, expectedWidth: 1440, maxBytes: 4_500_000 },
   { file: 'screenshots/latest-story-full.png', maxHeight: 3800, expectedWidth: 1440, maxBytes: 4_000_000 },
   { file: 'screenshots/latest-mobile-full.png', maxHeight: 5600, expectedWidth: 390, maxBytes: 2_500_000 }
 ];
