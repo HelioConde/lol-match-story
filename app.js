@@ -477,13 +477,18 @@
     const bestDamage=valid.slice().sort((a,b)=>b.damagePerMin-a.damagePerMin)[0];
     const bestKda=valid.slice().sort((a,b)=>((b.kills+b.assists)/Math.max(1,b.deaths))-((a.kills+a.assists)/Math.max(1,a.deaths)))[0];
     const arena=valid.filter(x=>x.context==='ARENA'&&x.placement).sort((a,b)=>a.placement-b.placement)[0];
+    const indexOf=m=>m?state.matches.findIndex(x=>x.id===m.id):-1;
     const cards=[
-      [locale()==='pt'?'Melhor história':'Best story',best?best.championName+' · '+best.score+'/100':'—'],
-      [locale()==='pt'?'Maior DPM':'Highest DPM',bestDamage?.damagePerMin?bestDamage.championName+' · '+Math.round(bestDamage.damagePerMin):'—'],
-      [locale()==='pt'?'Melhor KDA':'Best KDA',bestKda?bestKda.championName+' · '+(((bestKda.kills+bestKda.assists)/Math.max(1,bestKda.deaths)).toFixed(1)):'—'],
-      [locale()==='pt'?'Melhor Arena':'Best Arena',arena?arena.championName+' · #'+arena.placement:'—']
+      [locale()==='pt'?'Melhor história':'Best story',best?best.championName+' · '+best.score+'/100':'—',indexOf(best)],
+      [locale()==='pt'?'Maior DPM':'Highest DPM',bestDamage?.damagePerMin?bestDamage.championName+' · '+Math.round(bestDamage.damagePerMin):'—',indexOf(bestDamage)],
+      [locale()==='pt'?'Melhor KDA':'Best KDA',bestKda?bestKda.championName+' · '+(((bestKda.kills+bestKda.assists)/Math.max(1,bestKda.deaths)).toFixed(1)):'—',indexOf(bestKda)],
+      [locale()==='pt'?'Melhor Arena':'Best Arena',arena?arena.championName+' · #'+arena.placement:'—',indexOf(arena)]
     ];
-    box.innerHTML=`<div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Destaques das partidas carregadas agora':'Highlights from the matches loaded now'}</small></div><div class="session-grid">${cards.map(([a,b])=>`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+    box.innerHTML=`<div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Clique em um destaque para abrir a partida':'Select a highlight to open that match'}</small></div><div class="session-grid">${cards.map(([a,b,idx])=>idx>=0?`<button type="button" class="session-stat session-link" data-session-index="${idx}"><span>${esc(a)}</span><strong>${esc(b)}</strong><small>↗ ${locale()==='pt'?'Abrir história':'Open story'}</small></button>`:`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+    box.querySelectorAll('[data-session-index]').forEach(btn=>btn.addEventListener('click',()=>{
+      state.selected=Number(btn.dataset.sessionIndex);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
+      $('#storyCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+    }));
   }
 
   function renderHistoricalRecords(data){
