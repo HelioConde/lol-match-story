@@ -6,19 +6,31 @@
   <meta name="theme-color" content="#080b12">
   <meta name="description" content="Transforme uma partida de League of Legends em uma história visual, clara e compartilhável.">
   <title>LoL Match Story — Sua partida virou história</title>
-  <link rel="manifest" href="./manifest.webmanifest">\n  <link rel="preconnect" href="https://ddragon.leagueoflegends.com">\n  <link rel="preconnect" href="https://bieihhaobdztjyoweewa.supabase.co">\n  <meta property="og:title" content="LoL Match Story — Sua partida virou história">\n  <meta property="og:description" content="Transforme uma partida de League of Legends em uma história visual e compartilhável.">\n  <meta property="og:type" content="website">\n  <meta name="twitter:card" content="summary_large_image">\n  <meta name="twitter:title" content="LoL Match Story — Sua partida virou história">\n  <meta name="twitter:description" content="Entenda o que aconteceu na sua partida em capítulos visuais.">\n  <meta property="og:url" content="https://helioconde.github.io/lol-match-story/">\n  <link rel="canonical" href="https://helioconde.github.io/lol-match-story/">\n  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+  <link rel="preconnect" href="https://bieihhaobdztjyoweewa.supabase.co">
+  <meta property="og:title" content="LoL Match Story — Sua partida virou história">
+  <meta property="og:description" content="Transforme uma partida de League of Legends em uma história visual e compartilhável.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LoL Match Story — Sua partida virou história">
+  <meta name="twitter:description" content="Entenda o que aconteceu na sua partida em capítulos visuais.">
+  <meta property="og:url" content="https://helioconde.github.io/lol-match-story/">
+  <link rel="canonical" href="https://helioconde.github.io/lol-match-story/">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
   <header class="topbar">
     <a class="brand" href="#" aria-label="LoL Match Story"><span class="brand-mark">MS</span><span>LoL Match Story</span></a>
-    <nav class="top-actions">
+    <nav class="top-actions" aria-label="Ações principais">
       <button id="langBtn" class="ghost" type="button">EN</button>
       <button id="demoBtn" class="ghost" type="button" data-i18n="demo">Ver demo</button>
     </nav>
   </header>
 
-  <main>
+  <main id="mainContent" tabindex="-1">
     <section class="hero shell">
       <div class="eyebrow" data-i18n="eyebrow">SUA PARTIDA. SUA HISTÓRIA.</div>
       <h1 data-i18n="heroTitle">Pare de olhar só números.<br><span>Reviva o que aconteceu.</span></h1>
@@ -43,7 +55,8 @@
         </label>
         <button class="primary" type="submit"><span data-i18n="createStory">Criar minha história</span><span>→</span></button>
       </form>
-      <div id="sourceState" class="source-state" aria-live="polite"></div>\n      <div id="searchHistory" class="search-history" aria-label="Histórico de pesquisas"></div>
+      <div id="sourceState" class="source-state" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div id="searchHistory" class="search-history" aria-label="Histórico de pesquisas"></div>
     </section>
 
     <section class="product-preview shell" aria-labelledby="previewTitle">
@@ -73,17 +86,19 @@
         <button id="refreshBtn" class="ghost" type="button" data-i18n="refresh">Atualizar dados</button>
       </div>
 
-      <div id="matchRail" class="match-rail" aria-label="Partidas recentes"></div>\n      <section id="sessionSummary" class="session-summary"></section>
+      <div id="matchRail" class="match-rail" role="tablist" aria-label="Partidas recentes"></div>
+      <section id="sessionSummary" class="session-summary"></section>
 
       <article id="storyCard" class="story-card">
         <div class="story-cover">
           <div class="cover-shade"></div>
           <div class="cover-copy">
             <div class="story-kicker" id="storyKicker">RANKED SOLO • 34:12</div>
-            <h2 id="storyTitle">A partida em que você não desistiu.</h2>
+            <h2 id="storyTitle" tabindex="-1">A partida em que você não desistiu.</h2>
             <p id="storySubtitle">Um começo difícil, um mid game paciente e uma luta que virou tudo.</p>
             <div class="cover-meta">
-              <span id="resultBadge" class="result win">VITÓRIA</span>\n              <span id="archetypeBadge" class="archetype-badge">CONTROLE TOTAL</span>
+              <span id="resultBadge" class="result win">VITÓRIA</span>
+              <span id="archetypeBadge" class="archetype-badge">CONTROLE TOTAL</span>
               <span id="championName">Ahri</span>
               <span id="kda">10 / 3 / 11</span>
             </div>
@@ -109,7 +124,8 @@
           <section class="chapter">
             <div class="chapter-number">02</div>
             <p class="chapter-label" data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</p>
-            <div id="timelineSource" class="timeline-source"></div>\n            <div id="moments" class="timeline"></div>
+            <div id="timelineSource" class="timeline-source"></div>
+            <div id="moments" class="timeline"></div>
           </section>
 
           <section id="turningChapter" class="chapter hidden">
@@ -134,7 +150,9 @@
             <p class="chapter-label" data-i18n="finalChapter">CAPÍTULO FINAL</p>
             <h3 id="endingTitle">A vitória veio porque você converteu o momento certo.</h3>
             <p id="endingText">Nem toda vantagem precisa nascer cedo. Nesta partida, o ponto decisivo foi sobreviver ao começo e acelerar quando o time finalmente encontrou a luta certa.</p>
-            <div id="highlights" class="highlight-grid"></div>\n            <div id="comparison" class="comparison-card"></div>\n            <div id="matchDetails" class="match-details"></div>
+            <div id="highlights" class="highlight-grid"></div>
+            <div id="comparison" class="comparison-card"></div>
+            <div id="matchDetails" class="match-details"></div>
           </section>
 
           <section class="share-block">
@@ -143,7 +161,12 @@
               <h3 data-i18n="shareTitle">Uma história que cabe em um card.</h3>
               <p data-i18n="shareText">Compartilhe o resumo sem transformar sua partida em uma planilha.</p>
             </div>
-            <div class="share-actions">\n              <select id="cardFormat" class="share-format" aria-label="Formato do card"><option value="4:5">4:5</option><option value="9:16">9:16</option><option value="1:1">1:1</option></select>\n              <button id="copyLinkBtn" class="ghost" type="button" data-i18n="copyLink">Copiar link</button>\n              <button id="downloadBtn" class="ghost" type="button" data-i18n="download">Baixar card PNG</button>\n              <button id="shareBtn" class="primary" type="button" data-i18n="share">Compartilhar história</button>\n            </div>
+            <div class="share-actions">
+              <select id="cardFormat" class="share-format" aria-label="Formato do card"><option value="4:5">4:5</option><option value="9:16">9:16</option><option value="1:1">1:1</option></select>
+              <button id="copyLinkBtn" class="ghost" type="button" data-i18n="copyLink">Copiar link</button>
+              <button id="downloadBtn" class="ghost" type="button" data-i18n="download">Baixar card PNG</button>
+              <button id="shareBtn" class="primary" type="button" data-i18n="share">Compartilhar história</button>
+            </div>
           </section>
         </div>
       </article>
@@ -156,13 +179,15 @@
 
   <footer class="shell footer">
     <span>LoL Match Story</span>
-    <span><a href="./privacy.html">Privacidade</a> · <a href="./terms.html">Termos</a> · <a href="./about.html">Sobre</a> · <a href="./contact.html">Contato</a></span>\n    <span data-i18n="footer">Produto independente. Não afiliado à Riot Games.</span>
+    <span><a href="./privacy.html">Privacidade</a> · <a href="./terms.html">Termos</a> · <a href="./about.html">Sobre</a> · <a href="./contact.html">Contato</a></span>
+    <span data-i18n="footer">Produto independente. Não afiliado à Riot Games.</span>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="./backend-config.js"></script>
   <script src="./i18n.js"></script>
   <script src="./app.js"></script>
-  <script src="./live-update.js"></script>\n  <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));}</script>
+  <script src="./live-update.js"></script>
+  <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));}</script>
 </body>
 </html>
