@@ -475,6 +475,31 @@
     box.innerHTML=cards.map(([a,b])=>`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('');
   }
 
+  function renderHistoricalRecords(data){
+    const box=$('#historicalRecords');if(!box)return;
+    if(!data?.publishedStories){box.innerHTML='';return;}
+    const r=data.records||{};
+    const champion=v=>v?.champion||'—';
+    const cards=[
+      [locale()==='pt'?'Maior DPM publicado':'Published DPM record',r.damagePerMin?r.damagePerMin.value:'—',champion(r.damagePerMin)],
+      [locale()==='pt'?'Melhor KDA publicado':'Published KDA record',r.kda?r.kda.value:'—',champion(r.kda)],
+      [locale()==='pt'?'Mais kills publicadas':'Published kill record',r.kills?r.kills.value:'—',champion(r.kills)],
+      [locale()==='pt'?'Melhor Arena publicada':'Published Arena best',r.arena?('#'+r.arena.value):'—',champion(r.arena)]
+    ];
+    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${data.publishedStories} ${locale()==='pt'?'histórias publicadas':'published stories'} · ${data.pentakills||0} pentakills</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>`;
+  }
+
+  async function loadHistoricalRecords(){
+    if(!state.live||!backend.lolStory||!state.lookup){renderHistoricalRecords(null);return;}
+    try{
+      const res=await fetch(backend.lolStory,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'records',gameName:state.lookup.gameName,tagLine:state.lookup.tagLine
+      })});
+      const data=await res.json().catch(()=>null);
+      if(res.ok)renderHistoricalRecords(data);else renderHistoricalRecords(null);
+    }catch{renderHistoricalRecords(null);}
+  }
+
   function shareUrl(){
     const m=state.matches[state.selected];
     const u=new URL(location.href);
@@ -506,13 +531,14 @@
       const u=new URL('./story.html',location.href);
       u.searchParams.set('match',m.id);
       track('story_published',{mode:m.context});
+      loadHistoricalRecords();
       return u.toString();
     }catch{return null;}
   }
   function showStory(){
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
-    renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();
+    renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
