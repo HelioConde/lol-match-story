@@ -554,6 +554,7 @@
     }catch{return null;}
   }
   function showStory(){
+    document.body.classList.add('results-mode');
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
     renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();
@@ -601,7 +602,7 @@
       const empty=String(err?.message||'')==='empty_matches';
       const notFound=!rate && (/não encontrado|not found/i.test(String(err?.message||'')) || err?.code==='player');
       if(empty||notFound){
-        state.matches=[];state.live=false;$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
+        state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
         setSource('error',locale()==='pt'?(empty?'Nenhuma partida recente compatível foi encontrada para este Riot ID.':'Riot ID não encontrado. Confira Game Name, Tag e servidor.'):(empty?'No compatible recent matches were found for this Riot ID.':'Riot ID not found. Check Game Name, Tag, and server.'));
       }else{
         state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
@@ -670,6 +671,13 @@
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   document.querySelector('.preview-demo')?.addEventListener('click',()=>runLookup(true));
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
+  $('#newSearchBtn').addEventListener('click',()=>{
+    document.body.classList.remove('results-mode');
+    $('#storyApp').classList.add('hidden');
+    $('#sourceState').textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>$('#gameName')?.focus(),250);
+  });
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();loadGameAssets();});
   $('#downloadBtn').addEventListener('click',downloadCard);
   $('#copyLinkBtn').addEventListener('click',async()=>{try{track('copy_link',{mode:state.matches[state.selected]?.context});const url=await publishCurrentStory()||shareUrl();await navigator.clipboard.writeText(url);toast(locale()==='pt'?'Link público da partida copiado.':'Public match link copied.');}catch{}});
