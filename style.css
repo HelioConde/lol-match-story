@@ -664,3 +664,14 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
   .lookup-card{width:100%;max-width:100%}
   .lookup-card label,.lookup-card .primary{min-width:0}
 }
+
+
+/* Capture-driven mobile landing flow — 2026-10-06 */
+@media(max-width:520px){
+  body:not(.results-mode) .hero{padding-bottom:34px}
+  body:not(.results-mode) .product-preview{
+    padding-top:16px;
+    gap:22px;
+  }
+  body:not(.results-mode) .product-preview .preview-card{order:0}
+}
