@@ -328,3 +328,20 @@ test('resumo da sessão abre a partida destacada', async ({ page }) => {
   await links.first().click();
   await expect(page.locator('.match-pill').nth(Number(index))).toHaveAttribute('aria-selected','true');
 });
+
+
+test('ao abrir história entra em modo resultado compacto', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('body')).toHaveClass(/results-mode/);
+  await expect(page.locator('.product-preview')).toBeHidden();
+  await expect(page.locator('.hero h1')).toBeHidden();
+  await expect(page.locator('#storyApp')).toBeVisible();
+});
+
+test('nova busca restaura a home completa', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await page.locator('#newSearchBtn').click();
+  await expect(page.locator('body')).not.toHaveClass(/results-mode/);
+  await expect(page.locator('.product-preview')).toBeVisible();
+  await expect(page.locator('#storyApp')).toBeHidden();
+});
