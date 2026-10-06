@@ -533,3 +533,13 @@ test('fonte dos dados aparece junto ao perfil no modo resultado', async ({ page 
   await page.locator('#newSearchBtn').click();
   await expect(page.locator('#resultSourceState')).toBeHidden();
 });
+
+
+test('rail centraliza automaticamente a partida selecionada', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const rail=page.locator('#matchRail');
+  await page.locator('.match-pill').last().click();
+  await page.waitForTimeout(250);
+  const left=await rail.evaluate(el=>el.scrollLeft);
+  expect(left).toBeGreaterThan(0);
+});
