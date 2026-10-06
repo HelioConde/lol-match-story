@@ -182,3 +182,18 @@
   .share-actions .primary{width:100%;min-width:0}
   .share-actions .primary{font-size:12px;padding-inline:10px}
 }
+
+/* Capture-driven hierarchy: get to the story faster */
+.results-mode .lookup-card{display:none}
+.results-mode .source-state{margin:2px 0 8px}
+.results-mode .story-head{padding-top:4px}
+.results-mode .historical-records{margin-top:18px}
+.match-rail{scrollbar-width:thin;scrollbar-color:#354155 transparent}
+.match-rail::-webkit-scrollbar{height:5px}
+.match-rail::-webkit-scrollbar-thumb{background:#354155;border-radius:99px}
+@media(max-width:700px){
+  .chapter-nav a{gap:6px;padding:9px 11px;font-size:11px}
+  .chapter-nav b{font-size:11px;letter-spacing:.02em}
+  .chapter-nav span{font-size:10px}
+  .results-mode .source-state{font-size:10px;text-align:left;padding-inline:4px}
+}
