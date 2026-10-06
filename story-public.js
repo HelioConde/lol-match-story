@@ -105,6 +105,29 @@
     }
   }
 
+  async function sharePublicStory(){
+    const title=document.title;
+    const url=location.href;
+    try{
+      if(navigator.share){
+        await navigator.share({title,text:'Veja esta partida contada como uma história no LoL Match Story.',url});
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      const btn=$('#publicShareBtn');
+      if(btn){
+        const old=btn.textContent;
+        btn.textContent='Link copiado';
+        setTimeout(()=>{btn.textContent=old;},1800);
+      }
+    }catch(err){
+      if(err?.name==='AbortError')return;
+      try{await navigator.clipboard.writeText(url);}catch{}
+    }
+  }
+
+  $('#publicShareBtn')?.addEventListener('click',sharePublicStory);
+
   document.querySelectorAll('[data-helpful]').forEach(btn=>btn.addEventListener('click',()=>{
     const helpful=btn.dataset.helpful==='true';
     if(helpful)submitFeedback(true,'clear');

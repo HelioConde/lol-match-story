@@ -728,3 +728,39 @@ test('ação principal de compartilhamento ocupa linha inteira no mobile', async
   expect(primary.width).toBeGreaterThan(250);
   expect(tools.y).toBeGreaterThan(primary.y + primary.height - 1);
 });
+
+
+test('história pública pode ser compartilhada novamente', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__sharedPayload=null;
+    navigator.share=async payload => { window.__sharedPayload=payload; };
+  });
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_SHARE',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_SHARE');
+  await page.locator('#publicShareBtn').click();
+  const payload=await page.evaluate(()=>window.__sharedPayload);
+  expect(payload.url).toContain('story.html?match=BR1_SHARE');
+  expect(payload.title).toContain('LoL Match Story');
+});
+
+test('ações públicas empilham sem overflow no mobile', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_MOBILE',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_MOBILE');
+  const overflow=await page.locator('.public-share-actions').evaluate(el=>el.scrollWidth-el.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await expect(page.locator('#publicShareBtn')).toBeVisible();
+});
+

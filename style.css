@@ -287,3 +287,10 @@
   .share-primary{grid-column:1/-1}
   .share-tools{width:100%}
 }
+
+.public-share-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.public-share-actions .ghost,.public-share-actions .primary{min-height:44px}
+@media(max-width:640px){
+  .public-share-actions{width:100%;display:grid;grid-template-columns:1fr}
+  .public-share-actions .ghost,.public-share-actions .primary{width:100%;justify-content:center;text-align:center}
+}
