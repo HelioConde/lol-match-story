@@ -237,6 +237,10 @@
 
   function timelineMoment(e,m) {
     if(!e) return null;
+    if(e.reason==='gold_swing' || e.type==='GOLD_SWING'){
+      const swing=Number(e.goldSwing||0),after=Number(e.goldDiffAfter||0);
+      return {m:e.time,pt:'O ouro virou de lado',en:'Gold momentum flipped',dpt:`O maior swing alterou a diferença em ${Math.abs(Math.round(swing/100)/10)}k de ouro e deixou o time ${after>=0?'à frente':'atrás'} logo depois.`,den:`The biggest swing changed the gap by ${Math.abs(Math.round(swing/100)/10)}k gold and left the team ${after>=0?'ahead':'behind'} right after.`};
+    }
     if(e.type==='KILL') return {m:e.time,pt:'Eliminação no momento certo',en:'A kill at the right moment',dpt:'Você participou diretamente da pressão ao eliminar um adversário.',den:'You directly added pressure by securing a kill.'};
     if(e.type==='ASSIST') return {m:e.time,pt:'Você entrou na jogada',en:'You joined the play',dpt:'Sua assistência conectou você a uma eliminação importante.',den:'Your assist connected you to an important takedown.'};
     if(e.type==='DEATH') return {m:e.time,pt:'A partida cobrou um preço',en:'The match charged a price',dpt:'Uma morte abriu espaço para o adversário e mudou o ritmo por alguns instantes.',den:'A death opened space for the enemy and shifted the pace for a while.'};
@@ -257,6 +261,7 @@
     try{
       const data=await fetchTimeline(m);
       if(!data){source.textContent='';return;}
+      m.timelineGold=data.gold||null;
       const picks=[];
       if(data.firstBlood) picks.push(data.firstBlood);
       if(data.turningPoint && !picks.some(x=>x.timestamp===data.turningPoint.timestamp)) picks.push(data.turningPoint);
@@ -382,6 +387,11 @@
     if(m.riftHeraldTakedowns) objectiveBits.push((locale()==='pt'?'Arauto ':'Herald ')+m.riftHeraldTakedowns);
     if(m.objectivesStolen) objectiveBits.push((locale()==='pt'?'Roubos ':'Steals ')+m.objectivesStolen);
     if(objectiveBits.length) groups.push([locale()==='pt'?'Objetivos':'Objectives',objectiveBits.map(x=>`<span class="detail-chip">${esc(x)}</span>`).join('')]);
+    if(m.timelineGold?.phases){
+      const fmtGold=v=>v==null?'—':((v>=0?'+':'')+(v/1000).toFixed(1)+'k');
+      const p=m.timelineGold.phases;
+      groups.push([locale()==='pt'?'Ritmo do ouro':'Gold flow',[['10m',p.early?.diff],['20m',p.mid?.diff],[locale()==='pt'?'Final':'End',p.late?.diff]].map(([label,v])=>`<span class="detail-chip">${esc(label)} ${esc(fmtGold(v))}</span>`).join('')]);
+    }
     box.innerHTML=groups.map(([title,html])=>`<section><h4>${esc(title)}</h4><div class="detail-row">${html}</div></section>`).join('');
   }
 
