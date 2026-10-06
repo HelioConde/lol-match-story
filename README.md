@@ -31,7 +31,7 @@ Supabase gamer: `bieihhaobdztjyoweewa`
 
 Edge Function reutilizada:
 
-- `public-lol-profile`
+- `public-lol-profile`\n- `public-lol-match-story` — timeline Match-V5, ponto de virada e fluxo de ouro
 
 O frontend pede Riot ID e consome apenas o endpoint server-side. Em falha de rede, rate limit ou ausência temporária de dados, mantém fallback demonstrativo claramente identificado.
 
@@ -55,7 +55,7 @@ Já contém:
 - responsividade;
 - atualização automática de versão.
 
-Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora usa sinais reais como dano/min, participação, first blood, multi-kills, spree, objetivos, torres e visão para classificar o arquétipo da partida e enriquecer a narrativa. Card PNG e cobertura E2E também foram adicionados. Próximo passo: consumir eventos reais do Match-V5 Timeline para substituir os timestamps heurísticos.
+Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora usa sinais reais como dano/min, participação, first blood, multi-kills, spree, objetivos, torres e visão para classificar o arquétipo da partida e enriquecer a narrativa. Card PNG e cobertura E2E também foram adicionados. A timeline real do Match-V5 já está integrada. O projeto também possui ponto de virada por swing de ouro, capítulos variáveis, comparação por modo, histórico local, cards sociais em múltiplos formatos, PWA e GitHub Pages com smoke test. O backlog atualizado está em `IMPLEMENTATION_STATUS.md`.
 
 
 ## Conta padrão de teste
