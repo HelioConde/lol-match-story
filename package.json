@@ -5,7 +5,7 @@
   "description": "Transforma partidas de League of Legends em histórias visuais compartilháveis.",
   "scripts": {
     "dev": "http-server . -p 4173 -c-1",
-    "check": "node --check app.js && node --check story-public.js && node --check service-worker.js && node --check i18n.js && node --check backend-config.js",
+    "check": "node --check app.js && node --check story-public.js && node --check service-worker.js && node --check i18n.js && node --check backend-config.js && node --check ads-config.js && node --check ads.js",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
