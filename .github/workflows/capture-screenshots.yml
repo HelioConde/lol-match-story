@@ -62,6 +62,17 @@ jobs:
           CAPTURE_BASE_URL: http://127.0.0.1:4173
         run: node scripts/capture-pages.js
 
+      - name: Upload screenshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-page-screenshots
+          path: |
+            screenshots/latest-home-full.png
+            screenshots/latest-story-full.png
+            screenshots/latest-mobile-full.png
+            screenshots/metadata.json
+          retention-days: 14
+
       - name: Commit screenshots
         run: |
           git config user.name "github-actions[bot]"
