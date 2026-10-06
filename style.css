@@ -204,3 +204,28 @@
 .result-source-state.error{border-color:#5b2f35;background:#1c1012;color:#e69aa3}
 .results-source-hidden{display:none!important}
 @media(max-width:520px){.result-source-state{white-space:normal}}
+
+/* Mobile home polish from automatic capture */
+@media(max-width:520px){
+  body:not(.results-mode) .hero-proof{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+    margin-top:16px;
+  }
+  body:not(.results-mode) .hero-proof>span{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+    min-width:0;
+    padding:10px 8px;
+  }
+  body:not(.results-mode) .hero-proof b{font-size:9px}
+  body:not(.results-mode) .hero-proof em{
+    font-size:10px;
+    line-height:1.15;
+    white-space:normal;
+  }
+  body:not(.results-mode) .hero-proof small{display:none}
+  body:not(.results-mode) .product-copy .preview-demo{display:none}
+}
