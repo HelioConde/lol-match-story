@@ -538,3 +538,17 @@
   .rail-nav-btn{display:none}
   .match-rail-actions{margin-left:auto}
 }
+
+/* Screenshot-driven end-of-story density and secondary hierarchy */
+#finalChapter{padding-bottom:24px}
+.story-pager{margin-top:0;margin-bottom:12px}
+.share-block{margin-top:12px}
+.session-summary{border-color:#493c22!important;background:linear-gradient(145deg,#14130d,#0b1119)!important}
+.historical-records{border-color:#24404a!important;background:linear-gradient(145deg,#0b1619,#0a0f17)!important}
+.session-summary .secondary-disclosure>summary:after{border-color:#6c5427;color:#e4bd63}
+.historical-records .secondary-disclosure>summary:after{border-color:#31515b;color:#77c5cc}
+@media(max-width:600px){
+  #finalChapter{padding-bottom:18px}
+  .story-pager{margin-bottom:10px}
+  .share-block{margin-top:10px}
+}

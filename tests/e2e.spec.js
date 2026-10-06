@@ -1120,3 +1120,15 @@ test('mobile mantém swipe como navegação principal do rail', async ({ page })
   await expect(page.locator('#railNextBtn')).toBeHidden();
   await expect(page.locator('.match-rail-hint')).toBeVisible();
 });
+
+
+test('fim da história mantém detalhes, pager e compartilhamento próximos', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const details=await page.locator('#matchDetails').boundingBox();
+  const pager=await page.locator('.story-pager').boundingBox();
+  const share=await page.locator('.share-block').boundingBox();
+  expect(pager.y-(details.y+details.height)).toBeLessThan(90);
+  expect(share.y-(pager.y+pager.height)).toBeLessThan(40);
+});
