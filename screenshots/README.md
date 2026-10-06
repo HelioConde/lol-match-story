@@ -6,6 +6,10 @@ Estas imagens são geradas pelo workflow **Capture Full Page Screenshots** sempr
 
 ![Home desktop completa](./latest-home-full.png)
 
+## Carregamento
+
+![Skeleton de carregamento](./latest-loading-full.png)
+
 ## Perfil real — AlchemyFlames#BR1
 
 ![Perfil real AlchemyFlames](./latest-alchemy-full.png)
@@ -30,6 +34,10 @@ A captura usa uma história real persistida e registra em `metadata.json` se a p
 
 ![História pública mobile](./latest-public-story-mobile-full.png)
 
+## Perfil real — mobile
+
+![AlchemyFlames mobile](./latest-alchemy-mobile-full.png)
+
 ## História — mobile
 
 ![História mobile completa](./latest-mobile-full.png)
@@ -37,11 +45,13 @@ A captura usa uma história real persistida e registra em `metadata.json` se a p
 ## Arquivos
 
 - `latest-home-full.png` — página inicial inteira em desktop.
+- `latest-loading-full.png` — skeleton de carregamento de uma consulta real.
 - `latest-alchemy-full.png` — consulta automática do perfil real `AlchemyFlames#BR1`.
 - `latest-story-full.png` — página inteira com uma história demo aberta em desktop.
 - `latest-public-story-full.png` — página pública de uma história persistida em desktop.
 - `latest-public-story-mobile-full.png` — mesma história pública em viewport mobile.
 - `latest-mobile-home-full.png` — home inteira em viewport mobile.
+- `latest-alchemy-mobile-full.png` — perfil real `AlchemyFlames#BR1` em mobile.
 - `latest-mobile-full.png` — história demo inteira em viewport mobile.
 - `metadata.json` — commit, data, URL-base e viewports usados.
 

@@ -37,6 +37,22 @@ async function capture(page, file) {
     await settle(page);
     await capture(page, 'latest-home-full.png');
 
+    const loadingPage=await desktop.newPage();
+    await loadingPage.route('**/public-lol-profile', async route => {
+      await new Promise(r=>setTimeout(r,15000));
+      await route.abort();
+    });
+    await loadingPage.goto(BASE_URL,{waitUntil:'domcontentloaded'});
+    await settle(loadingPage);
+    await loadingPage.locator('#gameName').fill('AlchemyFlames');
+    await loadingPage.locator('#tagLine').fill('BR1');
+    await loadingPage.locator('#platform').selectOption('br1');
+    await loadingPage.locator('#lookupForm button[type="submit"]').click();
+    await loadingPage.locator('#storyLoading:not(.hidden)').waitFor({state:'visible',timeout:5000});
+    await loadingPage.waitForTimeout(300);
+    await capture(loadingPage,'latest-loading-full.png');
+    await loadingPage.close();
+
     let liveCaptureState='unknown';
     await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
     await settle(page);
@@ -96,6 +112,32 @@ async function capture(page, file) {
     await settle(mobilePage);
     await capture(mobilePage, 'latest-mobile-home-full.png');
 
+    let liveMobileState='unknown';
+    await mobilePage.locator('#gameName').fill('AlchemyFlames');
+    await mobilePage.locator('#tagLine').fill('BR1');
+    await mobilePage.locator('#platform').selectOption('br1');
+    await mobilePage.locator('#lookupForm button[type="submit"]').click();
+    try {
+      await Promise.race([
+        mobilePage.locator('#storyApp:not(.hidden)').waitFor({state:'visible',timeout:20000}),
+        mobilePage.locator('#sourceState.error').waitFor({state:'visible',timeout:20000})
+      ]);
+    } catch {}
+    try {
+      await mobilePage.waitForFunction(() => {
+        const el=document.querySelector('#timelineSource');
+        return !el || !/carregando|loading/i.test(el.textContent || '');
+      }, null, {timeout:12000});
+    } catch {}
+    await settle(mobilePage);
+    liveMobileState=await mobilePage.locator('#sourceState').evaluate(el=>{
+      if(el.classList.contains('live')) return 'live';
+      if(el.classList.contains('demo')) return 'fallback-demo';
+      if(el.classList.contains('error')) return 'error';
+      return 'unknown';
+    }).catch(()=> 'unknown');
+    await capture(mobilePage,'latest-alchemy-mobile-full.png');
+
     let publicStoryMobileState='unknown';
     await mobilePage.goto(BASE_URL + '/story.html?match=BR1_3288690697', { waitUntil: 'domcontentloaded' });
     try {
@@ -122,10 +164,12 @@ async function capture(page, file) {
       commit: process.env.GITHUB_SHA || null,
       captures: [
         { file: 'latest-home-full.png', viewport: '1440x1000', state: 'home' },
+        { file: 'latest-loading-full.png', viewport: '1440x1000', state: 'loading-skeleton' },
         { file: 'latest-alchemy-full.png', viewport: '1440x1000', state: 'alchemy-' + liveCaptureState },
         { file: 'latest-story-full.png', viewport: '1440x1000', state: 'demo-story' },
         { file: 'latest-public-story-full.png', viewport: '1440x1000', state: 'public-story-' + publicStoryState },
         { file: 'latest-mobile-home-full.png', viewport: '390x844', state: 'home-mobile' },
+        { file: 'latest-alchemy-mobile-full.png', viewport: '390x844', state: 'alchemy-mobile-' + liveMobileState },
         { file: 'latest-public-story-mobile-full.png', viewport: '390x844', state: 'public-story-mobile-' + publicStoryMobileState },
         { file: 'latest-mobile-full.png', viewport: '390x844', state: 'demo-story-mobile' }
       ]
