@@ -572,3 +572,11 @@ test('card visual da home abre a demo', async ({ page }) => {
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('body')).toHaveClass(/results-mode/);
 });
+
+
+test('card visual da home também abre demo pelo teclado', async ({ page }) => {
+  const card=page.locator('.preview-demo-card');
+  await card.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#storyApp')).toBeVisible();
+});
