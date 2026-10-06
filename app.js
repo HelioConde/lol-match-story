@@ -472,7 +472,7 @@
       [locale()==='pt'?'Melhor KDA':'Best KDA',bestKda?bestKda.championName+' · '+(((bestKda.kills+bestKda.assists)/Math.max(1,bestKda.deaths)).toFixed(1)):'—'],
       [locale()==='pt'?'Melhor Arena':'Best Arena',arena?arena.championName+' · #'+arena.placement:'—']
     ];
-    box.innerHTML=cards.map(([a,b])=>`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('');
+    box.innerHTML=`<div class="session-title"><div><span>${locale()==='pt'?'RESUMO DA SESSÃO':'SESSION RECAP'}</span><strong>${state.matches.length} ${locale()==='pt'?'partidas analisadas':'matches analyzed'}</strong></div><small>${locale()==='pt'?'Destaques das partidas carregadas agora':'Highlights from the matches loaded now'}</small></div><div class="session-grid">${cards.map(([a,b])=>`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
   }
 
   function renderHistoricalRecords(data){
