@@ -579,7 +579,12 @@
     ];
     const monthly=Array.isArray(data.monthlyStories)?data.monthlyStories:[];
     const monthlyHtml=monthly.length?`<div class="monthly-stories"><h4>${locale()==='pt'?'Histórias publicadas nos últimos 30 dias':'Stories published in the last 30 days'}</h4><div class="monthly-story-list">${monthly.map(m=>`<a href="./story.html?match=${encodeURIComponent(m.matchId)}"><strong>${esc(m.champion)}</strong><span>${esc(modeLabel(m.context||'LoL'))} · ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'Vitória':'Win'):(locale()==='pt'?'Derrota':'Loss'))}</span></a>`).join('')}</div></div>`:'';
-    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${data.publishedStories} ${locale()==='pt'?'histórias publicadas':'published stories'} · ${data.pentakills||0} pentakills</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}`;
+    const storyCount=Number(data.publishedStories||0),pentaCount=Number(data.pentakills||0);
+    const storyLabel=locale()==='pt'
+      ? `${storyCount} ${storyCount===1?'história publicada':'histórias publicadas'}`
+      : `${storyCount} published ${storyCount===1?'story':'stories'}`;
+    const pentaLabel=`${pentaCount} ${pentaCount===1?'pentakill':'pentakills'}`;
+    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${storyLabel} · ${pentaLabel}</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}`;
   }
 
   async function loadHistoricalRecords(){
