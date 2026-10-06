@@ -593,3 +593,31 @@ test('demo funciona com Riot ID vazio', async ({ page }) => {
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('#resultSourceState')).toContainText('Modo demonstrativo');
 });
+
+
+test('colar Riot ID completo separa Game Name e Tag automaticamente', async ({ page }) => {
+  await page.locator('#gameName').fill('AlchemyFlames#br1');
+  await page.locator('#gameName').blur();
+  await expect(page.locator('#gameName')).toHaveValue('AlchemyFlames');
+  await expect(page.locator('#tagLine')).toHaveValue('BR1');
+});
+
+test('submit aceita Riot ID completo digitado no primeiro campo', async ({ page }) => {
+  await page.route('**/public-lol-profile', async route => {
+    const body=route.request().postDataJSON();
+    expect(body.gameName).toBe('RealPlayer');
+    expect(body.tagLine).toBe('BR1');
+    await route.fulfill({
+      status:200,contentType:'application/json',
+      body:JSON.stringify({player:{gameName:'RealPlayer',tagLine:'BR1'},matches:[
+        {id:'BR1_800',champion:'Lux',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:7,deaths:2,assists:10}
+      ]})
+    });
+  });
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#gameName').fill('RealPlayer#br1');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#playerTitle')).toHaveText('RealPlayer#BR1');
+});
