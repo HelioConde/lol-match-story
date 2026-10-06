@@ -528,7 +528,7 @@
       })});
       const data=await res.json().catch(()=>null);
       if(!res.ok||!data?.ok) return null;
-      const u=new URL('./story.html',location.href);
+      const u=backend.lolStoryPage ? new URL(backend.lolStoryPage) : new URL('./story.html',location.href);
       u.searchParams.set('match',m.id);
       track('story_published',{mode:m.context});
       loadHistoricalRecords();
