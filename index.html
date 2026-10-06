@@ -171,7 +171,7 @@
         </div>
       </article>
 
-      <aside class="ad-slot" aria-label="Publicidade">
+      <aside class="ad-slot" data-ad-slot="story" aria-label="Publicidade">
         <span data-i18n="ad">Espaço reservado para anúncio</span>
       </aside>
     </section>
@@ -184,9 +184,11 @@
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./ads-config.js"></script>
   <script src="./backend-config.js"></script>
   <script src="./i18n.js"></script>
   <script src="./app.js"></script>
+  <script src="./ads.js"></script>
   <script src="./live-update.js"></script>
   <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));}</script>
 </body>
