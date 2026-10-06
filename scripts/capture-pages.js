@@ -73,7 +73,19 @@ async function capture(page, file) {
     await capture(page, 'latest-story-full.png');
     await desktop.close();
 
-    const mobile = await browser.newContext({
+    let publicStoryState='unknown';
+    await page.goto(BASE_URL + '/story.html?match=BR1_3288690697', { waitUntil: 'domcontentloaded' });
+    try {
+      await Promise.race([
+        page.locator('#publicStory:not(.hidden)').waitFor({state:'visible',timeout:12000}),
+        page.locator('#publicStatus').waitFor({state:'visible',timeout:12000})
+      ]);
+    } catch {}
+    await settle(page);
+    publicStoryState = await page.locator('#publicStory').evaluate(el => el.classList.contains('hidden') ? 'unavailable' : 'loaded').catch(()=> 'unavailable');
+    await capture(page, 'latest-public-story-full.png');
+
+        const mobile = await browser.newContext({
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 1,
       isMobile: true,
@@ -97,6 +109,7 @@ async function capture(page, file) {
         { file: 'latest-home-full.png', viewport: '1440x1000', state: 'home' },
         { file: 'latest-alchemy-full.png', viewport: '1440x1000', state: 'alchemy-' + liveCaptureState },
         { file: 'latest-story-full.png', viewport: '1440x1000', state: 'demo-story' },
+        { file: 'latest-public-story-full.png', viewport: '1440x1000', state: 'public-story-' + publicStoryState },
         { file: 'latest-mobile-home-full.png', viewport: '390x844', state: 'home-mobile' },
         { file: 'latest-mobile-full.png', viewport: '390x844', state: 'demo-story-mobile' }
       ]
