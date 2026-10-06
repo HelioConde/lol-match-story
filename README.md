@@ -55,4 +55,4 @@ Já contém:
 - responsividade;
 - atualização automática de versão.
 
-Próximos passos: validar o contrato real de `public-lol-profile`, enriquecer a narrativa com timeline real quando disponível, gerar card PNG e adicionar testes de browser.
+Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora usa sinais reais como dano/min, participação, first blood, multi-kills, spree, objetivos, torres e visão para classificar o arquétipo da partida e enriquecer a narrativa. Card PNG e cobertura E2E também foram adicionados. Próximo passo: consumir eventos reais do Match-V5 Timeline para substituir os timestamps heurísticos.
