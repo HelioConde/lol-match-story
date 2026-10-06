@@ -327,3 +327,9 @@
   .field-hint{position:static;display:block;margin:4px 2px 0;font-size:9px}
   .lookup-card{margin-bottom:12px}
 }
+
+@media(max-width:600px){
+  .share-actions{display:flex!important;flex-direction:column;align-items:stretch;gap:10px;width:100%}
+  .share-primary{width:100%;flex:0 0 auto}
+  .share-tools{width:100%;margin-top:0}
+}
