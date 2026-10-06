@@ -11,3 +11,11 @@ Monetização principal preparada para anúncios.
 - preservar legibilidade e estética cinematográfica.
 
 O MVP já possui um slot reservado após o card principal.
+
+
+## Regras de layout e consentimento
+- reservar altura fixa para cada slot para evitar CLS;
+- nunca posicionar anúncio encostado nos botões de busca, download ou compartilhamento;
+- mobile deve manter anúncio fora da timeline crítica;
+- não ativar cookies/trackers de publicidade antes do mecanismo de consentimento exigido pelo provedor;
+- o produto pode funcionar integralmente sem anúncios carregados.
