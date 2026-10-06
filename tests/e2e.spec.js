@@ -1213,3 +1213,17 @@ test('pack visual Riot está aplicado sem depender do layout principal', async (
   expect(shareIcon).toContain('icon-share.png');
   expect(downloadIcon).toContain('icon-download.png');
 });
+
+
+test('história pública também carrega a camada visual compartilhada', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_606',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Ahri',context:'RANKED',win:true,durationSeconds:1800,kills:8,deaths:2,assists:10}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_606');
+  const frame=await page.locator('#publicStory .story-card').evaluate(el=>getComputedStyle(el,'::after').backgroundImage);
+  expect(frame).toContain('riot-legacy/assets/ui/panel-frame.png');
+});
