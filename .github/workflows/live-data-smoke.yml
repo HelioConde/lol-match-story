@@ -1,0 +1,46 @@
+name: Live Riot Data Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/live-data-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  live-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test AlchemyFlames profile and timeline
+        env:
+          BASE: https://bieihhaobdztjyoweewa.supabase.co/functions/v1
+        run: |
+          node <<'NODE'
+          const base = process.env.BASE;
+          const lookup = { gameName: 'AlchemyFlames', tagLine: 'BR1', platform: 'br1', region: 'americas', limit: 5, matchLimit: 5 };
+          const post = async (url, body) => {
+            const r = await fetch(url, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body) });
+            let data = null; try { data = await r.json(); } catch {}
+            return { r, data };
+          };
+          const profile = await post(base + '/public-lol-profile', lookup);
+          if (profile.r.status === 429) {
+            console.log('Riot rate limit active; live smoke skipped safely.');
+            process.exit(0);
+          }
+          if (!profile.r.ok) throw new Error('profile HTTP ' + profile.r.status + ': ' + JSON.stringify(profile.data));
+          const matches = profile.data?.matches || [];
+          if (!matches.length) throw new Error('AlchemyFlames#BR1 returned no matches');
+          const first = matches[0];
+          if (!first.id) throw new Error('first match has no id');
+          console.log('Profile OK:', profile.data.player?.gameName, profile.data.player?.tagLine, 'matches=', matches.length, 'first=', first.id, first.context);
+
+          const story = await post(base + '/public-lol-match-story', { ...lookup, matchId:first.id });
+          if (story.r.status === 429) {
+            console.log('Timeline rate limit active; profile smoke still passed.');
+            process.exit(0);
+          }
+          if (!story.r.ok) throw new Error('timeline HTTP ' + story.r.status + ': ' + JSON.stringify(story.data));
+          if (!Array.isArray(story.data?.events)) throw new Error('timeline response missing events');
+          console.log('Timeline OK:', first.id, 'events=', story.data.events.length, 'cacheHit=', story.data.cacheHit);
+          NODE
