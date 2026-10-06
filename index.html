@@ -115,7 +115,13 @@
         </div>
 
         <div class="story-body">
-          <section class="chapter intro-grid">
+          <nav class="chapter-nav" aria-label="Navegação da história">
+            <a href="#openingChapter"><span>01</span><b data-i18n="chapterOpening">ABERTURA</b></a>
+            <a href="#momentsChapter"><span>02</span><b data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</b></a>
+            <a href="#impactChapter"><span>03</span><b data-i18n="impact">SEU IMPACTO</b></a>
+            <a href="#finalChapter"><span>04</span><b data-i18n="finalChapter">CAPÍTULO FINAL</b></a>
+          </nav>
+          <section id="openingChapter" class="chapter intro-grid">
             <div>
               <div class="chapter-number">01</div>
               <p class="chapter-label" data-i18n="chapterOpening">ABERTURA</p>
@@ -130,7 +136,7 @@
             </div>
           </section>
 
-          <section class="chapter">
+          <section id="momentsChapter" class="chapter">
             <div class="chapter-number">02</div>
             <p class="chapter-label" data-i18n="turningPoints">MOMENTOS QUE MUDARAM O JOGO</p>
             <div id="timelineSource" class="timeline-source"></div>
@@ -144,7 +150,7 @@
             <p id="turningText"></p>
           </section>
 
-          <section class="chapter impact">
+          <section id="impactChapter" class="chapter impact">
             <div>
               <div id="impactNumber" class="chapter-number">03</div>
               <p class="chapter-label" data-i18n="impact">SEU IMPACTO</p>
@@ -154,7 +160,7 @@
             <div class="impact-ring" id="impactRing"><span id="impactScore">84</span><small>/100</small></div>
           </section>
 
-          <section class="chapter">
+          <section id="finalChapter" class="chapter">
             <div id="finalNumber" class="chapter-number">04</div>
             <p class="chapter-label" data-i18n="finalChapter">CAPÍTULO FINAL</p>
             <h3 id="endingTitle">A vitória veio porque você converteu o momento certo.</h3>
