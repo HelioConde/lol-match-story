@@ -21,7 +21,25 @@ function pngSize(file) {
   };
 }
 
-let failed = false;
+const metadataPath = path.resolve(process.cwd(), 'screenshots/metadata.json');
+if (!fs.existsSync(metadataPath)) {
+  console.error('screenshots/metadata.json is missing');
+  process.exit(1);
+}
+const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+const declared = Array.isArray(metadata.captures) ? metadata.captures : [];
+if (!declared.length) {
+  console.error('metadata.json does not declare any captures');
+  process.exit(1);
+}
+for (const capture of declared) {
+  const file = path.resolve(process.cwd(), 'screenshots', capture.file);
+  if (!fs.existsSync(file)) {
+    console.error('declared screenshot is missing: ' + capture.file);
+    failed = true;
+  }
+}
+
 for (const budget of budgets) {
   const file = path.resolve(process.cwd(), budget.file);
   const s = pngSize(file);

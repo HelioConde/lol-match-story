@@ -608,3 +608,14 @@
   .share-tools .share-format,
   .share-tools .ghost{width:100%}
 }
+
+@media(min-width:701px) and (max-width:820px){
+  .lookup-card{grid-template-columns:minmax(0,1fr) 190px!important}
+  .lookup-card .primary{
+    min-width:190px;
+    white-space:nowrap;
+    gap:8px;
+    padding-inline:14px;
+    font-size:15px;
+  }
+}

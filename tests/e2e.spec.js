@@ -1184,3 +1184,14 @@ test('tablet usa toda a largura disponível para compartilhar', async ({ page })
   const toolsCols=await page.locator('.share-tools').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
   expect(toolsCols).toBe(3);
 });
+
+
+test('tablet mantém CTA de criação em uma linha', async ({ page }) => {
+  await page.setViewportSize({width:768,height:1024});
+  const button=page.locator('#lookupForm .primary');
+  const lineHeight=await button.evaluate(el=>parseFloat(getComputedStyle(el).lineHeight));
+  const box=await button.boundingBox();
+  expect(box.height).toBeLessThan(lineHeight*3);
+  const nowrap=await button.evaluate(el=>getComputedStyle(el).whiteSpace);
+  expect(nowrap).toBe('nowrap');
+});
