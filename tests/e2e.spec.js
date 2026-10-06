@@ -555,7 +555,6 @@ test('home mobile compacta diferenciais e remove CTA demo redundante', async ({ 
   await expect(page.locator('.hero-proof')).toBeVisible();
   const cols=await page.locator('.hero-proof').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
   expect(cols).toBe(3);
-  await expect(page.locator('.product-copy .preview-demo')).toBeHidden();
   await expect(page.locator('#demoBtn')).toBeVisible();
 });
 
@@ -572,6 +571,7 @@ test('home mobile mantém identidade curta e prioriza preview visual', async ({ 
 
 test('card visual da home abre a demo', async ({ page }) => {
   await expect(page.locator('.preview-demo-card')).toBeVisible();
+  await expect(page.locator('.preview-open')).toHaveText('Abrir demo →');
   await page.locator('.preview-demo-card').click();
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('body')).toHaveClass(/results-mode/);
@@ -764,3 +764,10 @@ test('ações públicas empilham sem overflow no mobile', async ({ page }) => {
   await expect(page.locator('#publicShareBtn')).toBeVisible();
 });
 
+
+
+test('home não repete botão demo na seção de preview', async ({ page }) => {
+  await expect(page.locator('.preview-copy .preview-demo')).toHaveCount(0);
+  await expect(page.locator('#demoBtn')).toBeVisible();
+  await expect(page.locator('.preview-open')).toBeVisible();
+});

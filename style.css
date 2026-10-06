@@ -294,3 +294,6 @@
   .public-share-actions{width:100%;display:grid;grid-template-columns:1fr}
   .public-share-actions .ghost,.public-share-actions .primary{width:100%;justify-content:center;text-align:center}
 }
+
+.preview-open{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;margin-top:2px;color:#e6c36e;font-size:12px;font-weight:850;letter-spacing:.04em}
+.preview-demo-card:hover .preview-open,.preview-demo-card:focus-visible .preview-open{color:#fff}

@@ -837,7 +837,6 @@
   $('#gameName').addEventListener('blur',syncCombinedRiotId);
     $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
-  document.querySelector('.preview-demo')?.addEventListener('click',()=>runLookup(true));
   const previewCard=document.querySelector('.preview-demo-card');
   previewCard?.addEventListener('click',()=>runLookup(true));
   previewCard?.addEventListener('keydown',e=>{
