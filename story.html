@@ -51,6 +51,21 @@
           <p class="chapter-label">DESTAQUES</p>
           <div id="publicHighlights" class="highlight-grid"></div>
         </section>
+        <section id="feedbackBlock" class="feedback-block hidden" aria-labelledby="feedbackTitle">
+          <span class="eyebrow">AJUDE A MELHORAR</span>
+          <h3 id="feedbackTitle">Essa história ajudou você a entender a partida?</h3>
+          <div id="feedbackChoices" class="feedback-actions">
+            <button type="button" class="ghost" data-helpful="true">Sim, ficou claro</button>
+            <button type="button" class="ghost" data-helpful="false">Ainda não</button>
+          </div>
+          <div id="feedbackReasons" class="feedback-reasons hidden">
+            <span>O que faltou?</span>
+            <button type="button" data-reason="too_generic">Ficou genérica</button>
+            <button type="button" data-reason="wrong_context">Contexto incorreto</button>
+            <button type="button" data-reason="missing_event">Faltou um evento importante</button>
+          </div>
+          <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
+        </section>
         <section class="share-block">
           <div>
             <span class="eyebrow">LOL MATCH STORY</span>
