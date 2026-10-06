@@ -273,3 +273,25 @@ test('rail de partidas expõe seleção como tabs', async ({ page }) => {
   await expect(page.locator('.match-pill').nth(1)).toHaveAttribute('aria-selected','true');
   await expect(page.locator('.match-pill').first()).toHaveAttribute('aria-selected','false');
 });
+
+
+test('história pública envia feedback anônimo estruturado', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',body:JSON.stringify({story:{
+      match_id:'BR1_555',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{id:'BR1_555',champion:'Ahri',context:'RANKED',win:true,durationSeconds:1800,kills:8,deaths:2,assists:10}}
+    }})
+  }));
+  let feedback=null;
+  await page.route('**/public-lol-feedback', async route => {
+    feedback=route.request().postDataJSON();
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true})});
+  });
+  await page.goto('/story.html?match=BR1_555');
+  await expect(page.locator('#feedbackBlock')).toBeVisible();
+  await page.getByRole('button',{name:/Sim, ficou claro/i}).click();
+  await expect.poll(()=>feedback?.helpful).toBe(true);
+  expect(feedback.matchId).toBe('BR1_555');
+  expect(feedback.reason).toBe('clear');
+  await expect(page.locator('#feedbackStatus')).toContainText('Obrigado');
+});
