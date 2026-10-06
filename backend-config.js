@@ -10,6 +10,7 @@
     lolMatchStory: existing.lolMatchStory || functionsBase + '/public-lol-match-story',
     lolStory: existing.lolStory || functionsBase + '/public-lol-story',
     lolStoryPage: existing.lolStoryPage || functionsBase + '/public-lol-story-page',
+    lolFeedback: existing.lolFeedback || functionsBase + '/public-lol-feedback',
     source: 'zerotwo-gamer-supabase'
   });
 })();
