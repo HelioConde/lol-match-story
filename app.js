@@ -409,7 +409,10 @@
         ? `Partida ${current} de ${state.matches.length}`
         : `Match ${current} of ${state.matches.length}`;
     }
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small><span class="match-mode">${esc(modeLabel(m.context||m.queue||'LoL'))}</span><span class="match-kda"> · ${m.kills}/${m.deaths}/${m.assists}</span></small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>{
+      const icon=`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/champion/${championAssetName(m.championName)}.png`;
+      return `<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="match-avatar" aria-hidden="true" style="--champ-icon:url('${icon}')"></span><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small><span class="match-mode">${esc(modeLabel(m.context||m.queue||'LoL'))}</span><span class="match-kda"> · ${m.kills}/${m.deaths}/${m.assists}</span></small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`;
+    }).join('');
     const rail=$('#matchRail');
     const pills=[...document.querySelectorAll('.match-pill')];
     const active=pills[state.selected];

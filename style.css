@@ -410,3 +410,11 @@
   .player-heading>div{min-width:0;max-width:100%}
   .player-heading h2{font-size:18px;line-height:1.05;overflow-wrap:anywhere}
 }
+
+.match-avatar{width:32px;height:32px;flex:0 0 32px;border-radius:9px;background-image:var(--champ-icon);background-size:cover;background-position:center;border:1px solid #354258;box-shadow:0 4px 12px #0005}
+.match-pill{display:flex;align-items:center;gap:9px}
+.match-pill .mini-result{flex:0 0 auto}
+@media(max-width:700px){
+  .match-avatar{width:28px;height:28px;flex-basis:28px;border-radius:8px}
+  .match-pill{min-width:202px}
+}

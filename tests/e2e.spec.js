@@ -921,3 +921,14 @@ test('ação de download usa rótulo curto', async ({ page }) => {
   await page.locator('#demoBtn').click();
   await expect(page.locator('#downloadBtn')).toHaveText('Baixar PNG');
 });
+
+
+test('rail usa ícones dos campeões para reconhecimento visual', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const avatar=page.locator('.match-avatar').first();
+  await expect(avatar).toBeVisible();
+  const bg=await avatar.evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(bg).toContain('Ahri.png');
+});
