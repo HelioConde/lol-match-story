@@ -493,3 +493,10 @@
   .loading-cover{height:170px}
   .story-loading>p{margin-top:12px}
 }
+
+/* Match rail clarity from mobile screenshot review */
+@media(max-width:700px){
+  .match-rail-head{margin:6px 0 8px;font-size:10px}
+  .match-rail-head #matchPosition{color:#c2cbd8;font-weight:900;letter-spacing:.09em}
+  .match-rail-hint{color:#8998ad!important;font-size:10px}
+}

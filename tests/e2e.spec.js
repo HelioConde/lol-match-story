@@ -1059,3 +1059,13 @@ test('loading mantém skeleton compacto após as etapas explicativas', async ({ 
   expect(coverHeight).toBeLessThanOrEqual(220);
   await pending;
 });
+
+
+test('cabeçalho do rail mobile orienta o gesto no idioma ativo', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#matchPosition')).toContainText('Partida 1 de');
+  await expect(page.locator('.match-rail-hint')).toHaveText('← deslize para escolher →');
+  await page.locator('#langBtn').click();
+  await expect(page.locator('.match-rail-hint')).toHaveText('← swipe to choose →');
+});
