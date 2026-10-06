@@ -186,7 +186,7 @@
     document.documentElement.lang=locale()==='pt'?'pt-BR':'en';
     document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(key==='heroTitle')el.innerHTML=t(key);else el.textContent=t(key);});
     $('#langBtn').textContent=locale()==='pt'?'EN':'PT';
-    if(state.matches.length){renderRail();renderSelected();}
+    if(state.matches.length){renderRail();renderSessionSummary();renderSelected();}
   }
 
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
@@ -285,9 +285,10 @@
     $('#openingText').textContent=m.context==='ARENA' ? (locale()==='pt'?`Na Arena, ${m.kills+m.assists} participações e ${m.augments.length||0} augments ajudam a contar como a run ganhou força.`:`In Arena, ${m.kills+m.assists} takedown contributions and ${m.augments.length||0} augments help tell how the run built momentum.`) : (locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`);
     $('#impactTitle').textContent=locale()==='pt'?`Impacto geral: ${m.score}/100.`:`Overall impact: ${m.score}/100.`;
     const damageK=m.damage?(m.damage/1000).toFixed(1):null;
-    $('#impactText').textContent=locale()==='pt'
+    const roleReason=m.position==='SUPPORT' ? (locale()==='pt'?`visão ${m.vision}, ${m.assists} assistências e ${m.ccSeconds}s de controle`:`${m.vision} vision, ${m.assists} assists and ${m.ccSeconds}s CC`) : m.position==='JUNGLE' ? (locale()==='pt'?`${m.dragonKills+m.baronKills+m.riftHeraldTakedowns} objetivos diretos e ${Math.round(m.objectiveDamage||0)} dano em objetivos`:`${m.dragonKills+m.baronKills+m.riftHeraldTakedowns} direct objectives and ${Math.round(m.objectiveDamage||0)} objective damage`) : (m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.kills+m.assists} takedowns`);
+    $('#impactText').innerHTML=(locale()==='pt'
       ? (damageK?`Você terminou com ${m.kills+m.assists} participações, ${m.deaths} mortes e ${damageK}k de dano a campeões.`:`Você terminou com ${m.kills+m.assists} participações e ${m.deaths} mortes, com impacto distribuído ao longo da partida.`)
-      : (damageK?`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and ${damageK}k champion damage.`:`You finished with ${m.kills+m.assists} takedown contributions and ${m.deaths} deaths, with impact spread across the match.`);
+      : (damageK?`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and ${damageK}k champion damage.`:`You finished with ${m.kills+m.assists} takedown contributions and ${m.deaths} deaths, with impact spread across the match.`)) + `<p class="why-line">${esc(locale()==='pt'?`Por quê? O impacto considera seu modo/função e sinais como ${roleReason}.`:`Why? Impact considers your mode/role and signals such as ${roleReason}.`)}</p>`;
     $('#endingTitle').textContent=m.context==='ARENA' ? (locale()==='pt'?(m.placement===1?'A run terminou no topo.':`A run terminou em #${m.placement||'—'}.`):(m.placement===1?'The run ended on top.':`The run ended at #${m.placement||'—'}.`)) : (locale()==='pt'?(m.win?'O último capítulo foi de conversão.':'O último capítulo mostra onde a recuperação parou.'):(m.win?'The final chapter was about conversion.':'The final chapter shows where the recovery stopped.'));
     $('#endingText').textContent=m.context==='ARENA' ? (locale()==='pt'?'Na Arena, o resultado resume uma sequência de rounds: composição, augments, sobrevivência e execução pesaram até o fim.':'In Arena, the result summarizes a sequence of rounds: composition, augments, survival, and execution mattered until the end.') : (locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, estruturas ou objetivo. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, structures, or objectives. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.'));
     $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
@@ -337,6 +338,22 @@
     box.innerHTML=groups.map(([title,html])=>`<section><h4>${esc(title)}</h4><div class="detail-row">${html}</div></section>`).join('');
   }
 
+  function renderSessionSummary(){
+    const box=$('#sessionSummary');if(!box||!state.matches.length){if(box)box.innerHTML='';return;}
+    const valid=state.matches.filter(x=>Number.isFinite(x.score));
+    const best=valid.slice().sort((a,b)=>b.score-a.score)[0];
+    const bestDamage=valid.slice().sort((a,b)=>b.damagePerMin-a.damagePerMin)[0];
+    const bestKda=valid.slice().sort((a,b)=>((b.kills+b.assists)/Math.max(1,b.deaths))-((a.kills+a.assists)/Math.max(1,a.deaths)))[0];
+    const arena=valid.filter(x=>x.context==='ARENA'&&x.placement).sort((a,b)=>a.placement-b.placement)[0];
+    const cards=[
+      [locale()==='pt'?'Melhor história':'Best story',best?best.championName+' · '+best.score+'/100':'—'],
+      [locale()==='pt'?'Maior DPM':'Highest DPM',bestDamage?.damagePerMin?bestDamage.championName+' · '+Math.round(bestDamage.damagePerMin):'—'],
+      [locale()==='pt'?'Melhor KDA':'Best KDA',bestKda?bestKda.championName+' · '+(((bestKda.kills+bestKda.assists)/Math.max(1,bestKda.deaths)).toFixed(1)):'—'],
+      [locale()==='pt'?'Melhor Arena':'Best Arena',arena?arena.championName+' · #'+arena.placement:'—']
+    ];
+    box.innerHTML=cards.map(([a,b])=>`<div class="session-stat"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('');
+  }
+
   function shareUrl(){
     const m=state.matches[state.selected];
     const u=new URL(location.href);
@@ -352,7 +369,7 @@
   function showStory(){
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
-    renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
+    renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
