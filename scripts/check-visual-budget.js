@@ -5,6 +5,8 @@ const budgets = [
   { file: 'screenshots/latest-home-full.png', maxHeight: 1700, expectedWidth: 1440, maxBytes: 2_500_000 },
   { file: 'screenshots/latest-alchemy-full.png', maxHeight: 3900, expectedWidth: 1440, maxBytes: 4_500_000 },
   { file: 'screenshots/latest-story-full.png', maxHeight: 3500, expectedWidth: 1440, maxBytes: 4_000_000 },
+  { file: 'screenshots/latest-tablet-home-full.png', maxHeight: 2200, expectedWidth: 768, maxBytes: 2_500_000 },
+  { file: 'screenshots/latest-tablet-story-full.png', maxHeight: 4400, expectedWidth: 768, maxBytes: 4_500_000 },
   { file: 'screenshots/latest-mobile-full.png', maxHeight: 5000, expectedWidth: 390, maxBytes: 2_500_000 }
 ];
 

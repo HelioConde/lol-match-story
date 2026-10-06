@@ -87,6 +87,8 @@ jobs:
             screenshots/latest-alchemy-full.png
             screenshots/latest-story-full.png
             screenshots/latest-public-story-full.png
+            screenshots/latest-tablet-home-full.png
+            screenshots/latest-tablet-story-full.png
             screenshots/latest-public-story-mobile-full.png
             screenshots/latest-mobile-home-full.png
             screenshots/latest-alchemy-mobile-full.png
@@ -98,7 +100,7 @@ jobs:
         run: |
           set -e
           mkdir -p /tmp/lms-captures
-          cp screenshots/latest-home-full.png screenshots/latest-loading-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-public-story-mobile-full.png screenshots/latest-mobile-home-full.png screenshots/latest-alchemy-mobile-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
+          cp screenshots/latest-home-full.png screenshots/latest-loading-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-tablet-home-full.png screenshots/latest-tablet-story-full.png screenshots/latest-public-story-mobile-full.png screenshots/latest-mobile-home-full.png screenshots/latest-alchemy-mobile-full.png screenshots/latest-mobile-full.png screenshots/metadata.json /tmp/lms-captures/
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -111,7 +113,7 @@ jobs:
             mkdir -p screenshots
             cp /tmp/lms-captures/* screenshots/
 
-            git add screenshots/latest-home-full.png screenshots/latest-loading-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-public-story-mobile-full.png screenshots/latest-mobile-home-full.png screenshots/latest-alchemy-mobile-full.png screenshots/latest-mobile-full.png screenshots/metadata.json
+            git add screenshots/latest-home-full.png screenshots/latest-loading-full.png screenshots/latest-alchemy-full.png screenshots/latest-story-full.png screenshots/latest-public-story-full.png screenshots/latest-tablet-home-full.png screenshots/latest-tablet-story-full.png screenshots/latest-public-story-mobile-full.png screenshots/latest-mobile-home-full.png screenshots/latest-alchemy-mobile-full.png screenshots/latest-mobile-full.png screenshots/metadata.json
             if git diff --cached --quiet; then
               echo "No screenshot changes."
               exit 0
