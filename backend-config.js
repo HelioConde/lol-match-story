@@ -8,6 +8,7 @@
     functionsBase,
     lolProfile: existing.lolProfile || functionsBase + '/public-lol-profile',
     lolMatchStory: existing.lolMatchStory || functionsBase + '/public-lol-match-story',
+    lolStory: existing.lolStory || functionsBase + '/public-lol-story',
     source: 'zerotwo-gamer-supabase'
   });
 })();
