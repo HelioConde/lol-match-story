@@ -386,7 +386,7 @@ test('modo resultado esconde demo redundante e placeholder de anúncio', async (
 test('PT-BR traduz o nome do modo e ouro na história', async ({ page }) => {
   await page.locator('#demoBtn').click();
   await expect(page.locator('#storyKicker')).toContainText('RANQUEADA SOLO');
-  await expect(page.locator('[data-i18n="gold"]')).toHaveText('Ouro');
+  await expect(page.locator('#stat4Label')).toHaveText('Ouro');
 });
 
 
