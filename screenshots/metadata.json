@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-06T16:58:37.276Z",
+  "generatedAt": "2026-10-06T16:59:36.770Z",
   "source": "http://127.0.0.1:4173",
-  "commit": "baa5ca33dc6355a0da12a7a0b1907c036a59c237",
+  "commit": "618f025f9007403fcb44f743f34e16221c8276df",
   "captures": [
     {
       "file": "latest-home-full.png",
@@ -17,6 +17,11 @@
       "file": "latest-story-full.png",
       "viewport": "1440x1000",
       "state": "demo-story"
+    },
+    {
+      "file": "latest-mobile-home-full.png",
+      "viewport": "390x844",
+      "state": "home-mobile"
     },
     {
       "file": "latest-mobile-full.png",
