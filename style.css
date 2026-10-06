@@ -171,3 +171,6 @@
   .session-link small{opacity:.72;transform:none}
 }
 @media(max-width:340px){.session-grid{grid-template-columns:1fr}}
+
+.mini-result.placement{background:#3a311b;color:#f0cf70}
+.result.placement{color:#f0c866}
