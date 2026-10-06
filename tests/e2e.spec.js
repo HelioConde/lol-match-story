@@ -355,3 +355,22 @@ test('história possui navegação direta entre capítulos', async ({ page }) =>
   await expect(nav.locator('a').nth(0)).toHaveAttribute('href','#openingChapter');
   await expect(nav.locator('a').nth(3)).toHaveAttribute('href','#finalChapter');
 });
+
+
+test('detalhes técnicos ficam recolhidos por padrão', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[{
+      id:'BR1_900',champion:'Ahri',context:'RANKED',queue:'RANKED',win:true,duration:30,
+      kills:8,deaths:2,assists:10,items:[3089],summonerSpells:[4,14]
+    }]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  const details=page.locator('.match-details-panel');
+  await expect(details).toBeVisible();
+  await expect(details).not.toHaveAttribute('open','');
+  await details.locator('summary').click();
+  await expect(details).toHaveAttribute('open','');
+});
