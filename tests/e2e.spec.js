@@ -523,3 +523,13 @@ test('navegação mobile usa rótulos curtos de capítulos', async ({ page }) =>
   await expect(page.locator('.chapter-nav')).toContainText('Impacto');
   await expect(page.locator('.chapter-nav')).toContainText('Final');
 });
+
+
+test('fonte dos dados aparece junto ao perfil no modo resultado', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#sourceState')).toBeHidden();
+  await expect(page.locator('#resultSourceState')).toBeVisible();
+  await expect(page.locator('#resultSourceState')).toContainText('Modo demonstrativo');
+  await page.locator('#newSearchBtn').click();
+  await expect(page.locator('#resultSourceState')).toBeHidden();
+});
