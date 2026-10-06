@@ -14,7 +14,7 @@ Deno.serve(async(req:Request)=>{
   let b:any={};try{b=await req.json()}catch{return out({error:"json"},400)}
   const action=String(b.action||"get");
   const matchId=String(b.matchId||"").trim();
-  if(!/^[A-Za-z0-9]+_\d+$/.test(matchId))return out({error:"match_id"},400);
+  if(action!=="records" && !/^[A-Za-z0-9]+_\d+$/.test(matchId))return out({error:"match_id"},400);
   const db=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
 
   if(action==="get"){
