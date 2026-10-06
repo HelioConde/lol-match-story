@@ -932,3 +932,11 @@ test('rail usa ícones dos campeões para reconhecimento visual', async ({ page 
   const bg=await avatar.evaluate(el=>getComputedStyle(el).backgroundImage);
   expect(bg).toContain('Ahri.png');
 });
+
+
+test('home mobile não renderiza resultado antes de qualquer ação', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator('#storyApp')).toBeHidden();
+  await expect(page.locator('.product-preview')).toBeVisible();
+  await expect(page.locator('body')).not.toHaveClass(/results-mode/);
+});

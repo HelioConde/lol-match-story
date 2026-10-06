@@ -428,3 +428,9 @@
   .share-tools .share-format{grid-column:1/-1!important;width:100%!important}
   .share-tools .ghost{width:100%!important}
 }
+
+/* State visibility must beat component display rules on every breakpoint */
+.hidden{display:none!important}
+@media(max-width:700px){
+  .public-story-page{padding-top:24px}
+}
