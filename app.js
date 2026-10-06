@@ -467,7 +467,8 @@
       const p=m.timelineGold.phases;
       groups.push([locale()==='pt'?'Ritmo do ouro':'Gold flow',[['10m',p.early?.diff],['20m',p.mid?.diff],[locale()==='pt'?'Final':'End',p.late?.diff]].map(([label,v])=>`<span class="detail-chip">${esc(label)} ${esc(fmtGold(v))}</span>`).join('')]);
     }
-    box.innerHTML=groups.map(([title,html])=>`<section><h4>${esc(title)}</h4><div class="detail-row">${html}</div></section>`).join('');
+    if(!groups.length){box.innerHTML='';return;}
+    box.innerHTML=`<details class="match-details-panel"><summary><span>${locale()==='pt'?'Detalhes da partida':'Match details'}</span><small>${locale()==='pt'?'Itens, runas, objetivos e contexto técnico':'Items, runes, objectives and technical context'}</small></summary><div class="match-details-content">${groups.map(([title,html])=>`<section><h4>${esc(title)}</h4><div class="detail-row">${html}</div></section>`).join('')}</div></details>`;
   }
 
   function renderSessionSummary(){
