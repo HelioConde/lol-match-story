@@ -544,3 +544,13 @@ test('rail centraliza automaticamente a partida selecionada', async ({ page }) =
   const left=await rail.evaluate(el=>el.scrollLeft);
   expect(left).toBeGreaterThan(0);
 });
+
+
+test('home mobile compacta diferenciais e remove CTA demo redundante', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator('.hero-proof')).toBeVisible();
+  const cols=await page.locator('.hero-proof').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+  expect(cols).toBe(3);
+  await expect(page.locator('.product-copy .preview-demo')).toBeHidden();
+  await expect(page.locator('#demoBtn')).toBeVisible();
+});
