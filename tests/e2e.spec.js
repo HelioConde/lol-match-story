@@ -628,3 +628,19 @@ test('placeholder do Riot ID acompanha idioma', async ({ page }) => {
   await page.locator('#langBtn').click();
   await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Your Game Name or Name#TAG');
 });
+
+
+test('história pública trata Top 4 da Arena como colocação positiva', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_999',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_999');
+  await expect(page.locator('#publicResult')).toHaveText('#2');
+  await expect(page.locator('#publicResult')).toHaveClass(/placement/);
+  await expect(page.locator('#publicSubtitle')).toContainText('campanha');
+  await expect(page.locator('#publicSubtitle')).not.toContainText(/run|round/i);
+});
