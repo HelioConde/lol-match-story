@@ -8,6 +8,7 @@
   };
   const splash=name=>`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championAssetName(name)}_0.jpg`;
   const n=v=>Number(v||0);
+  let currentMatchId=null,currentContext=null;
 
   function score(m){
     if(m.context==='ARENA'){
@@ -52,7 +53,40 @@
     document.querySelector('meta[property="og:title"]')?.setAttribute('content',document.title);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content',arc[1]+' '+arc[2]);
     $('#publicStory').classList.remove('hidden');$('#publicStatus').classList.add('hidden');
+    currentMatchId=story.match_id;currentContext=m.context||null;setupFeedback();
   }
+
+  function feedbackKey(){return currentMatchId?'lms-feedback-'+currentMatchId:null;}
+  function setupFeedback(){
+    const block=$('#feedbackBlock');if(!block||!currentMatchId||!backend.lolFeedback)return;
+    if(localStorage.getItem(feedbackKey())==='sent'){block.classList.add('hidden');return;}
+    block.classList.remove('hidden');
+  }
+  async function submitFeedback(helpful,reason){
+    if(!currentMatchId||!backend.lolFeedback)return;
+    const status=$('#feedbackStatus');
+    try{
+      status.textContent='Enviando feedback…';
+      const r=await fetch(backend.lolFeedback,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'submit',matchId:currentMatchId,helpful,reason:reason||null,context:currentContext,locale:'pt-BR'
+      })});
+      const data=await r.json().catch(()=>null);
+      if(!r.ok||!data?.ok)throw new Error('feedback_failed');
+      localStorage.setItem(feedbackKey(),'sent');
+      $('#feedbackChoices')?.classList.add('hidden');
+      $('#feedbackReasons')?.classList.add('hidden');
+      status.textContent='Obrigado. Esse feedback entra na validação do Match Story.';
+    }catch{
+      status.textContent='Não foi possível enviar agora.';
+    }
+  }
+
+  document.querySelectorAll('[data-helpful]').forEach(btn=>btn.addEventListener('click',()=>{
+    const helpful=btn.dataset.helpful==='true';
+    if(helpful)submitFeedback(true,'clear');
+    else $('#feedbackReasons')?.classList.remove('hidden');
+  }));
+  document.querySelectorAll('[data-reason]').forEach(btn=>btn.addEventListener('click',()=>submitFeedback(false,btn.dataset.reason)));
 
   async function main(){
     const matchId=new URLSearchParams(location.search).get('match');
