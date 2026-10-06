@@ -250,3 +250,6 @@
   .brand .brand-long{display:none!important}
   .brand .brand-short{display:inline!important}
 }
+
+.feedback-reasons.hidden{display:none!important}
+.public-cta{white-space:nowrap}
