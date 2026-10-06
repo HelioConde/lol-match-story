@@ -392,7 +392,7 @@
   }
 
   function renderRail() {
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(modeLabel(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small><span class="match-mode">${esc(modeLabel(m.context||m.queue||'LoL'))}</span><span class="match-kda"> · ${m.kills}/${m.deaths}/${m.assists}</span></small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
     const rail=$('#matchRail');
     const pills=[...document.querySelectorAll('.match-pill')];
     const active=pills[state.selected];
@@ -742,7 +742,7 @@
     }
     state.lookup={gameName,tagLine,platform};state.selected=0;state.requestedMatchId=requestedMatchId;
     setLookupBusy(true);
-    if(useDemo){state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
+    if(useDemo){state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo · dados de exemplo.':'Demo mode · example data.');showStory();return;}
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
       const data=await fetchLive(state.lookup),matches=adaptResponse(data);
