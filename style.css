@@ -229,3 +229,11 @@
   body:not(.results-mode) .hero-proof small{display:none}
   body:not(.results-mode) .product-copy .preview-demo{display:none}
 }
+
+.brand-short{display:none}
+@media(max-width:520px){
+  .brand-long{display:none}
+  .brand-short{display:inline;font-size:12px}
+  .brand{gap:8px}
+  body:not(.results-mode) .product-preview .preview-card{order:-1}
+}
