@@ -500,3 +500,31 @@
   .match-rail-head #matchPosition{color:#c2cbd8;font-weight:900;letter-spacing:.09em}
   .match-rail-hint{color:#8998ad!important;font-size:10px}
 }
+
+/* Screenshot-driven progress states */
+.loading-step{position:relative;overflow:hidden;transition:border-color .2s ease,background .2s ease,opacity .2s ease}
+.loading-step:not(.active):not(.done){opacity:.68}
+.loading-step.active{border-color:#80662f;background:linear-gradient(145deg,#17170f,#0d141f)}
+.loading-step.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#d7b15d,#f0cc72,#d7b15d);background-size:200% 100%;animation:loading-stage-flow 1.25s linear infinite}
+.loading-step.done{border-color:#285344;background:linear-gradient(145deg,#10201c,#0d141f)}
+.loading-step.done b{color:#72c9a7}
+.loading-step.done b:after{content:" ✓";font-family:system-ui;font-size:9px}
+.loading-step.active strong{color:#f4f0e7}
+@keyframes loading-stage-flow{to{background-position:-200% 0}}
+#loadingStatus{min-height:18px;font-weight:700;letter-spacing:.01em}
+@media(prefers-reduced-motion:reduce){.loading-step.active:after{animation:none}}
+
+.pager-avatar{width:34px;height:34px;flex:0 0 34px;border-radius:9px;background-image:var(--pager-icon);background-size:cover;background-position:center;border:1px solid #40506a;box-shadow:0 4px 14px #0005}
+.pager-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.story-pager-btn{min-width:0}
+.story-pager-btn strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.story-pager.single .story-pager-btn:not([hidden]){grid-column:1/-1;max-width:300px}
+.story-pager.single #nextMatchBtn{justify-self:end}
+.story-pager.single #prevMatchBtn{justify-self:start}
+@media(max-width:600px){
+  .story-pager.single .story-pager-btn:not([hidden]){width:100%;max-width:none}
+  .story-pager-btn{flex-direction:row!important;align-items:center!important}
+  .story-pager-btn:last-child{justify-content:flex-end}
+  .pager-avatar{width:38px;height:38px;flex-basis:38px}
+  .story-pager-btn strong{max-width:160px}
+}

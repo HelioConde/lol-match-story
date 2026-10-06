@@ -89,9 +89,9 @@
         <div class="loading-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div>
       </div>
       <div class="loading-steps" aria-label="Etapas da busca">
-        <span class="loading-step"><b>01</b><strong data-i18n="loadingStepProfile">Riot ID</strong><small data-i18n="loadingStepProfileText">Validando identificação</small></span>
-        <span class="loading-step"><b>02</b><strong data-i18n="loadingStepMatches">Partidas</strong><small data-i18n="loadingStepMatchesText">Buscando histórico recente</small></span>
-        <span class="loading-step"><b>03</b><strong data-i18n="loadingStepStory">História</strong><small data-i18n="loadingStepStoryText">Montando os capítulos</small></span>
+        <span class="loading-step" data-loading-stage="profile"><b>01</b><strong data-i18n="loadingStepProfile">Riot ID</strong><small data-i18n="loadingStepProfileText">Validando identificação</small></span>
+        <span class="loading-step" data-loading-stage="matches"><b>02</b><strong data-i18n="loadingStepMatches">Partidas</strong><small data-i18n="loadingStepMatchesText">Buscando histórico recente</small></span>
+        <span class="loading-step" data-loading-stage="story"><b>03</b><strong data-i18n="loadingStepStory">História</strong><small data-i18n="loadingStepStoryText">Montando os capítulos</small></span>
       </div>
       <div class="skeleton loading-rail"></div>
       <div class="loading-story-card">
@@ -102,7 +102,7 @@
           <div class="loading-grid"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
         </div>
       </div>
-      <p data-i18n="loadingStory">Buscando partidas e montando sua história…</p>
+      <p id="loadingStatus" data-i18n="loadingStory">Buscando partidas e montando sua história…</p>
     </section>
 
     <section id="storyApp" class="story-app shell hidden">

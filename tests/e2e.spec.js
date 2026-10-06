@@ -1069,3 +1069,30 @@ test('cabeçalho do rail mobile orienta o gesto no idioma ativo', async ({ page 
   await page.locator('#langBtn').click();
   await expect(page.locator('.match-rail-hint')).toHaveText('← swipe to choose →');
 });
+
+
+test('loading destaca etapas reais sem usar percentual', async ({ page }) => {
+  await page.route('**/public-lol-profile', async route => {
+    await new Promise(r=>setTimeout(r,450));
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+      player:{gameName:'AlchemyFlames',tagLine:'BR1'},
+      matches:[{id:'BR1_990',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}]
+    })});
+  });
+  const pending=page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('[data-loading-stage="profile"]')).toHaveClass(/active/);
+  await expect(page.locator('#loadingStatus')).toContainText(/Validando|Validating/);
+  await expect(page.locator('#loadingStatus')).not.toContainText('%');
+  await pending;
+});
+
+test('pager mostra campeão e expande a única direção disponível', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#prevMatchBtn')).toBeHidden();
+  await expect(page.locator('#nextMatchBtn .pager-avatar')).toBeVisible();
+  const bg=await page.locator('#nextMatchBtn .pager-avatar').evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(bg).toContain('Jinx.png');
+  await expect(page.locator('.story-pager')).toHaveClass(/single/);
+});

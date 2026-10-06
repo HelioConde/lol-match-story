@@ -240,6 +240,32 @@
   }
 
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
+  function setLoadingStage(stage='profile'){
+    const order=['profile','matches','story'];
+    const current=Math.max(0,order.indexOf(stage));
+    document.querySelectorAll('[data-loading-stage]').forEach((el,i)=>{
+      el.classList.toggle('done',i<current);
+      el.classList.toggle('active',i===current);
+      el.setAttribute('aria-current',i===current?'step':'false');
+    });
+    const status=$('#loadingStatus');
+    if(status){
+      const copy={
+        pt:{
+          profile:'Validando seu Riot ID e servidor…',
+          matches:'Riot ID encontrado. Buscando partidas recentes…',
+          story:'Partidas encontradas. Montando a história…'
+        },
+        en:{
+          profile:'Validating your Riot ID and server…',
+          matches:'Riot ID found. Loading recent matches…',
+          story:'Matches found. Building your story…'
+        }
+      };
+      status.textContent=copy[locale()]?.[stage]||copy.pt[stage]||'';
+    }
+  }
+
   function setSource(type,message){
     const el=$('#sourceState');
     const result=$('#resultSourceState');
@@ -258,7 +284,7 @@
       const shouldShow=busy&&!document.body.classList.contains('results-mode');
       document.body.classList.toggle('loading-mode',shouldShow);
       loading.classList.toggle('hidden',!shouldShow);
-      if(shouldShow) loading.scrollIntoView({behavior:'smooth',block:'start'});
+      if(shouldShow){setLoadingStage('profile');loading.scrollIntoView({behavior:'smooth',block:'start'});}
     }
   }
   function track(event,extra={}){
@@ -438,17 +464,22 @@
   }
 
   function renderMatchPager(){
-    const prev=$('#prevMatchBtn'),next=$('#nextMatchBtn'),pos=$('#storyPagerPosition');
+    const prev=$('#prevMatchBtn'),next=$('#nextMatchBtn'),pos=$('#storyPagerPosition'),pager=prev?.closest('.story-pager');
     if(!prev||!next||!pos||!state.matches.length)return;
     const prevIndex=state.selected-1,nextIndex=state.selected+1;
     const prevMatch=state.matches[prevIndex],nextMatch=state.matches[nextIndex];
+    const buttonMarkup=(m,direction)=>{
+      if(!m)return '';
+      const isPrev=direction==='prev';
+      const label=isPrev?(locale()==='pt'?'Anterior':'Previous'):(locale()==='pt'?'Próxima':'Next');
+      const icon=`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/champion/${championAssetName(m.championName)}.png`;
+      return `${isPrev?`<span class="pager-avatar" style="--pager-icon:url('${icon}')"></span>`:''}<span class="pager-copy"><span>${isPrev?'← ':''}${label}${isPrev?'':' →'}</span><strong>${esc(m.championName)}</strong></span>${!isPrev?`<span class="pager-avatar" style="--pager-icon:url('${icon}')"></span>`:''}`;
+    };
+    prev.hidden=!prevMatch;next.hidden=!nextMatch;
     prev.disabled=!prevMatch;next.disabled=!nextMatch;
-    prev.innerHTML=prevMatch
-      ? `<span>← ${locale()==='pt'?'Anterior':'Previous'}</span><strong>${esc(prevMatch.championName)}</strong>`
-      : `<span>← ${locale()==='pt'?'Anterior':'Previous'}</span><strong>—</strong>`;
-    next.innerHTML=nextMatch
-      ? `<span>${locale()==='pt'?'Próxima':'Next'} →</span><strong>${esc(nextMatch.championName)}</strong>`
-      : `<span>${locale()==='pt'?'Próxima':'Next'} →</span><strong>—</strong>`;
+    prev.innerHTML=buttonMarkup(prevMatch,'prev');
+    next.innerHTML=buttonMarkup(nextMatch,'next');
+    pager?.classList.toggle('single',!prevMatch||!nextMatch);
     pos.textContent=locale()==='pt'
       ? `${state.selected+1} de ${state.matches.length}`
       : `${state.selected+1} of ${state.matches.length}`;
@@ -832,6 +863,7 @@
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
       const data=await fetchLive(state.lookup),matches=adaptResponse(data);
+      setLoadingStage('story');
       if(!matches.length)throw new Error('empty_matches');
       state.explicitDemo=false;state.matches=matches;state.live=true;state.player=data?.player||null;
       const canonical=data?.player;if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
