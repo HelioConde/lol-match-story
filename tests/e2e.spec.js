@@ -173,6 +173,7 @@ test('manifest PWA está disponível', async ({ page }) => {
 
 
 test('publica snapshot seguro antes de copiar link', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read','clipboard-write']);
   await page.route('**/public-lol-profile', route => route.fulfill({
     status:200,contentType:'application/json',
     body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
