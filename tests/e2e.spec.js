@@ -815,3 +815,10 @@ test('resultado informa a posição da partida no conjunto', async ({ page }) =>
   await page.locator('.match-pill').nth(1).click();
   await expect(page.locator('#matchPosition')).toHaveText('Partida 2 de 3');
 });
+
+
+test('formulário explica que aceita Riot ID completo', async ({ page }) => {
+  await expect(page.locator('#gameName')).toHaveAccessibleName(/Riot ID|Game Name/i);
+  await expect(page.locator('#riotIdHint')).toContainText('Nome#TAG');
+  await expect(page.locator('#gameName')).toHaveAttribute('aria-describedby','riotIdHint');
+});
