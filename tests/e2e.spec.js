@@ -505,3 +505,21 @@ test('timeline da Arena pluraliza eliminações corretamente', async ({ page }) 
   await expect(page.locator('#moments')).toContainText('1 eliminação');
   await expect(page.locator('#moments')).not.toContainText('1 eliminações');
 });
+
+
+test('resultado prioriza a história e move recordes para depois do card', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('.lookup-card')).toBeHidden();
+  const storyBox=await page.locator('#storyCard').boundingBox();
+  const recordsBox=await page.locator('#historicalRecords').boundingBox();
+  if(recordsBox) expect(recordsBox.y).toBeGreaterThan(storyBox.y);
+});
+
+test('navegação mobile usa rótulos curtos de capítulos', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('.chapter-nav')).toContainText('Abertura');
+  await expect(page.locator('.chapter-nav')).toContainText('Momentos');
+  await expect(page.locator('.chapter-nav')).toContainText('Impacto');
+  await expect(page.locator('.chapter-nav')).toContainText('Final');
+});
