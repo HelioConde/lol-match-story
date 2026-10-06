@@ -822,3 +822,22 @@ test('formulário explica que aceita Riot ID completo', async ({ page }) => {
   await expect(page.locator('#riotIdHint')).toContainText('Nome#TAG');
   await expect(page.locator('#gameName')).toHaveAttribute('aria-describedby','riotIdHint');
 });
+
+
+test('consulta real exibe skeleton enquanto aguarda o backend', async ({ page }) => {
+  await page.route('**/public-lol-profile', async route => {
+    await new Promise(r=>setTimeout(r,500));
+    await route.fulfill({
+      status:200,contentType:'application/json',
+      body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
+        {id:'BR1_910',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}
+      ]})
+    });
+  });
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#storyLoading')).toBeVisible();
+  await expect(page.locator('#storyApp')).toBeVisible();
+  await expect(page.locator('#storyLoading')).toBeHidden();
+});

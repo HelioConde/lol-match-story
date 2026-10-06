@@ -250,7 +250,16 @@
       result.hidden=!document.body.classList.contains('results-mode');
     }
   }
-  function setLookupBusy(busy){const btn=$('#lookupForm button[type="submit"]');if(!btn)return;btn.disabled=busy;btn.setAttribute('aria-busy',String(busy));$('#storyApp')?.setAttribute('aria-busy',String(busy));}
+  function setLookupBusy(busy){
+    const btn=$('#lookupForm button[type="submit"]');if(!btn)return;
+    btn.disabled=busy;btn.setAttribute('aria-busy',String(busy));$('#storyApp')?.setAttribute('aria-busy',String(busy));
+    const loading=$('#storyLoading');
+    if(loading){
+      const shouldShow=busy&&!document.body.classList.contains('results-mode');
+      loading.classList.toggle('hidden',!shouldShow);
+      if(shouldShow) loading.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }
   function track(event,extra={}){
     try{
       const key='lms-local-analytics';
@@ -685,6 +694,7 @@
   }
 
   function showStory(){
+    $('#storyLoading')?.classList.add('hidden');
     document.body.classList.add('results-mode');
     $('#sourceState').classList.add('results-source-hidden');
     $('#resultSourceState').hidden=false;
