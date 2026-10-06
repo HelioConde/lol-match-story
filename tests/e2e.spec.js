@@ -996,3 +996,17 @@ test('pager não exibe caixa anterior vazia na primeira partida', async ({ page 
   await expect(page.locator('#prevMatchBtn')).toBeHidden();
   await expect(page.locator('#nextMatchBtn')).toBeVisible();
 });
+
+
+test('comparação mobile permanece em três colunas sem overflow', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  const grid=page.locator('#comparison .comparison-grid');
+  await expect(grid).toBeVisible();
+  const info=await grid.evaluate(el=>({
+    columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,
+    overflow:el.scrollWidth-el.clientWidth
+  }));
+  expect(info.columns).toBe(3);
+  expect(info.overflow).toBeLessThanOrEqual(1);
+});
