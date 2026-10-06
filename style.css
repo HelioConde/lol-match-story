@@ -245,3 +245,8 @@
   .preview-copy h2{font-size:30px}
   .preview-copy p{font-size:15px}
 }
+
+@media(max-width:520px){
+  .brand .brand-long{display:none!important}
+  .brand .brand-short{display:inline!important}
+}
