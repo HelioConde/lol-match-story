@@ -46,6 +46,24 @@
       <div id="sourceState" class="source-state" aria-live="polite"></div>\n      <div id="searchHistory" class="search-history" aria-label="Histórico de pesquisas"></div>
     </section>
 
+    <section class="product-preview shell" aria-labelledby="previewTitle">
+      <div class="preview-copy">
+        <div class="eyebrow" data-i18n="previewEyebrow">NÃO É SÓ UM PLACAR</div>
+        <h2 id="previewTitle" data-i18n="previewTitle">A partida vira uma história que você entende em segundos.</h2>
+        <p data-i18n="previewText">O Match Story conecta contexto, viradas, impacto e resultado sem obrigar você a interpretar uma planilha de estatísticas.</p>
+        <button class="ghost preview-demo" type="button" data-i18n="demo">Ver demo</button>
+      </div>
+      <div class="preview-card">
+        <div class="preview-cover"></div>
+        <div class="preview-content">
+          <span>RANKED · 34:12</span>
+          <strong data-i18n="previewStory">Você não venceu no começo. Venceu quando a partida apertou.</strong>
+          <div><b>19:42</b><small data-i18n="previewMoment">A luta que segurou o jogo</small></div>
+          <div><b>84/100</b><small data-i18n="previewImpact">Impacto contextual</small></div>
+        </div>
+      </div>
+    </section>
+
     <section id="storyApp" class="story-app shell hidden">
       <div class="story-head">
         <div>
@@ -94,9 +112,16 @@
             <div id="timelineSource" class="timeline-source"></div>\n            <div id="moments" class="timeline"></div>
           </section>
 
+          <section id="turningChapter" class="chapter hidden">
+            <div id="turningNumber" class="chapter-number">03</div>
+            <p class="chapter-label" data-i18n="turningChapterLabel">PONTO DE VIRADA</p>
+            <h3 id="turningTitle"></h3>
+            <p id="turningText"></p>
+          </section>
+
           <section class="chapter impact">
             <div>
-              <div class="chapter-number">03</div>
+              <div id="impactNumber" class="chapter-number">03</div>
               <p class="chapter-label" data-i18n="impact">SEU IMPACTO</p>
               <h3 id="impactTitle">Você apareceu quando a partida ficou apertada.</h3>
               <p id="impactText">Seu melhor trecho veio nas lutas por objetivo. Participação alta, poucas mortes e pressão suficiente para transformar uma vantagem pequena em controle do mapa.</p>
@@ -105,7 +130,7 @@
           </section>
 
           <section class="chapter">
-            <div class="chapter-number">04</div>
+            <div id="finalNumber" class="chapter-number">04</div>
             <p class="chapter-label" data-i18n="finalChapter">CAPÍTULO FINAL</p>
             <h3 id="endingTitle">A vitória veio porque você converteu o momento certo.</h3>
             <p id="endingText">Nem toda vantagem precisa nascer cedo. Nesta partida, o ponto decisivo foi sobreviver ao começo e acelerar quando o time finalmente encontrou a luta certa.</p>
