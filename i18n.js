@@ -5,7 +5,7 @@ window.MATCH_STORY_I18N = {
     gameName:'Game Name', server:'Servidor', createStory:'Criar minha história', recentMatches:'PARTIDAS RECENTES', refresh:'Atualizar dados',
     chapterOpening:'ABERTURA', vision:'Visão', turningPoints:'MOMENTOS QUE MUDARAM O JOGO', impact:'SEU IMPACTO',
     finalChapter:'CAPÍTULO FINAL', shareEyebrow:'GUARDE ESSA PARTIDA', shareTitle:'Uma história que cabe em um card.',
-    shareText:'Compartilhe o resumo sem transformar sua partida em uma planilha.', share:'Compartilhar história', download:'Baixar card PNG',
+    shareText:'Compartilhe o resumo sem transformar sua partida em uma planilha.', share:'Compartilhar história', download:'Baixar card PNG', copyLink:'Copiar link',
     ad:'Espaço reservado para anúncio', footer:'Produto independente. Não afiliado à Riot Games.'
   },
   en: {
@@ -14,7 +14,7 @@ window.MATCH_STORY_I18N = {
     gameName:'Game Name', server:'Server', createStory:'Create my story', recentMatches:'RECENT MATCHES', refresh:'Refresh data',
     chapterOpening:'OPENING', vision:'Vision', turningPoints:'MOMENTS THAT CHANGED THE GAME', impact:'YOUR IMPACT',
     finalChapter:'FINAL CHAPTER', shareEyebrow:'KEEP THIS MATCH', shareTitle:'A whole story that fits in one card.',
-    shareText:'Share the summary without turning your match into a spreadsheet.', share:'Share story', download:'Download PNG card',
+    shareText:'Share the summary without turning your match into a spreadsheet.', share:'Share story', download:'Download PNG card', copyLink:'Copy link',
     ad:'Reserved ad space', footer:'Independent product. Not affiliated with Riot Games.'
   }
 };
