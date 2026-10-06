@@ -466,3 +466,21 @@ test('Top 4 da Arena não é tratado visualmente como derrota', async ({ page })
   await expect(page.locator('.mini-result').first()).toHaveClass(/placement/);
   await expect(page.locator('#resultBadge')).not.toHaveClass(/loss/);
 });
+
+
+test('recordes persistentes usam pluralização correta', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
+      {id:'BR1_55',champion:'Gragas',context:'ARENA',queue:'ARENA',placement:2,win:false,duration:26,kills:4,deaths:6,assists:21}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[],arenaRounds:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({publishedStories:1,pentakills:1,records:{},monthlyStories:[]})
+  }));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#historicalRecords')).toContainText('1 história publicada');
+  await expect(page.locator('#historicalRecords')).toContainText('1 pentakill');
+});
