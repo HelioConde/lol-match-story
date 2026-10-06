@@ -191,6 +191,15 @@
 
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
   function setSource(type,message){const el=$('#sourceState');el.className='source-state '+type;el.textContent=message;}
+  function track(event,extra={}){
+    try{
+      const key='lms-local-analytics';
+      const data=JSON.parse(localStorage.getItem(key)||'{}');
+      data[event]=(data[event]||0)+1;
+      data.lastEvent={event,at:new Date().toISOString(),mode:extra.mode||null};
+      localStorage.setItem(key,JSON.stringify(data));
+    }catch{}
+  }
 
   function adaptResponse(data) {
     const list=data?.matches || data?.recentMatches || data?.data?.matches || [];
@@ -405,11 +414,13 @@
       const requestedIndex=requestedMatchId?matches.findIndex(x=>String(x.id)===String(requestedMatchId)):-1;
       if(requestedIndex>=0) state.selected=requestedIndex;
       saveHistory(state.lookup);
+      track('lookup_success',{mode:matches[state.selected]?.context});
       setSource('live',locale()==='pt'?`Dados Riot carregados: ${matches.length} partidas recentes.`:`Riot data loaded: ${matches.length} recent matches.`);
       showStory();
     }catch(err){
       state.matches=demoMatches.map(normalizeMatch);state.live=false;
       const rate=err?.status===429||err?.code==='rate_limited';
+      track('lookup_fallback');
       setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
       showStory();
     }
@@ -442,7 +453,7 @@
   }
 
   function downloadCard(){
-    const canvas=drawShareCard();if(!canvas)return;
+    const canvas=drawShareCard();if(!canvas)return;track('png_download',{mode:state.matches[state.selected]?.context});
     canvas.toBlob(blob=>{if(!blob)return;const a=document.createElement('a');a.href=URL.createObjectURL(blob);const m=state.matches[state.selected];const champion=String(m.championName||'match').toLowerCase().replace(/[^a-z0-9]+/g,'-');a.download=`lol-match-story-${champion}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(locale()==='pt'?'Card PNG gerado.':'PNG card generated.');},'image/png');
   }
 
@@ -451,8 +462,8 @@
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();});
   $('#downloadBtn').addEventListener('click',downloadCard);
-  $('#copyLinkBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(shareUrl());toast(locale()==='pt'?'Link da partida copiado.':'Match link copied.');}catch{}});
-  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:shareUrl()});else{await navigator.clipboard.writeText(text+' '+shareUrl());toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
+  $('#copyLinkBtn').addEventListener('click',async()=>{try{track('copy_link',{mode:state.matches[state.selected]?.context});await navigator.clipboard.writeText(shareUrl());toast(locale()==='pt'?'Link da partida copiado.':'Match link copied.');}catch{}});
+  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;track('share',{mode:m.context});const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Vitória':'Derrota')} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?'Victory':'Defeat')} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:shareUrl()});else{await navigator.clipboard.writeText(text+' '+shareUrl());toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
 
   renderSearchHistory();
   fetch('https://ddragon.leagueoflegends.com/api/versions.json',{cache:'force-cache'}).then(r=>r.ok?r.json():[]).then(v=>{if(Array.isArray(v)&&v[0]){state.ddVersion=v[0];if(state.matches.length)renderMatchDetails(state.matches[state.selected]);}}).catch(()=>{});
