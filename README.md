@@ -63,3 +63,16 @@ Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora u
 - Plataforma: `br1`
 - Região Match-V5: `americas`
 - A conta é usada apenas para validação funcional; a Riot API key continua somente no backend.
+
+
+## Estado atual do MVP 1.0
+- timeline Match-V5 real e ponto de virada;
+- Arena com janelas de combate detectadas pela timeline;
+- histórias públicas persistentes;
+- links sociais com Open Graph dinâmico via `public-lol-story-page`;
+- recordes persistentes e coleção de 30 dias;
+- feedback anônimo estruturado para validação com usuários;
+- acessibilidade com axe-core no CI;
+- anúncios desligados por padrão e carregados somente após configuração + consentimento.
+
+O que resta para fechar produto não é mais núcleo técnico: são respostas de usuários reais e credenciais definitivas do provedor de anúncios.
