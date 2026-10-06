@@ -101,7 +101,23 @@ async function capture(page, file) {
     await capture(page, 'latest-public-story-full.png');
     await desktop.close();
 
-    const mobile = await browser.newContext({
+    const tablet = await browser.newContext({
+      viewport: { width: 768, height: 1024 },
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: true
+    });
+    const tabletPage = await tablet.newPage();
+    await tabletPage.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+    await settle(tabletPage);
+    await capture(tabletPage, 'latest-tablet-home-full.png');
+    await tabletPage.locator('#demoBtn').click();
+    await tabletPage.locator('#storyApp:not(.hidden)').waitFor({ state: 'visible' });
+    await settle(tabletPage);
+    await capture(tabletPage, 'latest-tablet-story-full.png');
+    await tablet.close();
+
+        const mobile = await browser.newContext({
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 1,
       isMobile: true,
@@ -168,6 +184,8 @@ async function capture(page, file) {
         { file: 'latest-alchemy-full.png', viewport: '1440x1000', state: 'alchemy-' + liveCaptureState },
         { file: 'latest-story-full.png', viewport: '1440x1000', state: 'demo-story' },
         { file: 'latest-public-story-full.png', viewport: '1440x1000', state: 'public-story-' + publicStoryState },
+        { file: 'latest-tablet-home-full.png', viewport: '768x1024', state: 'home-tablet' },
+        { file: 'latest-tablet-story-full.png', viewport: '768x1024', state: 'demo-story-tablet' },
         { file: 'latest-mobile-home-full.png', viewport: '390x844', state: 'home-mobile' },
         { file: 'latest-alchemy-mobile-full.png', viewport: '390x844', state: 'alchemy-mobile-' + liveMobileState },
         { file: 'latest-public-story-mobile-full.png', viewport: '390x844', state: 'public-story-mobile-' + publicStoryMobileState },
