@@ -84,9 +84,13 @@
 
     <section id="storyApp" class="story-app shell hidden">
       <div class="story-head">
-        <div>
-          <div class="eyebrow" data-i18n="recentMatches">PARTIDAS RECENTES</div>
-          <h2 id="playerTitle">AlchemyFlames#BR1</h2>
+        <div class="player-heading">
+          <img id="playerIcon" class="player-icon" alt="" hidden>
+          <div>
+            <div class="eyebrow" data-i18n="recentMatches">PARTIDAS RECENTES</div>
+            <h2 id="playerTitle">AlchemyFlames#BR1</h2>
+            <span id="playerMeta" class="player-meta" hidden></span>
+          </div>
         </div>
         <div class="story-head-actions">
           <button id="newSearchBtn" class="ghost" type="button" data-i18n="newSearch">Nova busca</button>
