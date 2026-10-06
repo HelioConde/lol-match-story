@@ -413,3 +413,25 @@ test('perfil real mostra ícone e nível do invocador', async ({ page }) => {
   await expect(page.locator('#playerIcon')).toHaveAttribute('src',/profileicon\/123\.png/);
   await expect(page.locator('#playerMeta')).toContainText('Nível 77');
 });
+
+
+test('Arena usa métricas contextuais no capítulo de abertura', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[{
+      id:'BR1_321',champion:'Gragas',context:'ARENA',queue:'ARENA',placement:2,win:false,duration:26,
+      kills:4,deaths:6,assists:21,damagePerMin:1082,augments:[1,2,3,4,5]
+    }]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[],arenaRounds:[]})}));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#stat1Label')).toHaveText('Colocação');
+  await expect(page.locator('#csValue')).toHaveText('#2');
+  await expect(page.locator('#stat2Label')).toHaveText('Participações');
+  await expect(page.locator('#visionValue')).toHaveText('25');
+  await expect(page.locator('#stat3Label')).toHaveText('DPM');
+  await expect(page.locator('#kpValue')).toHaveText('1082');
+  await expect(page.locator('#stat4Label')).toHaveText('Augments');
+  await expect(page.locator('#goldValue')).toHaveText('5');
+});
