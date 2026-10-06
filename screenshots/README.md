@@ -31,3 +31,15 @@ O workflow também publica um artifact `full-page-screenshots` por 14 dias em ca
 4. O commit automático das imagens ignora deploy/versionamento para não criar loop.
 
 As capturas são feitas com Playwright usando `fullPage: true`.
+
+
+## Orçamento visual
+
+Após gerar as imagens, o CI valida automaticamente limites para evitar regressões de comprimento e peso:
+
+- home desktop: até **1800 px** de altura;
+- história desktop: até **3800 px**;
+- história mobile: até **5600 px**;
+- também valida largura esperada e tamanho máximo dos PNGs.
+
+O comando local é `npm run check:visual`.
