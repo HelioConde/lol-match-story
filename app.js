@@ -222,7 +222,11 @@
     }
     const bits=[];
     if(state.player?.level) bits.push((locale()==='pt'?'Nível ':'Level ')+state.player.level);
-    if(state.player?.platform) bits.push(String(state.player.platform).toUpperCase());
+    if(state.player?.platform){
+      const option=[...($('#platform')?.options||[])].find(o=>String(o.value).toLowerCase()===String(state.lookup?.platform||'').toLowerCase());
+      const serverName=option?.textContent?.trim()||String(state.player.platform).toUpperCase();
+      bits.push((locale()==='pt'?'Servidor ':'Server ')+serverName);
+    }
     meta.textContent=bits.join(' · ');
     meta.hidden=!bits.length;
   }
