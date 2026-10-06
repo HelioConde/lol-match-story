@@ -40,6 +40,9 @@ async function capture(page, file) {
     let liveCaptureState='unknown';
     await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
     await settle(page);
+    await page.locator('#gameName').fill('AlchemyFlames');
+    await page.locator('#tagLine').fill('BR1');
+    await page.locator('#platform').selectOption('br1');
     await page.locator('#lookupForm button[type="submit"]').click();
     try {
       await Promise.race([
