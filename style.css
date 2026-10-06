@@ -82,3 +82,8 @@
 .historical-records .records-title{padding-bottom:11px;border-bottom:1px solid #202a39}
 @media(max-width:800px){.session-grid{grid-template-columns:1fr 1fr}.session-title{align-items:start;flex-direction:column}.session-title>small{text-align:left}}
 @media(max-width:430px){.session-grid{grid-template-columns:1fr}}
+
+.session-link{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.session-link small{display:block;margin-top:8px;color:#8c9aaf;font-size:10px;font-weight:700;opacity:0;transform:translateY(2px);transition:.16s}
+.session-link:hover,.session-link:focus-visible{border-color:#9b7938;background:linear-gradient(145deg,#151b24,#0d131c)}
+.session-link:hover small,.session-link:focus-visible small{opacity:1;transform:none}
