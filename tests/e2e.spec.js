@@ -1159,3 +1159,28 @@ test('timeline real usa selo visual de evidência real', async ({ page }) => {
   await expect(page.locator('#timelineSource')).toHaveClass(/real/);
   await expect(page.locator('#timelineSource')).toContainText('Timeline real');
 });
+
+
+test('tablet mantém formulário equilibrado e diferenciais em três colunas', async ({ page }) => {
+  await page.setViewportSize({width:768,height:1024});
+  const form=page.locator('#lookupForm');
+  await expect(form).toBeVisible();
+  const columns=await form.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+  expect(columns).toBe(2);
+  const cta=await form.locator('.primary').boundingBox();
+  expect(cta.width).toBeGreaterThanOrEqual(145);
+  const proofCols=await page.locator('.hero-proof').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+  expect(proofCols).toBe(3);
+});
+
+test('tablet usa toda a largura disponível para compartilhar', async ({ page }) => {
+  await page.setViewportSize({width:768,height:1024});
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  const actions=await page.locator('.share-actions').boundingBox();
+  const block=await page.locator('.share-block').boundingBox();
+  expect(actions.width).toBeGreaterThan(block.width*0.85);
+  const toolsCols=await page.locator('.share-tools').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+  expect(toolsCols).toBe(3);
+});
