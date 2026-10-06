@@ -25,6 +25,8 @@ jobs:
           test -f service-worker.js
           test -f i18n.js
           test -f backend-config.js
+          test -f ads-config.js
+          test -f ads.js
           test -f README.md
           test -f FULLSTACK.md
           test -f ADS_SETUP.md
@@ -35,6 +37,8 @@ jobs:
           grep -qi 'id="storyApp"' index.html
           grep -qi 'public-lol-profile' backend-config.js
           grep -qi 'public-lol-story' backend-config.js
+          grep -qi 'public-lol-feedback' backend-config.js
+          grep -qi 'public-lol-story-page' backend-config.js
           grep -qi 'id="publicStory"' story.html
           grep -qi 'navigator.share' app.js
           grep -qi 'LoL Match Story' README.md
