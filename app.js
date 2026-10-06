@@ -4,191 +4,261 @@
   const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false };
 
   const demoMatches = [
-    {
-      id:'demo-1', win:true, championName:'Ahri', championId:103, queue:'Ranked Solo', duration:2052, kills:10, deaths:3, assists:11,
-      cs:228, vision:31, kp:61, gold:12840, score:84, date:'Hoje',
-      titlePt:'A partida em que você não desistiu.', titleEn:'The match where you refused to give up.',
-      subtitlePt:'Um começo difícil, um mid game paciente e uma luta que virou tudo.', subtitleEn:'A rough start, a patient mid game, and one fight that changed everything.',
-      moments:[
-        {m:'08:14',pt:'Primeiro sinal de controle',en:'First sign of control',dpt:'Você evitou uma troca ruim e manteve a rota jogável até o primeiro recall.',den:'You avoided a bad trade and kept the lane playable until the first recall.'},
-        {m:'19:42',pt:'A luta que segurou o jogo',en:'The fight that kept the game alive',dpt:'Participação em três eliminações perto do dragão impediu o snowball adversário.',den:'Three takedown contributions near dragon stopped the enemy snowball.'},
-        {m:'27:08',pt:'O ponto de virada',en:'The turning point',dpt:'Um pick antes do Barão abriu a primeira janela real para assumir o mapa.',den:'A pick before Baron opened the first real window to take over the map.'}
-      ]
-    },
-    {
-      id:'demo-2', win:false, championName:'Jinx', championId:222, queue:'Ranked Solo', duration:1845, kills:8, deaths:7, assists:6,
-      cs:252, vision:18, kp:54, gold:12120, score:66, date:'Ontem',
-      titlePt:'Você teve dano. Faltou espaço para usar.', titleEn:'You had the damage. You lacked the space to use it.',
-      subtitlePt:'Boa economia, lutas difíceis e um fim decidido antes do seu pico completo.', subtitleEn:'Good economy, difficult fights, and an ending decided before your full spike.',
-      moments:[
-        {m:'10:02',pt:'Farm acima do ritmo',en:'Ahead on farm',dpt:'Você construiu uma base sólida de ouro sem precisar arriscar a rota.',den:'You built a solid gold base without over-risking lane.'},
-        {m:'21:33',pt:'Pressão sem proteção',en:'Pressure without protection',dpt:'O time entrou separado e você precisou recuar antes de conseguir bater livre.',den:'The team entered split and you had to retreat before getting free damage.'},
-        {m:'29:51',pt:'Última defesa',en:'Last defense',dpt:'O dano apareceu, mas a luta começou tarde demais para recuperar o mapa.',den:'The damage showed up, but the fight started too late to recover the map.'}
-      ]
-    },
-    {
-      id:'demo-3', win:true, championName:'Lux', championId:99, queue:'Normal Draft', duration:1677, kills:6, deaths:2, assists:15,
-      cs:173, vision:42, kp:70, gold:10480, score:91, date:'2 dias',
-      titlePt:'Você venceu antes do placar mostrar.', titleEn:'You won before the scoreboard showed it.',
-      subtitlePt:'Visão, picks e controle de espaço construíram uma vitória limpa.', subtitleEn:'Vision, picks, and space control built a clean win.',
-      moments:[
-        {m:'07:48',pt:'Primeira rotação útil',en:'First useful rotation',dpt:'Você saiu da rota na hora certa e transformou pressão em assistência.',den:'You left lane at the right time and turned pressure into an assist.'},
-        {m:'16:20',pt:'Mapa escuro para o rival',en:'A dark map for the enemy',dpt:'A vantagem de visão começou a gerar picks sem necessidade de luta longa.',den:'Vision advantage started creating picks without needing long fights.'},
-        {m:'24:44',pt:'Controle total',en:'Full control',dpt:'A última sequência de visão e zoneamento encerrou qualquer chance de contestação.',den:'The final chain of vision and zoning ended any chance to contest.'}
-      ]
-    }
+    {id:'demo-1',win:true,championName:'Ahri',queue:'Ranked Solo',durationSeconds:2052,kills:10,deaths:3,assists:11,cs:228,vision:31,kp:61,gold:12840,damage:27600,damagePerMin:807,teamDamageShare:28.4,firstBloodAssist:true,soloKills:2,doubleKills:1,largestKillingSpree:6,turretDamage:3200,objectiveDamage:5100,score:86},
+    {id:'demo-2',win:false,championName:'Jinx',queue:'Ranked Solo',durationSeconds:1845,kills:8,deaths:7,assists:6,cs:252,vision:18,kp:54,gold:12120,damage:31100,damagePerMin:1011,teamDamageShare:31.7,tripleKills:1,largestKillingSpree:4,turretDamage:4700,objectiveDamage:3800,score:70},
+    {id:'demo-3',win:true,championName:'Lux',queue:'Normal Draft',durationSeconds:1677,kills:6,deaths:2,assists:15,cs:173,vision:42,kp:70,gold:10480,damage:19800,damagePerMin:708,teamDamageShare:22.1,firstBloodAssist:true,controlWards:4,wardsPlaced:18,ccSeconds:31,score:91}
   ];
 
-  const $ = (s) => document.querySelector(s);
+  const $ = s => document.querySelector(s);
   const locale = () => state.locale;
-  const t = (k) => dictionaries[locale()]?.[k] || dictionaries.pt?.[k] || k;
-  const platformRegion = (p) => ({br1:'americas',na1:'americas',la1:'americas',la2:'americas',oc1:'sea',euw1:'europe',eun1:'europe',tr1:'europe',ru:'europe',kr:'asia',jp1:'asia'})[p] || 'americas';
+  const t = k => dictionaries[locale()]?.[k] || dictionaries.pt?.[k] || k;
   const esc = (v='') => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const platformRegion = p => ({br1:'americas',na1:'americas',la1:'americas',la2:'americas',oc1:'sea',ph2:'sea',sg2:'sea',th2:'sea',tw2:'sea',vn2:'sea',euw1:'europe',eun1:'europe',tr1:'europe',ru:'europe',kr:'asia',jp1:'asia'})[p] || 'americas';
 
-  function championSplash(id){ return id ? `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey(id)}_0.jpg` : ''; }
-  const championKeys = {103:'Ahri',222:'Jinx',99:'Lux',157:'Yasuo',266:'Aatrox',84:'Akali',145:'Kaisa',64:'LeeSin',238:'Zed',81:'Ezreal',22:'Ashe',412:'Thresh'};
-  function championKey(id){ return championKeys[Number(id)] || 'Ahri'; }
-
-  function applyI18n(){
-    document.documentElement.lang = locale()==='pt' ? 'pt-BR' : 'en';
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.dataset.i18n;
-      if (key === 'heroTitle') el.innerHTML = t(key); else el.textContent = t(key);
-    });
-    $('#langBtn').textContent = locale()==='pt' ? 'EN' : 'PT';
-    if (state.matches.length) renderSelected();
+  function safeNumber(...values) {
+    for (const value of values) if (value !== undefined && value !== null && Number.isFinite(Number(value))) return Number(value);
+    return 0;
   }
 
-  function toast(msg){
-    const el=$('#toast'); el.textContent=msg; el.classList.add('show');
-    clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2600);
+  function durationSeconds(raw, info) {
+    if (info?.gameDuration != null) return Number(info.gameDuration);
+    if (raw?.gameDuration != null) return Number(raw.gameDuration);
+    if (raw?.durationSeconds != null) return Number(raw.durationSeconds);
+    if (raw?.duration != null) {
+      const value = Number(raw.duration);
+      return value > 240 ? value : Math.round(value * 60);
+    }
+    return 0;
   }
 
-  function setSource(type, message){
-    const el=$('#sourceState'); el.className='source-state ' + type; el.textContent=message;
+  function championAssetName(name) {
+    const map={Wukong:'MonkeyKing',"Kai'Sa":'Kaisa',Kaisa:'Kaisa',"Kha'Zix":'Khazix',Khazix:'Khazix',"Cho'Gath":'Chogath',Chogath:'Chogath',"Rek'Sai":'RekSai',RekSai:'RekSai',"Bel'Veth":'Belveth',BelVeth:'Belveth',Nunu:'Nunu',NunuWillump:'Nunu',LeBlanc:'Leblanc',VelKoz:'Velkoz'};
+    return map[name] || String(name||'Ahri').replace(/[^A-Za-z0-9]/g,'');
   }
 
-  function normalizeMatch(raw, i){
-    const p = raw?.participant || raw?.player || raw?.self || raw;
-    const info = raw?.info || raw;
-    const duration = Number(info?.gameDuration || raw?.duration || raw?.gameDuration || 0);
-    const win = Boolean(p?.win ?? raw?.win);
-    const kills = Number(p?.kills ?? raw?.kills ?? 0), deaths = Number(p?.deaths ?? raw?.deaths ?? 0), assists = Number(p?.assists ?? raw?.assists ?? 0);
-    const cs = Number(p?.totalMinionsKilled ?? p?.cs ?? raw?.cs ?? 0) + Number(p?.neutralMinionsKilled ?? 0);
-    const vision = Number(p?.visionScore ?? raw?.visionScore ?? 0);
-    const gold = Number(p?.goldEarned ?? raw?.goldEarned ?? 0);
-    const championName = p?.championName || raw?.championName || 'Champion';
-    const championId = Number(p?.championId || raw?.championId || 0);
-    const kp = Math.min(100, Math.max(0, Number(raw?.killParticipation || p?.killParticipation || 0) * (Number(raw?.killParticipation || p?.killParticipation || 0) <= 1 ? 100 : 1))) || Math.min(95, 38 + assists * 2 + kills);
-    const score = Math.max(35, Math.min(98, Math.round(55 + (win?12:0) + kills*1.4 + assists*.7 - deaths*2 + vision*.2)));
-    const strong = kills + assists >= 15;
-    const titlePt = win ? (strong ? 'Você encontrou o momento e tomou a partida.' : 'Você transformou consistência em vitória.') : (deaths <= 4 ? 'Você resistiu. A partida escapou em outro lugar.' : 'A partida acelerou antes de você estabilizar.');
-    const titleEn = win ? (strong ? 'You found the moment and took over the match.' : 'You turned consistency into a win.') : (deaths <= 4 ? 'You held on. The match slipped elsewhere.' : 'The game accelerated before you stabilized.');
-    return {
-      id: raw?.metadata?.matchId || raw?.matchId || raw?.id || 'live-'+i, win, championName, championId, queue: raw?.queueName || raw?.queue || 'League of Legends',
-      duration, kills, deaths, assists, cs, vision, kp: Math.round(kp), gold, score, date: locale()==='pt'?'Recente':'Recent', titlePt, titleEn,
-      subtitlePt: win ? 'O jogo teve um ponto de aceleração claro — e você estava presente nele.' : 'Os números contam só metade. O contexto mostra onde a partida começou a escapar.',
-      subtitleEn: win ? 'The game had a clear acceleration point — and you were present for it.' : 'The numbers tell only half the story. Context shows where the match began to slip.',
-      moments: buildMoments({win,kills,deaths,assists,vision,duration})
+  function championSplash(name) {
+    return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championAssetName(name)}_0.jpg`;
+  }
+
+  function archetype(m) {
+    if (m.pentaKills) return {key:'legendary',pt:'NOITE LENDÁRIA',en:'LEGENDARY NIGHT'};
+    if (m.win && m.deaths >= 6 && m.kills + m.assists >= 16) return {key:'comeback',pt:'COMEBACK',en:'COMEBACK'};
+    if (m.win && m.deaths <= 2 && m.score >= 85) return {key:'control',pt:'CONTROLE TOTAL',en:'TOTAL CONTROL'};
+    if (m.teamDamageShare >= 30 || m.damagePerMin >= 900 || m.kills >= 12) return {key:'carry',pt:'CARRY',en:'CARRY'};
+    if (m.vision >= 35 || m.ccSeconds >= 25 || m.assists >= 15) return {key:'utility',pt:'MAESTRO',en:'PLAYMAKER'};
+    if (!m.win && m.deaths <= 4 && m.kills + m.assists >= 10) return {key:'resistance',pt:'RESISTÊNCIA',en:'RESISTANCE'};
+    if (!m.win && m.damagePerMin >= 850) return {key:'pressure',pt:'PRESSÃO SEM CONVERSÃO',en:'PRESSURE WITHOUT CONVERSION'};
+    return {key:m.win?'steady-win':'learning-loss',pt:m.win?'VITÓRIA CONSISTENTE':'DERROTA PARA REVISAR',en:m.win?'STEADY WIN':'LOSS TO REVIEW'};
+  }
+
+  function storyCopy(m) {
+    const a=archetype(m);
+    const copies={
+      legendary:{pt:['Uma partida para guardar.','Você criou o tipo de momento que muda uma partida e vira lembrança.'],en:['A match worth keeping.','You created the kind of moment that changes a game and becomes a memory.']},
+      comeback:{pt:['A partida em que cair não significou acabar.','O começo cobrou caro, mas sua presença cresceu justamente quando o jogo ficou mais difícil.'],en:['The match where falling behind did not mean the end.','The start was costly, but your presence grew exactly when the game became harder.']},
+      control:{pt:['Você venceu antes do placar parecer decidido.','Poucas mortes, impacto alto e controle suficiente para não devolver a partida.'],en:['You won before the scoreboard looked decided.','Few deaths, high impact, and enough control to never hand the game back.']},
+      carry:{pt:['Quando o time precisou de dano, você apareceu.','A partida girou ao redor da sua capacidade de transformar recursos em pressão real.'],en:['When the team needed damage, you showed up.','The match revolved around turning your resources into real pressure.']},
+      utility:{pt:['Você fez a partida acontecer para os outros.','Visão, assistências e controle de espaço foram o fio invisível desta história.'],en:['You made the game happen for everyone else.','Vision, assists, and space control were the invisible thread of this story.']},
+      resistance:{pt:['Você resistiu mais do que o resultado mostra.','A derrota esconde uma partida em que você ainda encontrou maneiras de manter o jogo vivo.'],en:['You held on longer than the result suggests.','The loss hides a game where you still found ways to keep it alive.']},
+      pressure:{pt:['Você teve impacto. Faltou transformar pressão em mapa.','Os números mostram presença, mas o jogo terminou antes dessa força virar controle.'],en:['You had impact. The missing piece was converting pressure into map control.','The numbers show presence, but the game ended before that strength became control.']},
+      'steady-win':{pt:['Você transformou consistência em vitória.','Sem depender de um único lance, sua partida foi construída por decisões que se acumularam.'],en:['You turned consistency into a win.','Without relying on one play, your match was built by decisions that accumulated.']},
+      'learning-loss':{pt:['A partida acelerou antes de você estabilizar.','Nem toda derrota nasce em um único erro; aqui, o ritmo foi escapando em pequenas janelas.'],en:['The match accelerated before you stabilized.','Not every loss comes from one mistake; here, the pace slipped through smaller windows.']}
     };
+    return copies[a.key][locale()];
   }
 
-  function buildMoments(m){
-    const total=Math.max(1200,m.duration||1800), m1=Math.round(total*.25), m2=Math.round(total*.57), m3=Math.round(total*.82);
-    const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-    return [
-      {m:fmt(m1),pt:'Primeiro retrato da rota',en:'First lane snapshot',dpt:m.deaths<=2?'Você manteve a partida estável e preservou recursos.':'A fase inicial cobrou caro e passou a exigir recuperação.',den:m.deaths<=2?'You kept the match stable and preserved resources.':'The early game was costly and forced a recovery plan.'},
-      {m:fmt(m2),pt:'A partida mudou de escala',en:'The match changed scale',dpt:m.kills+m.assists>=12?'Sua participação começou a pesar nas lutas coletivas.':'As lutas cresceram, seu impacto ainda dependia de encontrar uma janela melhor.',den:m.kills+m.assists>=12?'Your participation started to matter in team fights.':'As fights grew, your impact still depended on finding a better window.'},
-      {m:fmt(m3),pt:m.win?'A janela decisiva':'O momento decisivo',en:m.win?'The decisive window':'The decisive moment',dpt:m.win?'O time converteu pressão em objetivo e o mapa finalmente abriu.':'A última sequência definiu o mapa antes de uma nova recuperação.',den:m.win?'The team converted pressure into an objective and the map finally opened.':'The final sequence decided the map before another recovery was possible.'}
-    ];
+  function computeScore(m) {
+    let score=50+(m.win?10:0)+Math.min(18,(m.kills+m.assists)*.8)-Math.min(18,m.deaths*2);
+    score+=Math.min(8,m.vision*.12)+Math.min(8,m.damagePerMin/180);
+    if(m.firstBloodKill||m.firstBloodAssist) score+=3;
+    if(m.pentaKills) score+=10; else if(m.quadraKills) score+=7; else if(m.tripleKills) score+=4;
+    if(m.objectivesStolen) score+=6;
+    return Math.max(35,Math.min(99,Math.round(score)));
   }
 
-  function adaptResponse(data){
-    const list = data?.matches || data?.recentMatches || data?.data?.matches || [];
-    return Array.isArray(list) ? list.map(normalizeMatch) : [];
+  function normalizeMatch(raw, i) {
+    const p=raw?.participant || raw?.player || raw?.self || raw;
+    const info=raw?.info || raw;
+    const kills=safeNumber(p?.kills,raw?.kills), deaths=safeNumber(p?.deaths,raw?.deaths), assists=safeNumber(p?.assists,raw?.assists);
+    const cs=safeNumber(p?.cs,raw?.cs,p?.totalMinionsKilled)+safeNumber(p?.neutralMinionsKilled);
+    const kpRaw=p?.killParticipation ?? raw?.killParticipation;
+    const kp=kpRaw == null ? Math.min(95,38+assists*2+kills) : Math.round(Number(kpRaw)<=1?Number(kpRaw)*100:Number(kpRaw));
+    const m={
+      id:raw?.metadata?.matchId || raw?.matchId || raw?.id || 'live-'+i,
+      win:Boolean(p?.win ?? raw?.win),
+      championName:p?.champion || p?.championName || raw?.champion || raw?.championName || 'Champion',
+      queue:raw?.queueName || raw?.queue || raw?.context || 'League of Legends',
+      durationSeconds:durationSeconds(raw,info),
+      kills,deaths,assists,cs,
+      vision:safeNumber(p?.vision,raw?.vision,p?.visionScore,raw?.visionScore),
+      kp,
+      gold:safeNumber(p?.gold,raw?.gold,p?.goldEarned,raw?.goldEarned),
+      damage:safeNumber(p?.damage,raw?.damage,p?.totalDamageDealtToChampions),
+      damagePerMin:safeNumber(p?.damagePerMin,raw?.damagePerMin),
+      teamDamageShare:safeNumber(p?.teamDamageShare,raw?.teamDamageShare),
+      objectiveDamage:safeNumber(p?.objectiveDamage,raw?.objectiveDamage,p?.damageDealtToObjectives),
+      turretDamage:safeNumber(p?.turretDamage,raw?.turretDamage,p?.damageDealtToTurrets),
+      turretTakedowns:safeNumber(p?.turretTakedowns,raw?.turretTakedowns),
+      firstBloodKill:Boolean(p?.firstBloodKill ?? raw?.firstBloodKill),
+      firstBloodAssist:Boolean(p?.firstBloodAssist ?? raw?.firstBloodAssist),
+      soloKills:safeNumber(p?.soloKills,raw?.soloKills),
+      doubleKills:safeNumber(p?.doubleKills,raw?.doubleKills),
+      tripleKills:safeNumber(p?.tripleKills,raw?.tripleKills),
+      quadraKills:safeNumber(p?.quadraKills,raw?.quadraKills),
+      pentaKills:safeNumber(p?.pentaKills,raw?.pentaKills),
+      largestKillingSpree:safeNumber(p?.largestKillingSpree,raw?.largestKillingSpree),
+      objectivesStolen:safeNumber(p?.objectivesStolen,raw?.objectivesStolen),
+      wardsPlaced:safeNumber(p?.wardsPlaced,raw?.wardsPlaced),
+      wardsKilled:safeNumber(p?.wardsKilled,raw?.wardsKilled),
+      controlWards:safeNumber(p?.controlWards,raw?.controlWards),
+      ccSeconds:safeNumber(p?.ccSeconds,raw?.ccSeconds,p?.timeCCingOthers),
+      position:p?.position || raw?.position || null
+    };
+    m.score=safeNumber(raw?.score)||computeScore(m);
+    m.moments=buildMoments(m);
+    return m;
   }
 
-  async function fetchLive(lookup){
-    const controller = new AbortController(), timer=setTimeout(()=>controller.abort(),14000);
+  function buildMoments(m) {
+    const total=Math.max(900,m.durationSeconds||1800);
+    const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.round(s)%60).padStart(2,'0');
+    const moments=[];
+    if(m.firstBloodKill||m.firstBloodAssist) moments.push({m:fmt(total*.12),pt:'Você apareceu no primeiro sangue',en:'You were there for first blood',dpt:m.firstBloodKill?'A primeira eliminação da partida foi sua.':'Você participou da primeira eliminação e ajudou a abrir o placar.',den:m.firstBloodKill?'The first kill of the match was yours.':'You contributed to first blood and helped open the game.'});
+    else moments.push({m:fmt(total*.24),pt:'Primeiro retrato da partida',en:'First snapshot of the match',dpt:m.deaths<=2?'Você manteve risco baixo e preservou recursos.':'O começo exigiu recuperação antes das lutas maiores.',den:m.deaths<=2?'You kept risk low and preserved resources.':'The opening demanded recovery before larger fights.'});
+
+    if(m.pentaKills||m.quadraKills||m.tripleKills||m.doubleKills) {
+      const label=m.pentaKills?'Pentakill':m.quadraKills?'Quadrakill':m.tripleKills?'Triple kill':'Double kill';
+      moments.push({m:fmt(total*.58),pt:label+' mudou o ritmo',en:label+' changed the pace',dpt:'Uma sequência de eliminações concentrou seu maior pico de impacto da partida.',den:'A multi-kill sequence concentrated your biggest impact spike of the match.'});
+    } else if(m.largestKillingSpree>=5) {
+      moments.push({m:fmt(total*.58),pt:'Você entrou em sequência',en:'You went on a streak',dpt:`Sua maior sequência chegou a ${m.largestKillingSpree} eliminações sem cair.`,den:`Your biggest streak reached ${m.largestKillingSpree} kills without dying.`});
+    } else {
+      moments.push({m:fmt(total*.57),pt:'A partida mudou de escala',en:'The match changed scale',dpt:m.kills+m.assists>=12?'Sua participação começou a pesar nas lutas coletivas.':'As lutas cresceram, a janela de impacto ficou mais apertada.',den:m.kills+m.assists>=12?'Your participation started to matter in team fights.':'As fights grew, the impact window became tighter.'});
+    }
+
+    if(m.objectivesStolen) moments.push({m:fmt(total*.8),pt:'Um objetivo roubado virou o mapa',en:'An objective steal flipped the map',dpt:'Você tirou um objetivo das mãos do adversário e criou uma mudança imediata de pressão.',den:'You stole an objective and created an immediate pressure swing.'});
+    else if(m.turretTakedowns>=2 || m.turretDamage>=4000) moments.push({m:fmt(total*.82),pt:'Pressão virou estrutura',en:'Pressure became structures',dpt:'Seu impacto saiu das lutas e apareceu diretamente nas torres.',den:'Your impact moved beyond fights and showed up directly on structures.'});
+    else moments.push({m:fmt(total*.82),pt:m.win?'A janela decisiva':'O momento decisivo',en:m.win?'The decisive window':'The decisive moment',dpt:m.win?'O time converteu pressão e fechou a partida.':'A última sequência definiu o mapa antes de uma nova recuperação.',den:m.win?'The team converted pressure and closed the game.':'The final sequence decided the map before another recovery was possible.'});
+    return moments.slice(0,3);
+  }
+
+  function applyI18n() {
+    document.documentElement.lang=locale()==='pt'?'pt-BR':'en';
+    document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(key==='heroTitle')el.innerHTML=t(key);else el.textContent=t(key);});
+    $('#langBtn').textContent=locale()==='pt'?'EN':'PT';
+    if(state.matches.length){renderRail();renderSelected();}
+  }
+
+  function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
+  function setSource(type,message){const el=$('#sourceState');el.className='source-state '+type;el.textContent=message;}
+
+  function adaptResponse(data) {
+    const list=data?.matches || data?.recentMatches || data?.data?.matches || [];
+    return Array.isArray(list)?list.map(normalizeMatch):[];
+  }
+
+  async function fetchLive(lookup) {
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),14000);
     try{
-      const res=await fetch(backend.lolProfile,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        gameName:lookup.gameName, tagLine:lookup.tagLine, platform:lookup.platform, region:platformRegion(lookup.platform), limit:12, matchLimit:12
-      }),signal:controller.signal});
-      let data=null; try{ data=await res.json(); }catch{}
-      if(!res.ok || data?.error) throw Object.assign(new Error(data?.message||'lookup_failed'),{status:res.status,code:data?.error});
+      const res=await fetch(backend.lolProfile,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameName:lookup.gameName,tagLine:lookup.tagLine,platform:lookup.platform,region:platformRegion(lookup.platform),limit:12,matchLimit:12}),signal:controller.signal});
+      let data=null;try{data=await res.json();}catch{}
+      if(!res.ok||data?.error)throw Object.assign(new Error(data?.message||'lookup_failed'),{status:res.status,code:data?.error});
       return data;
-    }finally{ clearTimeout(timer); }
+    }finally{clearTimeout(timer);}
   }
 
-  function renderRail(){
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`
-      <button class="match-pill ${i===state.selected?'active':''}" data-index="${i}">
-        <span class="mini-result ${m.win?'win':'loss'}">${m.win ? (locale()==='pt'?'V':'W') : (locale()==='pt'?'D':'L')}</span>
-        <span><strong>${esc(m.championName)}</strong><small>${m.kills}/${m.deaths}/${m.assists}</small></span>
-      </button>`).join('');
+  function renderRail() {
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L')}</span><span><strong>${esc(m.championName)}</strong><small>${m.kills}/${m.deaths}/${m.assists}</small></span></button>`).join('');
     document.querySelectorAll('.match-pill').forEach(b=>b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();}));
   }
 
-  function renderSelected(){
-    const m=state.matches[state.selected]; if(!m)return;
-    const mins=Math.floor(m.duration/60), secs=String(m.duration%60).padStart(2,'0');
-    $('#storyKicker').textContent=`${m.queue.toUpperCase()} • ${mins}:${secs}`;
-    $('#storyTitle').textContent=locale()==='pt'?m.titlePt:m.titleEn;
-    $('#storySubtitle').textContent=locale()==='pt'?m.subtitlePt:m.subtitleEn;
+  function renderSelected() {
+    const m=state.matches[state.selected];if(!m)return;
+    const mins=Math.floor(m.durationSeconds/60),secs=String(m.durationSeconds%60).padStart(2,'0');
+    const copy=storyCopy(m),a=archetype(m);
+    $('#storyKicker').textContent=`${String(m.queue).toUpperCase()} • ${mins}:${secs}`;
+    $('#storyTitle').textContent=copy[0];$('#storySubtitle').textContent=copy[1];
+    $('#archetypeBadge').textContent=locale()==='pt'?a.pt:a.en;
     $('#resultBadge').textContent=m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT');
     $('#resultBadge').className='result '+(m.win?'win':'loss');
-    $('#championName').textContent=m.championName; $('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
-    $('#csValue').textContent=m.cs||'—'; $('#visionValue').textContent=m.vision||'—'; $('#kpValue').textContent=(m.kp||0)+'%';
-    $('#goldValue').textContent=m.gold? (m.gold/1000).toFixed(1)+'k':'—'; $('#impactScore').textContent=m.score;
-    $('#storyCard').style.setProperty('--cover', `url("${championSplash(m.championId)}")`);
-    $('#openingTitle').textContent=locale()==='pt' ? (m.deaths<=3?'Você construiu a partida sem se entregar cedo.':'O começo exigiu recuperação.') : (m.deaths<=3?'You built the game without giving it away early.':'The opening demanded recovery.');
-    $('#openingText').textContent=locale()==='pt' ? `Com ${m.cs||0} de farm e ${m.vision||0} de visão, o início mostra ${m.deaths<=3?'controle de risco':'um ritmo mais turbulento'} antes das lutas maiores.` : `With ${m.cs||0} CS and ${m.vision||0} vision, the opening shows ${m.deaths<=3?'risk control':'a more turbulent pace'} before larger fights.`;
+    $('#championName').textContent=m.championName;$('#kda').textContent=`${m.kills} / ${m.deaths} / ${m.assists}`;
+    $('#csValue').textContent=m.cs||'—';$('#visionValue').textContent=m.vision||'—';$('#kpValue').textContent=(m.kp||0)+'%';$('#goldValue').textContent=m.gold?(m.gold/1000).toFixed(1)+'k':'—';$('#impactScore').textContent=m.score;
+    $('#impactRing').style.setProperty('--score',m.score);
+    $('#storyCard').style.setProperty('--cover',`url("${championSplash(m.championName)}")`);
+    $('#openingTitle').textContent=locale()==='pt'?(m.firstBloodKill?'Você abriu o placar.':m.deaths<=3?'Você construiu espaço sem entregar cedo.':'O começo exigiu recuperação.'):(m.firstBloodKill?'You opened the scoreboard.':m.deaths<=3?'You built space without giving the game away early.':'The opening demanded recovery.');
+    const pace=m.damagePerMin? `${Math.round(m.damagePerMin)} DPM` : `${m.kills+m.assists} participações`;
+    $('#openingText').textContent=locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`;
     $('#impactTitle').textContent=locale()==='pt'?`Impacto geral: ${m.score}/100.`:`Overall impact: ${m.score}/100.`;
-    $('#impactText').textContent=locale()==='pt'?`Você terminou com ${m.kills+m.assists} participações diretas em abates e ${m.deaths} mortes. O resumo prioriza o que isso significou no fluxo da partida.`:`You finished with ${m.kills+m.assists} direct takedown contributions and ${m.deaths} deaths. The summary focuses on what that meant in the flow of the match.`;
+    const dmg=m.damage? ` ${Math.round(m.damage/100)/10}k de dano a campeões.`:'';
+    $('#impactText').textContent=locale()==='pt'?`Você terminou com ${m.kills+m.assists} participações, ${m.deaths} mortes e${dmg||' impacto distribuído ao longo da partida.'}`:`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and${dmg?dmg.replace(' de dano a campeões.','k champion damage.'):' impact spread across the match.'}`;
     $('#endingTitle').textContent=locale()==='pt'?(m.win?'O último capítulo foi de conversão.':'O último capítulo mostra onde a recuperação parou.'):(m.win?'The final chapter was about conversion.':'The final chapter shows where the recovery stopped.');
-    $('#endingText').textContent=locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, objetivo e encerramento. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, objectives, and a finish. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.');
+    $('#endingText').textContent=locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, estruturas ou objetivo. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, structures, or objectives. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.');
     $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
-    const chips = locale()==='pt'
-      ? [`${m.kills+m.assists} participações`,`${m.vision} visão`,`${m.cs} CS`,m.win?'Vitória convertida':'Derrota revisável']
-      : [`${m.kills+m.assists} takedowns`,`${m.vision} vision`,`${m.cs} CS`,m.win?'Converted win':'Reviewable loss'];
+    const chips=locale()==='pt'
+      ? [`${m.kills+m.assists} participações`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Vitória convertida':'Derrota revisável']
+      : [`${m.kills+m.assists} takedowns`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} vision`,m.largestKillingSpree>=3?`Streak x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Converted win':'Reviewable loss'];
     $('#highlights').innerHTML=chips.map(x=>`<div class="highlight">${esc(x)}</div>`).join('');
   }
 
-  function showStory(){
-    $('#storyApp').classList.remove('hidden'); $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`; renderRail(); renderSelected();
-    $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  function showStory(){ $('#storyApp').classList.remove('hidden');$('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;renderRail();renderSelected();$('#storyApp').scrollIntoView({behavior:'smooth',block:'start'}); }
 
-  async function runLookup(useDemo=false){
-    const gameName=$('#gameName').value.trim(), tagLine=$('#tagLine').value.trim().replace('#',''), platform=$('#platform').value;
-    if(!gameName || !tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
-    state.lookup={gameName,tagLine,platform}; state.selected=0;
-    if(useDemo){state.matches=demoMatches;state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
+  async function runLookup(useDemo=false) {
+    const gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#',''),platform=$('#platform').value;
+    if(!gameName||!tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
+    state.lookup={gameName,tagLine,platform};state.selected=0;
+    if(useDemo){state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
-      const data=await fetchLive(state.lookup), matches=adaptResponse(data);
-      if(!matches.length) throw new Error('empty_matches');
-      state.matches=matches; state.live=true;
-      const canonical=data?.player;
-      if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
+      const data=await fetchLive(state.lookup),matches=adaptResponse(data);
+      if(!matches.length)throw new Error('empty_matches');
+      state.matches=matches;state.live=true;
+      const canonical=data?.player;if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
       setSource('live',locale()==='pt'?`Dados Riot carregados: ${matches.length} partidas recentes.`:`Riot data loaded: ${matches.length} recent matches.`);
       showStory();
     }catch(err){
-      state.matches=demoMatches; state.live=false;
-      setSource('demo', locale()==='pt'?'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.');
+      state.matches=demoMatches.map(normalizeMatch);state.live=false;
+      const rate=err?.status===429||err?.code==='rate_limited';
+      setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
       showStory();
     }
+  }
+
+  function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+
+  function wrapText(ctx,text,x,y,maxWidth,lineHeight,maxLines=3){
+    const words=String(text).split(/\s+/);let line='',lines=[];
+    for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;}
+    if(line)lines.push(line);lines=lines.slice(0,maxLines);
+    lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+lines.length*lineHeight;
+  }
+
+  function drawShareCard() {
+    const m=state.matches[state.selected];if(!m)return null;
+    const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#111a2b');g.addColorStop(.55,'#080b12');g.addColorStop(1,'#17130b');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
+    ctx.fillStyle='#d7b15d';ctx.font='800 28px system-ui';ctx.fillText('LOL MATCH STORY',70,90);
+    ctx.fillStyle='#74829a';ctx.font='600 24px system-ui';ctx.fillText(state.lookup?`${state.lookup.gameName}#${state.lookup.tagLine}`:'',70,132);
+    const a=archetype(m);ctx.fillStyle='#2a2214';roundedRect(ctx,70,190,420,62,18);ctx.fillStyle='#e2bd65';ctx.font='900 27px system-ui';ctx.fillText(locale()==='pt'?a.pt:a.en,94,231);
+    ctx.fillStyle='#f5f7fb';ctx.font='900 72px system-ui';const copy=storyCopy(m);let next=wrapText(ctx,copy[0],70,350,940,84,3);
+    ctx.fillStyle='#aab4c4';ctx.font='500 32px system-ui';next=wrapText(ctx,copy[1],70,next+32,900,46,3);
+    ctx.fillStyle=m.win?'#63e5cd':'#ff8e98';ctx.font='900 30px system-ui';ctx.fillText(m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'),70,next+72);
+    ctx.fillStyle='#f5f7fb';ctx.font='800 48px system-ui';ctx.fillText(m.championName,70,next+135);ctx.font='700 34px system-ui';ctx.fillText(`${m.kills} / ${m.deaths} / ${m.assists}`,70,next+185);
+    const stats=[['CS',m.cs||'—'],[locale()==='pt'?'VISÃO':'VISION',m.vision||'—'],['KP',(m.kp||0)+'%'],['IMPACT',m.score+'/100']];
+    stats.forEach((s,i)=>{const x=70+i*235;ctx.fillStyle='#111927';roundedRect(ctx,x,970,210,130,20);ctx.fillStyle='#77859a';ctx.font='700 20px system-ui';ctx.fillText(s[0],x+22,1010);ctx.fillStyle='#f5f7fb';ctx.font='900 38px system-ui';ctx.fillText(String(s[1]),x+22,1068);});
+    ctx.fillStyle='#526078';ctx.font='500 22px system-ui';ctx.fillText(locale()==='pt'?'Sua partida. Sua história.':'Your match. Your story.',70,1235);ctx.fillStyle='#d7b15d';ctx.font='800 24px system-ui';ctx.fillText('LoL Match Story',70,1280);
+    return canvas;
+  }
+
+  function downloadCard(){
+    const canvas=drawShareCard();if(!canvas)return;
+    canvas.toBlob(blob=>{if(!blob)return;const a=document.createElement('a');a.href=URL.createObjectURL(blob);const m=state.matches[state.selected];const champion=String(m.championName||'match').toLowerCase().replace(/[^a-z0-9]+/g,'-');a.download=`lol-match-story-${champion}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(locale()==='pt'?'Card PNG gerado.':'PNG card generated.');},'image/png');
   }
 
   $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   $('#refreshBtn').addEventListener('click',()=>runLookup(false));
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();});
-  $('#shareBtn').addEventListener('click',async()=>{
-    const m=state.matches[state.selected]; if(!m)return;
-    const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Vitória':'Derrota'} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Victory':'Defeat'} — my match told by LoL Match Story.`;
-    try{ if(navigator.share) await navigator.share({title:'LoL Match Story',text,url:location.href}); else {await navigator.clipboard.writeText(text+' '+location.href);toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');} }catch{}
-  });
+  $('#downloadBtn').addEventListener('click',downloadCard);
+  $('#shareBtn').addEventListener('click',async()=>{const m=state.matches[state.selected];if(!m)return;const text=locale()==='pt'?`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Vitória':'Derrota'} — minha partida contada no LoL Match Story.`:`${m.championName} • ${m.kills}/${m.deaths}/${m.assists} • ${m.win?'Victory':'Defeat'} — my match told by LoL Match Story.`;try{if(navigator.share)await navigator.share({title:'LoL Match Story',text,url:location.href});else{await navigator.clipboard.writeText(text+' '+location.href);toast(locale()==='pt'?'Resumo copiado.':'Summary copied.');}}catch{}});
 
   applyI18n();
 })();
