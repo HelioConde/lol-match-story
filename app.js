@@ -2,6 +2,7 @@
   const backend = window.LOL_MATCH_STORY_BACKEND || {};
   const dictionaries = window.MATCH_STORY_I18N || {};
   const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
+  let chapterObserver=null;
 
   const demoMatches = [
     {id:'demo-1',win:true,championName:'Ahri',queue:'Ranked Solo',durationSeconds:2052,kills:10,deaths:3,assists:11,cs:228,vision:31,kp:61,gold:12840,damage:27600,damagePerMin:807,teamDamageShare:28.4,firstBloodAssist:true,soloKills:2,doubleKills:1,largestKillingSpree:6,turretDamage:3200,objectiveDamage:5100,score:86},
@@ -571,11 +572,31 @@
       return u.toString();
     }catch{return null;}
   }
+  function setupChapterNav(){
+    const links=[...document.querySelectorAll('.chapter-nav a')];
+    const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const setCurrent=id=>{
+      links.forEach(a=>{
+        const active=a.getAttribute('href')==='#'+id;
+        if(active)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');
+      });
+    };
+    links.forEach(a=>a.addEventListener('click',()=>setCurrent(String(a.getAttribute('href')||'').replace('#',''))));
+    if(sections[0])setCurrent(sections[0].id);
+    chapterObserver?.disconnect();
+    if(!('IntersectionObserver' in window))return;
+    chapterObserver=new IntersectionObserver(entries=>{
+      const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(visible)setCurrent(visible.target.id);
+    },{rootMargin:'-22% 0px -62% 0px',threshold:[0,.15,.35]});
+    sections.forEach(s=>chapterObserver.observe(s));
+  }
+
   function showStory(){
     document.body.classList.add('results-mode');
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
-    renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();
+    renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();setupChapterNav();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
