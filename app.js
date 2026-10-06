@@ -188,8 +188,10 @@
     const pace=m.damagePerMin? `${Math.round(m.damagePerMin)} DPM` : `${m.kills+m.assists} participações`;
     $('#openingText').textContent=locale()==='pt'?`Com ${m.cs||0} CS, ${m.vision||0} de visão e ${pace}, o início ajuda a explicar como seu ritmo foi construído.`:`With ${m.cs||0} CS, ${m.vision||0} vision and ${pace}, the opening helps explain how your pace was built.`;
     $('#impactTitle').textContent=locale()==='pt'?`Impacto geral: ${m.score}/100.`:`Overall impact: ${m.score}/100.`;
-    const dmg=m.damage? ` ${Math.round(m.damage/100)/10}k de dano a campeões.`:'';
-    $('#impactText').textContent=locale()==='pt'?`Você terminou com ${m.kills+m.assists} participações, ${m.deaths} mortes e${dmg||' impacto distribuído ao longo da partida.'}`:`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and${dmg?dmg.replace(' de dano a campeões.','k champion damage.'):' impact spread across the match.'}`;
+    const damageK=m.damage?(m.damage/1000).toFixed(1):null;
+    $('#impactText').textContent=locale()==='pt'
+      ? (damageK?`Você terminou com ${m.kills+m.assists} participações, ${m.deaths} mortes e ${damageK}k de dano a campeões.`:`Você terminou com ${m.kills+m.assists} participações e ${m.deaths} mortes, com impacto distribuído ao longo da partida.`)
+      : (damageK?`You finished with ${m.kills+m.assists} takedown contributions, ${m.deaths} deaths and ${damageK}k champion damage.`:`You finished with ${m.kills+m.assists} takedown contributions and ${m.deaths} deaths, with impact spread across the match.`);
     $('#endingTitle').textContent=locale()==='pt'?(m.win?'O último capítulo foi de conversão.':'O último capítulo mostra onde a recuperação parou.'):(m.win?'The final chapter was about conversion.':'The final chapter shows where the recovery stopped.');
     $('#endingText').textContent=locale()==='pt'?(m.win?'A vantagem só importou quando virou espaço, estruturas ou objetivo. Essa foi a assinatura desta vitória.':'Mesmo com momentos bons, a partida terminou antes de uma nova janela segura aparecer.'):(m.win?'The lead only mattered once it became space, structures, or objectives. That was the signature of this win.':'Even with good moments, the match ended before another safe window appeared.');
     $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
