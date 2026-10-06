@@ -120,7 +120,7 @@ test('Arena usa colocação e narrativa específica', async ({ page }) => {
   await expect(page.locator('#resultBadge')).toHaveText('#1');
   await expect(page.locator('#archetypeBadge')).toHaveText('CAMPEÃO DA ARENA');
   await expect(page.locator('#storyTitle')).toContainText(/topo da Arena/i);
-  await expect(page.locator('#highlights')).toContainText('4 augments');
+  await expect(page.locator('#highlights')).toContainText('4 aprimoramentos');
   await expect(page.locator('#timelineSource')).toContainText('janelas de combate');
   await expect(page.locator('#moments')).toContainText('01:25');
   await expect(page.locator('#matchDetails')).toContainText('3 detectadas');
@@ -432,7 +432,7 @@ test('Arena usa métricas contextuais no capítulo de abertura', async ({ page }
   await expect(page.locator('#visionValue')).toHaveText('25');
   await expect(page.locator('#stat3Label')).toHaveText('DPM');
   await expect(page.locator('#kpValue')).toHaveText('1082');
-  await expect(page.locator('#stat4Label')).toHaveText('Augments');
+  await expect(page.locator('#stat4Label')).toHaveText('Aprimoramentos');
   await expect(page.locator('#goldValue')).toHaveText('5');
 });
 
