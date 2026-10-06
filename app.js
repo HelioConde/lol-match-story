@@ -1,7 +1,7 @@
 (() => {
   const backend = window.LOL_MATCH_STORY_BACKEND || {};
   const dictionaries = window.MATCH_STORY_I18N || {};
-  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false };
+  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1' };
 
   const demoMatches = [
     {id:'demo-1',win:true,championName:'Ahri',queue:'Ranked Solo',durationSeconds:2052,kills:10,deaths:3,assists:11,cs:228,vision:31,kp:61,gold:12840,damage:27600,damagePerMin:807,teamDamageShare:28.4,firstBloodAssist:true,soloKills:2,doubleKills:1,largestKillingSpree:6,turretDamage:3200,objectiveDamage:5100,score:86},
@@ -47,6 +47,10 @@
       if (m.kills+m.assists>=20) return {key:'arena-brawler',pt:'BRIGA ATÉ O FIM',en:'FIGHT TO THE END'};
       return {key:'arena-run',pt:'CORRIDA DE ARENA',en:'ARENA RUN'};
     }
+    if (m.context==='ARAM' || m.context==='ARAM MAYHEM') {
+      if (m.kills+m.assists>=25) return {key:'aram-brawl',pt:'CAOS CONTROLADO',en:'CONTROLLED CHAOS'};
+      if (!m.win && m.damagePerMin>=900) return {key:'aram-pressure',pt:'PRESSÃO ATÉ O FIM',en:'PRESSURE TO THE END'};
+    }
     if (m.pentaKills) return {key:'legendary',pt:'NOITE LENDÁRIA',en:'LEGENDARY NIGHT'};
     if (m.win && m.deaths >= 6 && m.kills + m.assists >= 16) return {key:'comeback',pt:'COMEBACK',en:'COMEBACK'};
     if (m.win && m.deaths <= 2 && m.score >= 85) return {key:'control',pt:'CONTROLE TOTAL',en:'TOTAL CONTROL'};
@@ -72,14 +76,23 @@
       'arena-champion':{pt:['Você terminou no topo da Arena.','Rounds agressivos, adaptação e sobrevivência convergiram para o primeiro lugar.'],en:['You finished on top of the Arena.','Aggressive rounds, adaptation, and survival converged into first place.']},
       'arena-top4':{pt:['Você foi longe na Arena.','A run se sustentou por rounds suficientes para transformar consistência em Top 4.'],en:['You made a deep Arena run.','The run held through enough rounds to turn consistency into a Top 4 finish.']},
       'arena-brawler':{pt:['Você transformou a Arena em guerra de atrito.','Mesmo sem o topo, sua participação em eliminações mostra uma run de combate constante.'],en:['You turned the Arena into a war of attrition.','Even without the top finish, your takedown involvement shows a constant fighting run.']},
-      'arena-run':{pt:['Cada round contou uma parte da run.','Na Arena, a história não é sobre rota ou torres: é sobre sobreviver, adaptar e vencer confrontos.'],en:['Every round told part of the run.','In Arena, the story is not about lanes or towers: it is about surviving, adapting, and winning fights.']}
+      'arena-run':{pt:['Cada round contou uma parte da run.','Na Arena, a história não é sobre rota ou torres: é sobre sobreviver, adaptar e vencer confrontos.'],en:['Every round told part of the run.','In Arena, the story is not about lanes or towers: it is about surviving, adapting, and winning fights.']},
+      'aram-brawl':{pt:['A ponte virou uma sequência de lutas sem pausa.','No ARAM, seu impacto veio da presença constante nas eliminações e do ritmo de combate.'],en:['The bridge became a nonstop chain of fights.','In ARAM, your impact came from constant takedown presence and combat pace.']},
+      'aram-pressure':{pt:['Você manteve a pressão até o fim.','Mesmo na derrota, o dano por minuto mostra que você permaneceu relevante nas lutas.'],en:['You kept the pressure until the end.','Even in defeat, damage per minute shows you stayed relevant in fights.']}
     };
     return copies[a.key][locale()];
   }
 
   function computeScore(m) {
-    let score=50+(m.win?10:0)+Math.min(18,(m.kills+m.assists)*.8)-Math.min(18,m.deaths*2);
-    score+=Math.min(8,m.vision*.12)+Math.min(8,m.damagePerMin/180);
+    if(m.context==='ARENA'){
+      let score=48+(m.placement?Math.max(0,18-(m.placement-1)*3):0)+Math.min(18,(m.kills+m.assists)*.55)-Math.min(12,m.deaths*1.2);
+      score+=Math.min(8,m.damagePerMin/180);
+      return Math.max(35,Math.min(99,Math.round(score)));
+    }
+    let score=48+(m.win?10:0)+Math.min(16,(m.kills+m.assists)*.75)-Math.min(16,m.deaths*1.8);
+    if(m.position==='SUPPORT') score+=Math.min(12,m.vision*.22)+Math.min(10,m.assists*.35)+Math.min(6,m.ccSeconds/8);
+    else if(m.position==='JUNGLE') score+=Math.min(10,(m.dragonKills+m.baronKills+m.riftHeraldTakedowns)*3)+Math.min(8,m.objectiveDamage/2500);
+    else score+=Math.min(9,m.damagePerMin/170)+Math.min(6,m.csPerMin||m.cs/Math.max(1,m.durationSeconds/60));
     if(m.firstBloodKill||m.firstBloodAssist) score+=3;
     if(m.pentaKills) score+=10; else if(m.quadraKills) score+=7; else if(m.tripleKills) score+=4;
     if(m.objectivesStolen) score+=6;
@@ -125,7 +138,16 @@
       position:p?.position || raw?.position || null,
       context:String(p?.context || raw?.context || raw?.queue || '').toUpperCase(),
       placement:safeNumber(p?.placement,raw?.placement),
-      augments:Array.isArray(p?.augments)?p.augments:(Array.isArray(raw?.augments)?raw.augments:[])
+      augments:Array.isArray(p?.augments)?p.augments:(Array.isArray(raw?.augments)?raw.augments:[]),
+      items:Array.isArray(p?.items)?p.items:(Array.isArray(raw?.items)?raw.items:[]),
+      runeStyles:Array.isArray(p?.runeStyles)?p.runeStyles:(Array.isArray(raw?.runeStyles)?raw.runeStyles:[]),
+      summonerSpells:Array.isArray(p?.summonerSpells)?p.summonerSpells:(Array.isArray(raw?.summonerSpells)?raw.summonerSpells:[]),
+      dragonKills:safeNumber(p?.dragonKills,raw?.dragonKills),
+      baronKills:safeNumber(p?.baronKills,raw?.baronKills),
+      riftHeraldTakedowns:safeNumber(p?.riftHeraldTakedowns,raw?.riftHeraldTakedowns),
+      csPerMin:safeNumber(p?.csPerMin,raw?.csPerMin),
+      visionPerMin:safeNumber(p?.visionPerMin,raw?.visionPerMin),
+      goldPerMin:safeNumber(p?.goldPerMin,raw?.goldPerMin)
     };
     m.score=safeNumber(raw?.score)||computeScore(m);
     m.moments=buildMoments(m);
