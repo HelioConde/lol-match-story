@@ -332,7 +332,18 @@
 
   function renderRail() {
     $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(String(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
-    document.querySelectorAll('.match-pill').forEach(b=>b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();}));
+    const pills=[...document.querySelectorAll('.match-pill')];
+    pills.forEach((b,idx)=>{
+      b.tabIndex=idx===state.selected?0:-1;
+      b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();});
+      b.addEventListener('keydown',e=>{
+        if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;
+        e.preventDefault();
+        const next=e.key==='Home'?0:e.key==='End'?pills.length-1:(idx+(e.key==='ArrowRight'?1:-1)+pills.length)%pills.length;
+        state.selected=next;renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
+        document.querySelectorAll('.match-pill')[next]?.focus();
+      });
+    });
   }
 
   function renderSelected() {
