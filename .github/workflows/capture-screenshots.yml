@@ -1,0 +1,75 @@
+name: Capture Full Page Screenshots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "style.css"
+      - "app.js"
+      - "i18n.js"
+      - "backend-config.js"
+      - "ads-config.js"
+      - "ads.js"
+      - "story.html"
+      - "story-public.js"
+      - "service-worker.js"
+      - "scripts/capture-pages.js"
+      - ".github/workflows/capture-screenshots.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capture-screenshots
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local site
+        run: |
+          npm run dev > /tmp/lol-match-story-server.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/lol-match-story-server.log
+          exit 1
+
+      - name: Capture full-page screenshots
+        env:
+          CAPTURE_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/capture-pages.js
+
+      - name: Commit screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add screenshots/latest-home-full.png screenshots/latest-story-full.png screenshots/latest-mobile-full.png screenshots/metadata.json
+          if git diff --cached --quiet; then
+            echo "No screenshot changes."
+            exit 0
+          fi
+          git commit -m "chore: update full-page screenshots [skip capture]"
+          git push
