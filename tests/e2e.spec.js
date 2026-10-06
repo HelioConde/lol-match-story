@@ -38,7 +38,8 @@ test('dados reais substituem demo quando public-lol-profile responde', async ({ 
       matches: [{
         id: 'BR1_1', championName: 'Lux', championId: 99, win: true,
         kills: 9, deaths: 2, assists: 14, cs: 220, visionScore: 36,
-        goldEarned: 13200, duration: 32, damage: 31200, damagePerMin: 975, teamDamageShare: 31.5,\n        largestKillingSpree: 7, tripleKills: 1, firstBloodAssist: true
+        goldEarned: 13200, duration: 32, damage: 31200, damagePerMin: 975, teamDamageShare: 31.5,
+        largestKillingSpree: 7, tripleKills: 1, firstBloodAssist: true
       }]
     })
   }));
