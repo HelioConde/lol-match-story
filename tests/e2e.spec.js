@@ -1126,10 +1126,10 @@ test('fim da história mantém detalhes, pager e compartilhamento próximos', as
   await page.locator('#gameName').fill('');
   await page.locator('#tagLine').fill('');
   await page.locator('#demoBtn').click();
-  const details=await page.locator('#matchDetails').boundingBox();
+  const anchor=await page.locator('#comparison').boundingBox();
   const pager=await page.locator('.story-pager').boundingBox();
   const share=await page.locator('.share-block').boundingBox();
-  expect(pager.y-(details.y+details.height)).toBeLessThan(90);
+  expect(pager.y-(anchor.y+anchor.height)).toBeLessThan(90);
   expect(share.y-(pager.y+pager.height)).toBeLessThan(40);
 });
 
