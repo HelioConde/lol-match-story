@@ -253,3 +253,16 @@
 
 .feedback-reasons.hidden{display:none!important}
 .public-cta{white-space:nowrap}
+
+.match-copy{min-width:0}
+.match-copy strong,.match-copy small{overflow:hidden;text-overflow:ellipsis}
+.match-copy small{white-space:nowrap}
+@media(max-width:520px){
+  .match-pill{min-width:142px;padding:9px 10px;gap:8px}
+  .match-pill .match-mode{display:none}
+  .match-pill .match-kda::first-letter{font-size:0}
+  .match-pill .match-kda{font-size:10px}
+  .match-pill .match-score{font-size:11px}
+  .mini-result{width:24px;height:24px;font-size:10px}
+  .lookup-card label span{letter-spacing:.08em}
+}
