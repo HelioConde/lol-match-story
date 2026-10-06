@@ -47,6 +47,12 @@ async function capture(page, file) {
         page.locator('#sourceState.error').waitFor({ state:'visible', timeout:20000 })
       ]);
     } catch {}
+    try {
+      await page.waitForFunction(() => {
+        const el=document.querySelector('#timelineSource');
+        return !el || !/carregando|loading/i.test(el.textContent || '');
+      }, null, { timeout: 12000 });
+    } catch {}
     await settle(page);
     liveCaptureState = await page.locator('#sourceState').evaluate(el => {
       if (el.classList.contains('live')) return 'live';
