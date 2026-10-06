@@ -191,6 +191,7 @@
 
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
   function setSource(type,message){const el=$('#sourceState');el.className='source-state '+type;el.textContent=message;}
+  function setLookupBusy(busy){const btn=$('#lookupForm button[type="submit"]');if(!btn)return;btn.disabled=busy;btn.setAttribute('aria-busy',String(busy));}
   function track(event,extra={}){
     try{
       const key='lms-local-analytics';
@@ -404,7 +405,8 @@
     const gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#',''),platform=$('#platform').value;
     if(!gameName||!tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
     state.lookup={gameName,tagLine,platform};state.selected=0;state.requestedMatchId=requestedMatchId;
-    if(useDemo){state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
+    setLookupBusy(true);
+    if(useDemo){state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
       const data=await fetchLive(state.lookup),matches=adaptResponse(data);
@@ -418,12 +420,18 @@
       setSource('live',locale()==='pt'?`Dados Riot carregados: ${matches.length} partidas recentes.`:`Riot data loaded: ${matches.length} recent matches.`);
       showStory();
     }catch(err){
-      state.matches=demoMatches.map(normalizeMatch);state.live=false;
       const rate=err?.status===429||err?.code==='rate_limited';
-      track('lookup_fallback');
-      setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
-      showStory();
-    }
+      const empty=String(err?.message||'')==='empty_matches';
+      const notFound=!rate && (/não encontrado|not found/i.test(String(err?.message||'')) || err?.code==='player');
+      if(empty||notFound){
+        state.matches=[];state.live=false;$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
+        setSource('error',locale()==='pt'?(empty?'Nenhuma partida recente compatível foi encontrada para este Riot ID.':'Riot ID não encontrado. Confira Game Name, Tag e servidor.'):(empty?'No compatible recent matches were found for this Riot ID.':'Riot ID not found. Check Game Name, Tag, and server.'));
+      }else{
+        state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
+        setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
+        showStory();
+      }
+    }finally{setLookupBusy(false);}
   }
 
   function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
