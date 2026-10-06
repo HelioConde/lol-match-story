@@ -706,8 +706,15 @@
   }
 
   async function runLookup(useDemo=false,requestedMatchId=null) {
-    const gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#',''),platform=$('#platform').value;
-    if(!gameName||!tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
+    let gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#','');
+    const platform=$('#platform').value;
+    if(useDemo){
+      gameName=gameName||'Demo Player';
+      tagLine=tagLine||'DEMO';
+    }else if(!gameName||!tagLine){
+      toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');
+      return;
+    }
     state.lookup={gameName,tagLine,platform};state.selected=0;state.requestedMatchId=requestedMatchId;
     setLookupBusy(true);
     if(useDemo){state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
