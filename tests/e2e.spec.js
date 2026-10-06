@@ -1132,3 +1132,30 @@ test('fim da história mantém detalhes, pager e compartilhamento próximos', as
   expect(pager.y-(details.y+details.height)).toBeLessThan(90);
   expect(share.y-(pager.y+pager.height)).toBeLessThan(40);
 });
+
+
+test('demo identifica horários como ilustrativos', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#timelineSource')).toHaveClass(/estimated/);
+  await expect(page.locator('#timelineSource')).toContainText('horários ilustrativos');
+  await expect(page.locator('#timelineSource')).toContainText('não eventos oficiais');
+});
+
+test('timeline real usa selo visual de evidência real', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
+      {id:'BR1_991',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO',win:true,duration:30,kills:8,deaths:2,assists:10}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({events:[{type:'KILL',timestamp:600000,time:'10:00'}],firstBlood:{type:'KILL',timestamp:600000,time:'10:00'}})
+  }));
+  await page.route('**/public-lol-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({publishedStories:0,pentakills:0,records:{}})}));
+  await page.locator('#lookupForm button[type="submit"]').click();
+  await expect(page.locator('#timelineSource')).toHaveClass(/real/);
+  await expect(page.locator('#timelineSource')).toContainText('Timeline real');
+});

@@ -378,14 +378,20 @@
   async function loadTimelineForSelected() {
     const m=state.matches[state.selected]; if(!m) return;
     const source=$('#timelineSource');
+    const setTimelineSource=(kind,message)=>{
+      source.className='timeline-source'+(kind?' '+kind:'');
+      source.textContent=message;
+    };
     if(!state.live){
-      source.textContent=locale()==='pt'?'Narrativa contextual do modo.':'Mode-contextual narrative.';
+      setTimelineSource('estimated',locale()==='pt'
+        ? (state.explicitDemo?'Demo · horários ilustrativos, não eventos oficiais da Riot.':'Exemplo temporário · horários ilustrativos, não eventos oficiais da Riot.')
+        : (state.explicitDemo?'Demo · illustrative times, not official Riot events.':'Temporary example · illustrative times, not official Riot events.'));
       return;
     }
-    source.textContent=locale()==='pt'?'Carregando eventos reais da partida…':'Loading real match events…';
+    setTimelineSource('loading',locale()==='pt'?'Carregando eventos reais da partida…':'Loading real match events…');
     try{
       const data=await fetchTimeline(m);
-      if(!data){source.textContent='';return;}
+      if(!data){setTimelineSource('', '');return;}
       m.timelineGold=data.gold||null;
       m.arenaRounds=Array.isArray(data.arenaRounds)?data.arenaRounds:[];
       if(m.context==='ARENA' && m.arenaRounds.length){
@@ -409,7 +415,7 @@
         });
         m.timelineReal=true;
         $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
-        source.textContent=locale()==='pt'?'Timeline real · janelas de combate detectadas na Arena.':'Real timeline · detected Arena combat windows.';
+        setTimelineSource('real',locale()==='pt'?'Timeline real · janelas de combate detectadas na Arena.':'Real timeline · detected Arena combat windows.');
         renderMatchDetails(m);
         return;
       }
@@ -425,9 +431,9 @@
         m.timelineReal=true;
         $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
       }
-      source.textContent=locale()==='pt'?'Timeline real do Match-V5.':'Real Match-V5 timeline.';
+      setTimelineSource('real',locale()==='pt'?'Timeline real do Match-V5.':'Real Match-V5 timeline.');
     }catch{
-      source.textContent=locale()==='pt'?'Timeline real indisponível; mantendo leitura estimada.':'Real timeline unavailable; keeping estimated narrative.';
+      setTimelineSource('estimated warning',locale()==='pt'?'Timeline real indisponível · horários estimados.':'Real timeline unavailable · estimated times.');
     }
   }
 
