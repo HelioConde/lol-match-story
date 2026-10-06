@@ -295,9 +295,66 @@
       ? (m.context==='ARENA' ? [`#${m.placement||'—'} colocação`,`${m.kills+m.assists} participações`,`${m.augments.length||0} augments`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:'Run de Arena'] : [`${m.kills+m.assists} participações`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} visão`,m.largestKillingSpree>=3?`Sequência x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Vitória convertida':'Derrota revisável'])
       : (m.context==='ARENA' ? [`#${m.placement||'—'} placement`,`${m.kills+m.assists} takedowns`,`${m.augments.length||0} augments`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:'Arena run'] : [`${m.kills+m.assists} takedowns`,m.damagePerMin?`${Math.round(m.damagePerMin)} DPM`:`${m.vision} vision`,m.largestKillingSpree>=3?`Streak x${m.largestKillingSpree}`:`${m.cs} CS`,m.win?'Converted win':'Reviewable loss']);
     $('#highlights').innerHTML=chips.map(x=>`<div class="highlight">${esc(x)}</div>`).join('');
+    renderComparison(m);
+    renderMatchDetails(m);
   }
 
-  function showStory(){ $('#storyApp').classList.remove('hidden');$('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;renderRail();renderSelected();$('#storyApp').scrollIntoView({behavior:'smooth',block:'start'}); }
+  function metricDelta(value,avg,suffix=''){
+    if(!Number.isFinite(value)||!Number.isFinite(avg)||avg===0) return '—';
+    const pct=Math.round((value-avg)/Math.abs(avg)*100);
+    return (pct>0?'+':'')+pct+'%'+suffix;
+  }
+
+  function renderComparison(m){
+    const peers=state.matches.filter((x,i)=>i!==state.selected && x.context===m.context);
+    const box=$('#comparison');
+    if(!peers.length){box.innerHTML='';return;}
+    const avg=k=>peers.reduce((a,x)=>a+Number(x[k]||0),0)/peers.length;
+    const kda=(m.kills+m.assists)/Math.max(1,m.deaths);
+    const peerKda=peers.reduce((a,x)=>a+((x.kills+x.assists)/Math.max(1,x.deaths)),0)/peers.length;
+    const items=[
+      [locale()==='pt'?'Impacto vs média':'Impact vs avg',metricDelta(m.score,avg('score'))],
+      [locale()==='pt'?'KDA vs média':'KDA vs avg',metricDelta(kda,peerKda)],
+      [m.context==='ARENA'?(locale()==='pt'?'Colocação':'Placement'):'DPM',m.context==='ARENA'?(m.placement?('#'+m.placement):'—'):metricDelta(m.damagePerMin,avg('damagePerMin'))]
+    ];
+    box.innerHTML=`<div class="chapter-label">${locale()==='pt'?'COMPARAÇÃO COM PARTIDAS DO MESMO MODO':'COMPARISON WITH SAME-MODE MATCHES'}</div><div class="comparison-grid">${items.map(([a,b])=>`<div class="comparison-item"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+  }
+
+  const spellNames={4:'Flash',14:'Ignite',12:'Teleport',7:'Heal',3:'Exhaust',11:'Smite',6:'Ghost',21:'Barrier'};
+  function renderMatchDetails(m){
+    const box=$('#matchDetails');
+    const groups=[];
+    if(m.items.length) groups.push([locale()==='pt'?'Itens':'Items',m.items.map(id=>`<span class="detail-chip"><img alt="" loading="lazy" src="https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/item/${id}.png">#${id}</span>`).join('')]);
+    if(m.summonerSpells.length) groups.push([locale()==='pt'?'Feitiços':'Summoner spells',m.summonerSpells.map(id=>`<span class="detail-chip">${esc(spellNames[id]||('Spell '+id))}</span>`).join('')]);
+    if(m.runeStyles.length) groups.push([locale()==='pt'?'Runas':'Runes',m.runeStyles.map(r=>`<span class="detail-chip">Style ${esc(r.style||'—')}</span>`).join('')]);
+    if(m.augments.length) groups.push(['Augments',m.augments.map(id=>`<span class="detail-chip">#${esc(id)}</span>`).join('')]);
+    const objectiveBits=[];
+    if(m.dragonKills) objectiveBits.push((locale()==='pt'?'Dragões ':'Dragons ')+m.dragonKills);
+    if(m.baronKills) objectiveBits.push('Baron '+m.baronKills);
+    if(m.riftHeraldTakedowns) objectiveBits.push((locale()==='pt'?'Arauto ':'Herald ')+m.riftHeraldTakedowns);
+    if(m.objectivesStolen) objectiveBits.push((locale()==='pt'?'Roubos ':'Steals ')+m.objectivesStolen);
+    if(objectiveBits.length) groups.push([locale()==='pt'?'Objetivos':'Objectives',objectiveBits.map(x=>`<span class="detail-chip">${esc(x)}</span>`).join('')]);
+    box.innerHTML=groups.map(([title,html])=>`<section><h4>${esc(title)}</h4><div class="detail-row">${html}</div></section>`).join('');
+  }
+
+  function shareUrl(){
+    const m=state.matches[state.selected];
+    const u=new URL(location.href);
+    if(state.lookup){u.searchParams.set('gameName',state.lookup.gameName);u.searchParams.set('tagLine',state.lookup.tagLine);u.searchParams.set('platform',state.lookup.platform);}
+    if(m?.id && !String(m.id).startsWith('demo-')) u.searchParams.set('match',m.id); else u.searchParams.delete('match');
+    return u.toString();
+  }
+  function updateShareUrl(){
+    if(!state.live) return;
+    const u=new URL(shareUrl());
+    history.replaceState(null,'',u.pathname+u.search+u.hash);
+  }
+  function showStory(){
+    $('#storyApp').classList.remove('hidden');
+    $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
+    renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();
+    $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
+  }
 
   async function runLookup(useDemo=false) {
     const gameName=$('#gameName').value.trim(),tagLine=$('#tagLine').value.trim().replace('#',''),platform=$('#platform').value;
