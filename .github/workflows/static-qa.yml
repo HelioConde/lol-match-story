@@ -20,6 +20,9 @@ jobs:
           test -f index.html
           test -f style.css
           test -f app.js
+          test -f story.html
+          test -f story-public.js
+          test -f service-worker.js
           test -f i18n.js
           test -f backend-config.js
           test -f README.md
@@ -31,6 +34,8 @@ jobs:
           grep -qi 'id="lookupForm"' index.html
           grep -qi 'id="storyApp"' index.html
           grep -qi 'public-lol-profile' backend-config.js
+          grep -qi 'public-lol-story' backend-config.js
+          grep -qi 'id="publicStory"' story.html
           grep -qi 'navigator.share' app.js
           grep -qi 'LoL Match Story' README.md
           grep -qi 'PT-BR' README.md
