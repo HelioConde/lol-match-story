@@ -1,42 +1,69 @@
 # Fullstack — LoL Match Story
 
 ## Produto
-Experiência narrativa pós-partida de League of Legends.
+Experiência narrativa pós-partida de League of Legends. O objetivo é explicar **o que aconteceu e por quê**, não reproduzir um tracker tradicional.
 
 ## Frontend
-Aplicação estática em HTML/CSS/JS, pronta para GitHub Pages. A interface prioriza splash art, capítulos, timeline e cards em vez de tabelas técnicas.
+HTML/CSS/JS estático publicado em GitHub Pages.
+
+Recursos atuais:
+- Riot ID + servidor;
+- PT-BR principal e EN;
+- rail de partidas;
+- capítulos narrativos e capítulo opcional de ponto de virada;
+- comparação com partidas do mesmo modo;
+- resumo de sessão;
+- itens, runas e feitiços via Data Dragon;
+- link compartilhável e PNG 4:5 / 9:16 / 1:1;
+- PWA;
+- histórico local;
+- estados de loading/erro/fallback;
+- métricas locais sem terceiros.
 
 ## Backend
-Reutiliza o Supabase gamer ZeroTwo.gg (`bieihhaobdztjyoweewa`). A Riot API key permanece exclusivamente em Edge Functions.
+Supabase gamer ZeroTwo.gg: `bieihhaobdztjyoweewa`.
 
-Integração inicial: `public-lol-profile`.
+### `public-lol-profile`
+Fornece perfil e partidas normalizadas.
 
-## Dados
-O MVP aceita respostas com `matches`, `recentMatches` ou `data.matches` e normaliza os campos relevantes para a experiência.
+### `public-lol-match-story`
+Fornece eventos derivados do Match-V5 Timeline:
+- first blood real quando o jogador participou;
+- kills/assists/deaths;
+- objetivos e estruturas;
+- multi-kills;
+- fluxo de ouro por fase;
+- maior swing de ouro;
+- ponto de virada.
 
-## UX/UI
-- hero com proposta em uma frase;
-- entrada Riot ID sem cadastro;
-- histórico horizontal compacto;
-- narrativa em quatro capítulos;
-- dados técnicos somente como apoio;
-- fallback demo sempre rotulado;
-- anúncio fora do fluxo crítico.
+A função só consulta timeline de partidas já presentes no cache e associadas ao jogador consultado. A Riot API key nunca chega ao browser.
 
-## Internacionalização
-PT-BR padrão + EN com preferência persistida em localStorage.
+### Cache
+`lol_timeline_cache`:
+- RLS ativo;
+- acesso direto revogado para `anon` e `authenticated`;
+- service role usado apenas pela Edge Function;
+- timeline de partida concluída cacheada por 30 dias.
 
-## QA mínimo
-- nenhum segredo no browser;
-- falha de API não derruba a página;
-- troca de idioma mantém o estado;
-- seleção de partida atualiza a história sem reload;
-- mobile sem overflow horizontal crítico;
-- live update ativo fora de localhost.
+## QA
+- Static QA;
+- Browser E2E;
+- Live Update QA;
+- GitHub Pages deploy;
+- GitHub Pages smoke;
+- Live Riot Data Smoke usando `AlchemyFlames#BR1`.
 
-## Próxima etapa
-1. validar IDs reais contra `public-lol-profile`;
-2. mapear exatamente o schema de partidas;
-3. derivar eventos reais quando houver timeline;
-4. exportar share card PNG;
-5. testes E2E.
+## Deploy
+`main` → GitHub Actions → GitHub Pages.
+
+URL:
+`https://helioconde.github.io/lol-match-story/`
+
+## Próximos itens estruturais
+1. persistir histórias públicas;
+2. página dedicada/metadata dinâmica por match;
+3. recordes históricos permanentes;
+4. WCAG completo;
+5. validação com usuários reais.
+
+Veja `IMPLEMENTATION_STATUS.md` para o status dos 40 itens.
