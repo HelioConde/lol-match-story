@@ -486,7 +486,9 @@
       [locale()==='pt'?'Mais kills publicadas':'Published kill record',r.kills?r.kills.value:'—',champion(r.kills)],
       [locale()==='pt'?'Melhor Arena publicada':'Published Arena best',r.arena?('#'+r.arena.value):'—',champion(r.arena)]
     ];
-    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${data.publishedStories} ${locale()==='pt'?'histórias publicadas':'published stories'} · ${data.pentakills||0} pentakills</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>`;
+    const monthly=Array.isArray(data.monthlyStories)?data.monthlyStories:[];
+    const monthlyHtml=monthly.length?`<div class="monthly-stories"><h4>${locale()==='pt'?'Histórias publicadas nos últimos 30 dias':'Stories published in the last 30 days'}</h4><div class="monthly-story-list">${monthly.map(m=>`<a href="./story.html?match=${encodeURIComponent(m.matchId)}"><strong>${esc(m.champion)}</strong><span>${esc(m.context||'LoL')} · ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'Vitória':'Win'):(locale()==='pt'?'Derrota':'Loss'))}</span></a>`).join('')}</div></div>`:'';
+    box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${data.publishedStories} ${locale()==='pt'?'histórias publicadas':'published stories'} · ${data.pentakills||0} pentakills</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}`;
   }
 
   async function loadHistoricalRecords(){
