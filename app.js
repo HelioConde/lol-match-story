@@ -444,6 +444,15 @@
       return `<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="match-avatar" aria-hidden="true" style="--champ-icon:url('${icon}')"></span><span class="mini-result ${resultTone(m)}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small><span class="match-mode">${esc(modeLabel(m.context||m.queue||'LoL'))}</span><span class="match-kda"> · ${m.kills}/${m.deaths}/${m.assists}</span></small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`;
     }).join('');
     const rail=$('#matchRail');
+    const prevBtn=$('#railPrevBtn'),nextBtn=$('#railNextBtn');
+    if(prevBtn){
+      prevBtn.disabled=state.selected<=0;
+      prevBtn.setAttribute('aria-label',locale()==='pt'?'Partida anterior':'Previous match');
+    }
+    if(nextBtn){
+      nextBtn.disabled=state.selected>=state.matches.length-1;
+      nextBtn.setAttribute('aria-label',locale()==='pt'?'Próxima partida':'Next match');
+    }
     const pills=[...document.querySelectorAll('.match-pill')];
     const active=pills[state.selected];
     if(active&&rail){
@@ -953,6 +962,8 @@
     $('#platform').focus();
   });
   $('#gameName').addEventListener('blur',syncCombinedRiotId);
+    $('#railPrevBtn')?.addEventListener('click',()=>selectMatch(state.selected-1,{scroll:false}));
+  $('#railNextBtn')?.addEventListener('click',()=>selectMatch(state.selected+1,{scroll:false}));
     $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   const previewCard=document.querySelector('.preview-demo-card');

@@ -1096,3 +1096,27 @@ test('pager mostra campeão e expande a única direção disponível', async ({ 
   expect(bg).toContain('Jinx.png');
   await expect(page.locator('.story-pager')).toHaveClass(/single/);
 });
+
+
+test('desktop navega pelas partidas com controles explícitos do rail', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#railPrevBtn')).toBeDisabled();
+  await expect(page.locator('#railNextBtn')).toBeEnabled();
+  await page.locator('#railNextBtn').click();
+  await expect(page.locator('#matchPosition')).toHaveText('Partida 2 de 3');
+  await expect(page.locator('#championName')).toHaveText('Jinx');
+  await page.locator('#railPrevBtn').click();
+  await expect(page.locator('#championName')).toHaveText('Ahri');
+});
+
+test('mobile mantém swipe como navegação principal do rail', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#railPrevBtn')).toBeHidden();
+  await expect(page.locator('#railNextBtn')).toBeHidden();
+  await expect(page.locator('.match-rail-hint')).toBeVisible();
+});

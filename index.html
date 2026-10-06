@@ -122,7 +122,14 @@
         </div>
       </div>
 
-      <div class="match-rail-head"><span id="matchPosition"></span><span class="match-rail-hint" data-i18n="railHint">← deslize para escolher →</span></div>
+      <div class="match-rail-head">
+        <span id="matchPosition"></span>
+        <div class="match-rail-actions">
+          <span class="match-rail-hint" data-i18n="railHint">← deslize para escolher →</span>
+          <button id="railPrevBtn" class="rail-nav-btn" type="button" aria-label="Partida anterior">←</button>
+          <button id="railNextBtn" class="rail-nav-btn" type="button" aria-label="Próxima partida">→</button>
+        </div>
+      </div>
       <div id="matchRail" class="match-rail" role="tablist" aria-label="Partidas recentes"></div>
       <section id="sessionSummary" class="session-summary"></section>
 
