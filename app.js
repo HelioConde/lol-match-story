@@ -256,6 +256,7 @@
     const loading=$('#storyLoading');
     if(loading){
       const shouldShow=busy&&!document.body.classList.contains('results-mode');
+      document.body.classList.toggle('loading-mode',shouldShow);
       loading.classList.toggle('hidden',!shouldShow);
       if(shouldShow) loading.scrollIntoView({behavior:'smooth',block:'start'});
     }
@@ -695,6 +696,7 @@
 
   function showStory(){
     $('#storyLoading')?.classList.add('hidden');
+    document.body.classList.remove('loading-mode');
     document.body.classList.add('results-mode');
     $('#sourceState').classList.add('results-source-hidden');
     $('#resultSourceState').hidden=false;

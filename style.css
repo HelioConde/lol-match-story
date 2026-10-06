@@ -354,3 +354,19 @@
   .loading-grid{grid-template-columns:1fr 1fr}
 }
 @media(prefers-reduced-motion:reduce){.skeleton:after{animation:none}}
+
+/* Loading mode: keep focus on the task after submit */
+.loading-mode .hero{padding:20px 0 12px}
+.loading-mode .hero>.eyebrow,
+.loading-mode .hero>h1,
+.loading-mode .hero>p,
+.loading-mode .hero-proof,
+.loading-mode .product-preview,
+.loading-mode .search-history{display:none!important}
+.loading-mode .lookup-card{margin-top:0;margin-bottom:8px}
+.loading-mode .source-state{margin:4px 0 0}
+.loading-mode .story-loading{padding-top:14px}
+@media(max-width:600px){
+  .loading-mode .hero{padding:12px 0 8px}
+  .loading-mode .lookup-card{padding:9px}
+}
