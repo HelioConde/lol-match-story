@@ -37,6 +37,27 @@ async function capture(page, file) {
     await settle(page);
     await capture(page, 'latest-home-full.png');
 
+    let liveCaptureState='unknown';
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+    await settle(page);
+    await page.locator('#lookupForm button[type="submit"]').click();
+    try {
+      await Promise.race([
+        page.locator('#storyApp:not(.hidden)').waitFor({ state:'visible', timeout:20000 }),
+        page.locator('#sourceState.error').waitFor({ state:'visible', timeout:20000 })
+      ]);
+    } catch {}
+    await settle(page);
+    liveCaptureState = await page.locator('#sourceState').evaluate(el => {
+      if (el.classList.contains('live')) return 'live';
+      if (el.classList.contains('demo')) return 'fallback-demo';
+      if (el.classList.contains('error')) return 'error';
+      return 'unknown';
+    });
+    await capture(page, 'latest-alchemy-full.png');
+
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+    await settle(page);
     await page.locator('#demoBtn').click();
     await page.locator('#storyApp:not(.hidden)').waitFor({ state: 'visible' });
     await settle(page);
@@ -64,6 +85,7 @@ async function capture(page, file) {
       commit: process.env.GITHUB_SHA || null,
       captures: [
         { file: 'latest-home-full.png', viewport: '1440x1000', state: 'home' },
+        { file: 'latest-alchemy-full.png', viewport: '1440x1000', state: 'alchemy-' + liveCaptureState },
         { file: 'latest-story-full.png', viewport: '1440x1000', state: 'demo-story' },
         { file: 'latest-mobile-full.png', viewport: '390x844', state: 'demo-story-mobile' }
       ]
