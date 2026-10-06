@@ -237,3 +237,11 @@
   .brand{gap:8px}
   body:not(.results-mode) .product-preview .preview-card{order:-1}
 }
+
+.preview-demo-card{width:100%;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.preview-demo-card:hover,.preview-demo-card:focus-visible{border-color:#7f642e;box-shadow:0 28px 90px #0008,0 0 0 1px #7f642e55}
+.preview-demo-card:focus-visible{outline:2px solid #d7b15d;outline-offset:3px}
+@media(max-width:520px){
+  .preview-copy h2{font-size:30px}
+  .preview-copy p{font-size:15px}
+}
