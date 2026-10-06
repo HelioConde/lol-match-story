@@ -642,7 +642,7 @@
   function showStory(){
     document.body.classList.add('results-mode');
     $('#storyApp').classList.remove('hidden');
-    $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
+    $('#playerTitle').textContent=`${state.lookup.gameName}#${String(state.lookup.tagLine||'').toUpperCase()}`;
     renderPlayerHeader();
     renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();setupChapterNav();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
@@ -659,7 +659,7 @@
   function renderSearchHistory(){
     const el=$('#searchHistory');if(!el)return;
     const rows=readHistory();
-    el.innerHTML=rows.map((x,i)=>`<button type="button" data-history="${i}">${esc(x.gameName)}#${esc(x.tagLine)} · ${esc(x.platform.toUpperCase())}</button>`).join('');
+    el.innerHTML=rows.map((x,i)=>`<button type="button" data-history="${i}">${esc(x.gameName)}#${esc(String(x.tagLine||'').toUpperCase())} · ${esc(x.platform.toUpperCase())}</button>`).join('');
     el.querySelectorAll('[data-history]').forEach(btn=>btn.addEventListener('click',()=>{
       const row=rows[Number(btn.dataset.history)];if(!row)return;
       $('#gameName').value=row.gameName;$('#tagLine').value=row.tagLine;$('#platform').value=row.platform;runLookup(false);
