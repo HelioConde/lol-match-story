@@ -312,3 +312,10 @@
   .share-tools .ghost{width:100%;min-height:42px}
   .share-primary{width:100%;min-height:44px}
 }
+
+.match-rail-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:3px 0 7px;color:#718097;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.match-rail-head #matchPosition{color:#9aa7ba;font-weight:800}
+.match-rail-hint{display:none}
+@media(max-width:700px){
+  .match-rail-hint{display:inline;color:#59687d;text-transform:none;letter-spacing:0}
+}

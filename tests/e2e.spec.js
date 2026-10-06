@@ -805,3 +805,13 @@ test('história pública da Arena não repete impacto na grade de métricas', as
   await expect(page.locator('#publicStats')).toContainText('Aprimoramentos');
   await expect(page.locator('#publicStats')).not.toContainText('Impacto');
 });
+
+
+test('resultado informa a posição da partida no conjunto', async ({ page }) => {
+  await page.locator('#gameName').fill('');
+  await page.locator('#tagLine').fill('');
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#matchPosition')).toHaveText('Partida 1 de 3');
+  await page.locator('.match-pill').nth(1).click();
+  await expect(page.locator('#matchPosition')).toHaveText('Partida 2 de 3');
+});
