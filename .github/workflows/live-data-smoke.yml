@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/live-data-smoke.yml"
+      - "supabase/functions/**"
+      - "supabase/migrations/**"
+      - "backend-config.js"
   workflow_dispatch:
 
 jobs:
