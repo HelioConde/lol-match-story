@@ -23,6 +23,41 @@ Deno.serve(async(req:Request)=>{
     return out({story:data});
   }
 
+  if(action==="records"){
+    const gameName=String(b.gameName||"").trim(),tagLine=String(b.tagLine||"").replace(/^#/,"").trim();
+    if(!gameName||!tagLine)return out({error:"riot_id"},400);
+    const riotId=gameName+"#"+tagLine;
+    const {data,error}=await db.from("lol_public_stories")
+      .select("match_id,riot_id,story_data,published_at")
+      .ilike("riot_id",riotId)
+      .order("published_at",{ascending:false})
+      .limit(100);
+    if(error)return out({error:"records_failed"},500);
+    const rows=(data||[]).map((x:any)=>({matchId:x.match_id,publishedAt:x.published_at,...(x.story_data?.match||{})}));
+    const kda=(m:any)=>(num(m.kills)+num(m.assists))/Math.max(1,num(m.deaths));
+    const by=(fn:(x:any)=>number)=>rows.slice().sort((a:any,b:any)=>fn(b)-fn(a))[0]||null;
+    const arena=rows.filter((x:any)=>String(x.context||"").toUpperCase()==="ARENA"&&num(x.placement)>0).sort((a:any,b:any)=>num(a.placement)-num(b.placement))[0]||null;
+    const cutoff=Date.now()-30*24*60*60*1000;
+    const month=rows.filter((x:any)=>new Date(x.publishedAt).getTime()>=cutoff);
+    const safeRecord=(m:any)=>m?{matchId:m.matchId,champion:m.champion||m.championName||"Champion",context:m.context||null,placement:m.placement||null,value:null}:null;
+    const bestDamage=by((x:any)=>num(x.damagePerMin));
+    const bestKda=by(kda);
+    const mostKills=by((x:any)=>num(x.kills));
+    const bestMonthly=month.slice().sort((a:any,b:any)=>(num(b.damagePerMin)+kda(b)*50)-(num(a.damagePerMin)+kda(a)*50))[0]||null;
+    return out({
+      riotId,
+      publishedStories:rows.length,
+      pentakills:rows.reduce((s:number,x:any)=>s+num(x.pentaKills),0),
+      records:{
+        damagePerMin:bestDamage?{...safeRecord(bestDamage),value:num(bestDamage.damagePerMin)}:null,
+        kda:bestKda?{...safeRecord(bestKda),value:+kda(bestKda).toFixed(2)}:null,
+        kills:mostKills?{...safeRecord(mostKills),value:num(mostKills.kills)}:null,
+        arena:arena?{...safeRecord(arena),value:num(arena.placement)}:null,
+        monthly:bestMonthly?{...safeRecord(bestMonthly),value:num(bestMonthly.damagePerMin)}:null
+      }
+    });
+  }
+
   if(action!=="publish")return out({error:"action"},400);
   const gameName=String(b.gameName||"").trim(),tagLine=String(b.tagLine||"").replace(/^#/,"").trim();
   const platform=String(b.platform||"br1").toLowerCase(),region=String(b.region||"americas").toLowerCase();
