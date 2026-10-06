@@ -15,7 +15,9 @@
 /* Decorative image pack integration. Every layer is optional: layout remains valid if an asset fails. */
 .hero{position:relative;isolation:isolate}
 .hero::before{
-  content:"";position:absolute;z-index:-1;inset:-18px -8vw -24px;
+  content:"";position:absolute;z-index:-1;
+  top:-18px;bottom:-24px;
+  left:calc((100vw - 100%) / -2);right:calc((100vw - 100%) / -2);
   background:
     radial-gradient(circle at 50% 15%,rgba(215,177,93,.08),transparent 46%),
     linear-gradient(180deg,rgba(8,11,18,.28),rgba(8,11,18,.94) 88%),
@@ -75,7 +77,8 @@
 
 @media(max-width:700px){
   .hero::before{
-    inset:-8px -24px -20px;
+    top:-8px;bottom:-20px;
+    left:calc((100vw - 100%) / -2);right:calc((100vw - 100%) / -2);
     background:
       linear-gradient(180deg,rgba(8,11,18,.18),rgba(8,11,18,.95) 86%),
       var(--ms-art-hero-mobile) center 28%/cover no-repeat;

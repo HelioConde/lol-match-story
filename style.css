@@ -647,9 +647,9 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
     grid-template-columns:minmax(0,1fr) minmax(170px,190px)!important;
   }
   .lookup-card .primary{
-    height:48px;
-    min-height:48px;
-    max-height:48px;
+    height:42px;
+    min-height:42px;
+    max-height:42px;
     align-self:center;
     padding-block:0;
     white-space:nowrap;
