@@ -157,3 +157,9 @@
 
 .chapter-nav a[aria-current="step"]{color:#f7f2e6;border-color:#6a5426;background:linear-gradient(135deg,#1d1a12,#111925)}
 .chapter-nav a[aria-current="step"] span{color:#f1c966}
+
+.player-heading{display:flex;align-items:center;gap:12px}
+.player-icon{width:50px;height:50px;flex:0 0 50px;border-radius:13px;object-fit:cover;border:1px solid #6f5727;box-shadow:0 8px 24px #0006}
+.player-heading h2{margin-bottom:2px}
+.player-meta{display:block;color:#8290a4;font-size:11px;font-weight:700}
+@media(max-width:520px){.player-icon{width:42px;height:42px;flex-basis:42px;border-radius:11px}}
