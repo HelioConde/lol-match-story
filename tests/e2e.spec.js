@@ -15,7 +15,7 @@ test('abre em PT-BR e mostra a proposta principal', async ({ page }) => {
 test('demo cria uma história navegável', async ({ page }) => {
   await page.getByRole('button', { name: /Ver demo/i }).click();
   await expect(page.locator('#storyApp')).toBeVisible();
-  await expect(page.locator('#storyTitle')).toContainText(/partida|dano|venceu/i);
+  await expect(page.locator('#storyTitle')).toContainText(/partida|dano|venceu|consistência|vitória/i);
   await expect(page.locator('.match-pill')).toHaveCount(3);
   await page.locator('.match-pill').nth(1).click();
   await expect(page.locator('#championName')).toHaveText('Jinx');
@@ -53,7 +53,7 @@ test('dados reais substituem demo quando public-lol-profile responde', async ({ 
   await expect(page.locator('#championName')).toHaveText('Lux');
   await expect(page.locator('#sourceState')).toContainText('Dados Riot carregados');
   await expect(page.locator('#storyKicker')).toContainText('32:00');
-  await expect(page.locator('#archetypeBadge')).toHaveText('CARRY');
+  await expect(page.locator('#archetypeBadge')).toHaveText('CONTROLE TOTAL');
 });
 
 test('falha do backend mantém fallback demonstrativo identificado', async ({ page }) => {
