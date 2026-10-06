@@ -15,6 +15,7 @@ on:
       - "story-public.js"
       - "service-worker.js"
       - "scripts/capture-pages.js"
+      - "scripts/check-visual-budget.js"
       - ".github/workflows/capture-screenshots.yml"
   workflow_dispatch:
 
@@ -61,6 +62,9 @@ jobs:
         env:
           CAPTURE_BASE_URL: http://127.0.0.1:4173
         run: node scripts/capture-pages.js
+
+      - name: Check visual budgets
+        run: npm run check:visual
 
       - name: Upload screenshot artifact
         uses: actions/upload-artifact@v4
