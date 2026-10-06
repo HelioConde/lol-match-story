@@ -12,6 +12,23 @@
   const $ = s => document.querySelector(s);
   const locale = () => state.locale;
   const t = k => dictionaries[locale()]?.[k] || dictionaries.pt?.[k] || k;
+  function modeLabel(value){
+    const raw=String(value||'League of Legends').trim();
+    const key=raw.toUpperCase().replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+    if(locale()==='en') return key || 'LEAGUE OF LEGENDS';
+    const pt={
+      'RANKED SOLO':'RANQUEADA SOLO',
+      'RANKED SOLO/DUO':'RANQUEADA SOLO/DUO',
+      'RANKED FLEX':'RANQUEADA FLEX',
+      'NORMAL DRAFT':'NORMAL (DRAFT)',
+      'NORMAL BLIND':'NORMAL (ÀS CEGAS)',
+      'QUICKPLAY':'PARTIDA RÁPIDA',
+      'ARAM':'ARAM',
+      'ARENA':'ARENA',
+      'CLASSIC':'SUMMONER\'S RIFT'
+    };
+    return pt[key]||key||'LEAGUE OF LEGENDS';
+  }
   const esc = (v='') => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const platformRegion = p => ({br1:'americas',na1:'americas',la1:'americas',la2:'americas',oc1:'sea',ph2:'sea',sg2:'sea',th2:'sea',tw2:'sea',vn2:'sea',euw1:'europe',eun1:'europe',tr1:'europe',ru:'europe',kr:'asia',jp1:'asia'})[p] || 'americas';
 
@@ -331,7 +348,7 @@
   }
 
   function renderRail() {
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(String(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" role="tab" aria-selected="${i===state.selected?'true':'false'}" aria-controls="storyCard" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span class="match-copy"><strong>${esc(m.championName)}</strong><small>${esc(modeLabel(m.context||m.queue||'LoL'))} · ${m.kills}/${m.deaths}/${m.assists}</small></span><span class="match-score" aria-label="${locale()==='pt'?'Impacto':'Impact'} ${m.score}">${m.score}</span></button>`).join('');
     const pills=[...document.querySelectorAll('.match-pill')];
     pills.forEach((b,idx)=>{
       b.tabIndex=idx===state.selected?0:-1;
@@ -353,7 +370,7 @@
     if($('#finalNumber')) $('#finalNumber').textContent='04';
     const mins=Math.floor(m.durationSeconds/60),secs=String(m.durationSeconds%60).padStart(2,'0');
     const copy=storyCopy(m),a=archetype(m);
-    $('#storyKicker').textContent=`${String(m.queue).toUpperCase()} • ${mins}:${secs}`;
+    $('#storyKicker').textContent=`${modeLabel(m.queue||m.context)} • ${mins}:${secs}`;
     $('#storyTitle').textContent=copy[0];$('#storySubtitle').textContent=copy[1];
     $('#archetypeBadge').textContent=locale()==='pt'?a.pt:a.en;
     $('#resultBadge').textContent=m.context==='ARENA' && m.placement ? `#${m.placement}` : (m.win?(locale()==='pt'?'VITÓRIA':'VICTORY'):(locale()==='pt'?'DERROTA':'DEFEAT'));
@@ -504,7 +521,7 @@
       [locale()==='pt'?'Melhor Arena publicada':'Published Arena best',r.arena?('#'+r.arena.value):'—',champion(r.arena)]
     ];
     const monthly=Array.isArray(data.monthlyStories)?data.monthlyStories:[];
-    const monthlyHtml=monthly.length?`<div class="monthly-stories"><h4>${locale()==='pt'?'Histórias publicadas nos últimos 30 dias':'Stories published in the last 30 days'}</h4><div class="monthly-story-list">${monthly.map(m=>`<a href="./story.html?match=${encodeURIComponent(m.matchId)}"><strong>${esc(m.champion)}</strong><span>${esc(m.context||'LoL')} · ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'Vitória':'Win'):(locale()==='pt'?'Derrota':'Loss'))}</span></a>`).join('')}</div></div>`:'';
+    const monthlyHtml=monthly.length?`<div class="monthly-stories"><h4>${locale()==='pt'?'Histórias publicadas nos últimos 30 dias':'Stories published in the last 30 days'}</h4><div class="monthly-story-list">${monthly.map(m=>`<a href="./story.html?match=${encodeURIComponent(m.matchId)}"><strong>${esc(m.champion)}</strong><span>${esc(modeLabel(m.context||'LoL'))} · ${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'Vitória':'Win'):(locale()==='pt'?'Derrota':'Loss'))}</span></a>`).join('')}</div></div>`:'';
     box.innerHTML=`<div class="records-title"><h3>${locale()==='pt'?'Recordes persistentes':'Persistent records'}</h3><span>${data.publishedStories} ${locale()==='pt'?'histórias publicadas':'published stories'} · ${data.pentakills||0} pentakills</span></div><div class="records-grid">${cards.map(([label,value,who])=>`<div class="record-card"><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(who)}</small></div>`).join('')}</div>${monthlyHtml}`;
   }
 
