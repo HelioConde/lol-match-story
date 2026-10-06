@@ -644,3 +644,33 @@ test('história pública trata Top 4 da Arena como colocação positiva', async 
   await expect(page.locator('#publicSubtitle')).toContainText('campanha');
   await expect(page.locator('#publicSubtitle')).not.toContainText(/run|round/i);
 });
+
+
+test('história pública mantém motivos de feedback ocultos até resposta negativa', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_404',riot_id:'AlchemyFlames#br1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082,augments:[1,2,3,4,5]}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_404');
+  await expect(page.locator('#feedbackReasons')).toBeHidden();
+  await page.getByRole('button',{name:'Ainda não'}).click();
+  await expect(page.locator('#feedbackReasons')).toBeVisible();
+});
+
+test('história pública da Arena usa métricas contextuais e Tag normalizada', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_405',riot_id:'AlchemyFlames#br1',
+      story_data:{match:{champion:'Gragas',context:'ARENA',placement:2,win:false,durationSeconds:1500,kills:4,deaths:6,assists:21,damagePerMin:1082,augments:[1,2,3,4,5]}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_405');
+  await expect(page.locator('#publicKicker')).toContainText('AlchemyFlames#BR1');
+  await expect(page.locator('#publicStats')).toContainText('Participações');
+  await expect(page.locator('#publicHighlights')).toContainText('5 aprimoramentos');
+  await expect(page.locator('#publicImpactText')).not.toContainText('% de participação em abates');
+});
