@@ -141,3 +141,16 @@
   .match-details-panel summary{align-items:flex-start}
   .match-details-panel summary small{display:none}
 }
+
+/* Capture-driven refinements */
+.ad-slot.hidden{display:none!important}
+.results-mode #demoBtn,
+.results-mode .search-history{display:none}
+@media(max-width:600px){
+  .moment{grid-template-columns:36px minmax(0,1fr);gap:15px;padding:15px 0}
+  .timeline:before{left:43px}
+  .moment-time{font-size:11px}
+  .moment strong{font-size:16px;line-height:1.25}
+  .moment p{font-size:13px;line-height:1.55}
+  .cover-shade{background:linear-gradient(0deg,#0d121c 0,#0d121c66 54%,transparent 76%),linear-gradient(90deg,#0b0f16f2 0,#0b0f168f 68%,#0b0f1640)}
+}
