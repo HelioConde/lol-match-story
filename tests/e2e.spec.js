@@ -564,3 +564,11 @@ test('home mobile mantém identidade curta e prioriza preview visual', async ({ 
   const cardOrder=await page.locator('.preview-card').evaluate(el=>getComputedStyle(el).order);
   expect(Number(cardOrder)).toBeLessThan(0);
 });
+
+
+test('card visual da home abre a demo', async ({ page }) => {
+  await expect(page.locator('.preview-demo-card')).toBeVisible();
+  await page.locator('.preview-demo-card').click();
+  await expect(page.locator('#storyApp')).toBeVisible();
+  await expect(page.locator('body')).toHaveClass(/results-mode/);
+});
