@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-06T18:02:42.790Z",
+  "generatedAt": "2026-10-06T18:05:15.025Z",
   "source": "http://127.0.0.1:4173",
-  "commit": "8f844d6cad9ab91426eb5f1e8714daa4ed63572e",
+  "commit": "13dd4fdf5f14b3e6c6fea2f26886692daeff9de3",
   "captures": [
     {
       "file": "latest-home-full.png",
@@ -26,7 +26,7 @@
     {
       "file": "latest-public-story-full.png",
       "viewport": "1440x1000",
-      "state": "public-story-loaded"
+      "state": "public-story-unavailable"
     },
     {
       "file": "latest-mobile-home-full.png",
