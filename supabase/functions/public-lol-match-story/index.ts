@@ -85,6 +85,33 @@ Deno.serve(async(req:Request)=>{
   let teamId=Number(own.teamId||0)||(participantId<=5?100:200);
 
   const frames=Array.isArray(timeline?.info?.frames)?timeline.info.frames:[];
+  const matchParticipants=Array.isArray(mc?.match_data?.info?.participants)?mc.match_data.info.participants:[];
+  const participantTeam=new Map<number,number>();
+  participants.forEach((pu:any,idx:number)=>{
+    const mp=matchParticipants.find((x:any)=>String(x.puuid)===String(pu));
+    if(mp?.teamId) participantTeam.set(idx+1,Number(mp.teamId));
+  });
+  const goldTimeline=frames.map((frame:any)=>{
+    let ownGold=0,enemyGold=0;
+    const pf=frame?.participantFrames||{};
+    Object.entries(pf).forEach(([idStr,v]:any)=>{
+      const id=Number(idStr),gold=Number(v?.totalGold||0),tid=participantTeam.get(id)||(id<=5?100:200);
+      if(tid===teamId) ownGold+=gold; else enemyGold+=gold;
+    });
+    return {timestamp:Number(frame?.timestamp||0),time:mmss(Number(frame?.timestamp||0)),ownGold,enemyGold,diff:ownGold-enemyGold};
+  }).filter((x:any)=>x.timestamp>=0);
+
+  const closestPhase=(target:number)=>{
+    if(!goldTimeline.length)return null;
+    return goldTimeline.reduce((best:any,x:any)=>Math.abs(x.timestamp-target)<Math.abs(best.timestamp-target)?x:best,goldTimeline[0]);
+  };
+  const early=closestPhase(10*60*1000),mid=closestPhase(20*60*1000),late=goldTimeline.at(-1)||null;
+  let biggestSwing:any=null;
+  for(let i=1;i<goldTimeline.length;i++){
+    const prev=goldTimeline[i-1],cur=goldTimeline[i],delta=cur.diff-prev.diff;
+    if(!biggestSwing||Math.abs(delta)>Math.abs(biggestSwing.delta)) biggestSwing={from:prev.time,to:cur.time,timestamp:cur.timestamp,time:cur.time,delta,diffAfter:cur.diff};
+  }
+
   const events:any[]=[];
   const kills:any[]=[];
   let firstChampionKill:any=null;
@@ -144,12 +171,27 @@ Deno.serve(async(req:Request)=>{
   });
   let turningPoint=candidates.sort((a:any,b:any)=>Math.abs(b.weight)-Math.abs(a.weight))[0]||null;
   if(bestMulti && (!turningPoint || bestMulti.count>=3)) turningPoint={type:"MULTI_KILL",...bestMulti,weight:5+bestMulti.count};
+  if(biggestSwing && Math.abs(biggestSwing.delta)>=1200){
+    const nearest=combined.reduce((best:any,e:any)=>{
+      const dist=Math.abs(Number(e.timestamp||0)-biggestSwing.timestamp);
+      return !best||dist<best.dist?{event:e,dist}:best;
+    },null);
+    if(nearest?.event && nearest.dist<=90000){
+      turningPoint={...nearest.event,weight:6,reason:"gold_swing",goldSwing:biggestSwing.delta,goldDiffAfter:biggestSwing.diffAfter};
+    }else{
+      turningPoint={type:"GOLD_SWING",timestamp:biggestSwing.timestamp,time:biggestSwing.time,weight:6,reason:"gold_swing",goldSwing:biggestSwing.delta,goldDiffAfter:biggestSwing.diffAfter};
+    }
+  }
 
   return out({
     matchId,participantId,teamId,cacheHit,
     firstBlood,
     bestMulti,
     turningPoint,
+    gold:{
+      phases:{early,mid,late},
+      biggestSwing
+    },
     events:combined.slice(0,80),
     counts:{
       kills:kills.filter((x:any)=>x.type==="KILL").length,
