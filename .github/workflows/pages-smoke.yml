@@ -1,0 +1,19 @@
+name: GitHub Pages Smoke
+
+on:
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public site
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 https://helioconde.github.io/lol-match-story/ -o page.html
+          grep -q "LoL Match Story" page.html
+          curl --fail --silent --show-error --location https://helioconde.github.io/lol-match-story/manifest.webmanifest -o manifest.webmanifest
+          grep -q '"name": "LoL Match Story"' manifest.webmanifest
