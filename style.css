@@ -227,7 +227,7 @@
     white-space:normal;
   }
   body:not(.results-mode) .hero-proof small{display:none}
-  body:not(.results-mode) .product-copy .preview-demo{display:none}
+  body:not(.results-mode) .preview-copy .preview-demo{display:none}
 }
 
 .brand-short{display:none}
