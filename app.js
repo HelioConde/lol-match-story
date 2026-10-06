@@ -250,6 +250,38 @@
     return null;
   }
 
+  function renderTurningChapter(data,m){
+    const section=$('#turningChapter');
+    if(!section)return;
+    const tp=data?.turningPoint;
+    const strongSwing=tp?.reason==='gold_swing' && Math.abs(Number(tp.goldSwing||0))>=1200;
+    const strongMulti=data?.bestMulti?.count>=3;
+    if(!strongSwing && !strongMulti){
+      section.classList.add('hidden');
+      $('#impactNumber').textContent='03';
+      $('#finalNumber').textContent='04';
+      return;
+    }
+    section.classList.remove('hidden');
+    $('#impactNumber').textContent='04';
+    $('#finalNumber').textContent='05';
+    if(strongSwing){
+      const swing=Math.abs(Number(tp.goldSwing||0));
+      const after=Number(tp.goldDiffAfter||0);
+      $('#turningTitle').textContent=locale()==='pt'?'Foi aqui que a partida mudou de direção.':'This is where the match changed direction.';
+      $('#turningText').textContent=locale()==='pt'
+        ? 'Por volta de '+tp.time+', o maior swing alterou a diferença em '+(swing/1000).toFixed(1)+'k de ouro e deixou seu time '+(after>=0?'à frente':'atrás')+' logo depois.'
+        : 'Around '+tp.time+', the biggest swing moved the gold gap by '+(swing/1000).toFixed(1)+'k and left your team '+(after>=0?'ahead':'behind')+' immediately after.';
+    }else{
+      $('#turningTitle').textContent=locale()==='pt'
+        ? 'Uma sequência de '+data.bestMulti.count+' eliminações abriu a janela.'
+        : 'A '+data.bestMulti.count+'-kill sequence opened the window.';
+      $('#turningText').textContent=locale()==='pt'
+        ? 'Aos '+data.bestMulti.time+', sua sequência concentrou o maior pico individual da partida.'
+        : 'At '+data.bestMulti.time+', your streak concentrated the biggest individual spike of the match.';
+    }
+  }
+
   async function loadTimelineForSelected() {
     const m=state.matches[state.selected]; if(!m) return;
     const source=$('#timelineSource');
@@ -262,6 +294,7 @@
       const data=await fetchTimeline(m);
       if(!data){source.textContent='';return;}
       m.timelineGold=data.gold||null;
+      renderTurningChapter(data,m);
       const picks=[];
       if(data.firstBlood) picks.push(data.firstBlood);
       if(data.turningPoint && !picks.some(x=>x.timestamp===data.turningPoint.timestamp)) picks.push(data.turningPoint);
@@ -286,6 +319,9 @@
 
   function renderSelected() {
     const m=state.matches[state.selected];if(!m)return;
+    $('#turningChapter')?.classList.add('hidden');
+    if($('#impactNumber')) $('#impactNumber').textContent='03';
+    if($('#finalNumber')) $('#finalNumber').textContent='04';
     const mins=Math.floor(m.durationSeconds/60),secs=String(m.durationSeconds%60).padStart(2,'0');
     const copy=storyCopy(m),a=archetype(m);
     $('#storyKicker').textContent=`${String(m.queue).toUpperCase()} • ${mins}:${secs}`;
@@ -538,6 +574,7 @@
 
   $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
+  document.querySelector('.preview-demo')?.addEventListener('click',()=>runLookup(true));
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#langBtn').addEventListener('click',()=>{state.locale=locale()==='pt'?'en':'pt';localStorage.setItem('lms-locale',state.locale);applyI18n();loadGameAssets();});
   $('#downloadBtn').addEventListener('click',downloadCard);
