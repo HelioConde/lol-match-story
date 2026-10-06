@@ -13,7 +13,7 @@ test('abre em PT-BR e mostra a proposta principal', async ({ page }) => {
 });
 
 test('demo cria uma história navegável', async ({ page }) => {
-  await page.getByRole('button', { name: /Ver demo/i }).click();
+  await page.locator('#demoBtn').click();
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('#storyTitle')).toContainText(/partida|dano|venceu|consistência|vitória/i);
   await expect(page.locator('.match-pill')).toHaveCount(3);
@@ -75,7 +75,7 @@ test('mobile não cria overflow horizontal crítico', async ({ page }) => {
 });
 
 test('gera card PNG da partida selecionada', async ({ page }) => {
-  await page.getByRole('button', { name: /Ver demo/i }).click();
+  await page.locator('#demoBtn').click();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: /Baixar card PNG/i }).click();
   const download = await downloadPromise;
