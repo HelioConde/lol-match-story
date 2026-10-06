@@ -1,7 +1,7 @@
 (() => {
   const backend = window.LOL_MATCH_STORY_BACKEND || {};
   const dictionaries = window.MATCH_STORY_I18N || {};
-  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
+  const state = { locale: localStorage.getItem('lms-locale') || 'pt', matches: [], selected: 0, lookup: null, live: false, player: null, timelineCache: new Map(), requestedMatchId: null, ddVersion: '16.19.1', assetLocale: null, itemMap: {}, spellMap: {}, runeMap: {} };
   let chapterObserver=null;
 
   const demoMatches = [
@@ -200,6 +200,22 @@
     else if(m.turretTakedowns>=2 || m.turretDamage>=4000) moments.push({m:fmt(total*.82),pt:'Pressão virou estrutura',en:'Pressure became structures',dpt:'Seu impacto saiu das lutas e apareceu diretamente nas torres.',den:'Your impact moved beyond fights and showed up directly on structures.'});
     else moments.push({m:fmt(total*.82),pt:m.win?'A janela decisiva':'O momento decisivo',en:m.win?'The decisive window':'The decisive moment',dpt:m.win?'O time converteu pressão e fechou a partida.':'A última sequência definiu o mapa antes de uma nova recuperação.',den:m.win?'The team converted pressure and closed the game.':'The final sequence decided the map before another recovery was possible.'});
     return moments.slice(0,3);
+  }
+
+  function renderPlayerHeader(){
+    const icon=$('#playerIcon'),meta=$('#playerMeta');
+    if(state.player?.profileIconId){
+      icon.src=`https://ddragon.leagueoflegends.com/cdn/${state.ddVersion}/img/profileicon/${state.player.profileIconId}.png`;
+      icon.alt=`${state.lookup?.gameName||state.player.gameName||'Player'} profile icon`;
+      icon.hidden=false;
+    }else{
+      icon.removeAttribute('src');icon.alt='';icon.hidden=true;
+    }
+    const bits=[];
+    if(state.player?.level) bits.push((locale()==='pt'?'Nível ':'Level ')+state.player.level);
+    if(state.player?.platform) bits.push(String(state.player.platform).toUpperCase());
+    meta.textContent=bits.join(' · ');
+    meta.hidden=!bits.length;
   }
 
   function applyI18n() {
@@ -596,6 +612,7 @@
     document.body.classList.add('results-mode');
     $('#storyApp').classList.remove('hidden');
     $('#playerTitle').textContent=`${state.lookup.gameName}#${state.lookup.tagLine}`;
+    renderPlayerHeader();
     renderRail();renderSessionSummary();renderSelected();updateShareUrl();loadTimelineForSelected();loadHistoricalRecords();setupChapterNav();
     $('#storyApp').scrollIntoView({behavior:'smooth',block:'start'});
   }
@@ -623,12 +640,12 @@
     if(!gameName||!tagLine){toast(locale()==='pt'?'Preencha seu Riot ID.':'Enter your Riot ID.');return;}
     state.lookup={gameName,tagLine,platform};state.selected=0;state.requestedMatchId=requestedMatchId;
     setLookupBusy(true);
-    if(useDemo){state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
+    if(useDemo){state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;setLookupBusy(false);state.matches=demoMatches.map(normalizeMatch);state.live=false;setSource('demo',locale()==='pt'?'Modo demonstrativo: história construída com dados de exemplo.':'Demo mode: story built with example data.');showStory();return;}
     setSource('loading',locale()==='pt'?'Buscando suas partidas recentes…':'Loading your recent matches…');
     try{
       const data=await fetchLive(state.lookup),matches=adaptResponse(data);
       if(!matches.length)throw new Error('empty_matches');
-      state.matches=matches;state.live=true;
+      state.matches=matches;state.live=true;state.player=data?.player||null;
       const canonical=data?.player;if(canonical?.gameName){state.lookup.gameName=canonical.gameName;state.lookup.tagLine=canonical.tagLine||tagLine;}
       const requestedIndex=requestedMatchId?matches.findIndex(x=>String(x.id)===String(requestedMatchId)):-1;
       if(requestedIndex>=0) state.selected=requestedIndex;
@@ -641,10 +658,10 @@
       const empty=String(err?.message||'')==='empty_matches';
       const notFound=!rate && (/não encontrado|not found/i.test(String(err?.message||'')) || err?.code==='player');
       if(empty||notFound){
-        state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
+        state.player=null;state.matches=[];state.live=false;document.body.classList.remove('results-mode');$('#storyApp').classList.add('hidden');track(empty?'lookup_empty':'lookup_not_found');
         setSource('error',locale()==='pt'?(empty?'Nenhuma partida recente compatível foi encontrada para este Riot ID.':'Riot ID não encontrado. Confira Game Name, Tag e servidor.'):(empty?'No compatible recent matches were found for this Riot ID.':'Riot ID not found. Check Game Name, Tag, and server.'));
       }else{
-        state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
+        state.player=null;state.matches=demoMatches.map(normalizeMatch);state.live=false;track('lookup_fallback');
         setSource('demo',locale()==='pt'?(rate?'A Riot limitou a consulta temporariamente. Exibindo uma história de exemplo até ser possível atualizar.':'Dados Riot indisponíveis agora. Mantivemos um exemplo claramente identificado para você conhecer a experiência.'):(rate?'Riot temporarily rate-limited the lookup. Showing an example story until data can be refreshed.':'Riot data is unavailable right now. A clearly labeled example is shown so you can explore the experience.'));
         showStory();
       }
