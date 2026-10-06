@@ -10,6 +10,15 @@
   const n=v=>Number(v||0);
   let currentMatchId=null,currentContext=null;
 
+  function resultTone(m){
+    if(m?.context==='ARENA'&&m?.placement){
+      if(Number(m.placement)===1)return 'win';
+      if(Number(m.placement)<=4)return 'placement';
+      return 'loss';
+    }
+    return m?.win?'win':'loss';
+  }
+
   function score(m){
     if(m.context==='ARENA'){
       return Math.max(35,Math.min(99,Math.round(48+(m.placement?Math.max(0,18-(m.placement-1)*3):0)+Math.min(18,(n(m.kills)+n(m.assists))*.55)-Math.min(12,n(m.deaths)*1.2)+Math.min(8,n(m.damagePerMin)/180))));
@@ -19,9 +28,9 @@
 
   function archetype(m){
     if(m.context==='ARENA'){
-      if(m.placement===1)return ['CAMPEÃO DA ARENA','Você terminou no topo da Arena.','Rounds, adaptação e sobrevivência convergiram para o primeiro lugar.'];
-      if(m.placement&&m.placement<=4)return ['TOP 4 NA ARENA','Você foi longe na Arena.','A run se sustentou até uma colocação de destaque.'];
-      return ['CORRIDA DE ARENA','Cada round contou uma parte da run.','Na Arena, sobreviver e adaptar importou tanto quanto eliminar.'];
+      if(m.placement===1)return ['CAMPEÃO DA ARENA','Você terminou no topo da Arena.','Rodadas, adaptação e sobrevivência convergiram para o primeiro lugar.'];
+      if(m.placement&&m.placement<=4)return ['TOP 4 NA ARENA','Você foi longe na Arena.','A campanha se sustentou até uma colocação de destaque.'];
+      return ['CAMPANHA DE ARENA','Cada rodada contou uma parte da campanha.','Na Arena, sobreviver e adaptar importou tanto quanto eliminar.'];
     }
     if(m.pentaKills)return ['NOITE LENDÁRIA','Uma partida para guardar.','Um Pentakill transformou esta partida em memória.'];
     if(n(m.damagePerMin)>=900||n(m.teamDamageShare)>=30||n(m.kills)>=12)return ['CARRY','Quando o time precisou de pressão, você apareceu.','Dano e participação colocaram você no centro da história.'];
@@ -38,7 +47,7 @@
     escText($('#publicKicker'),`${String(m.context||m.mode||'LEAGUE OF LEGENDS').toUpperCase()} • ${mins}:${secs} • ${story.riot_id}`);
     escText($('#publicTitle'),arc[1]);escText($('#publicSubtitle'),arc[2]);
     const result=m.context==='ARENA'&&m.placement?`#${m.placement}`:(m.win?'VITÓRIA':'DERROTA');
-    escText($('#publicResult'),result);$('#publicResult').className='result '+(m.win?'win':'loss');
+    escText($('#publicResult'),result);$('#publicResult').className='result '+resultTone(m);
     escText($('#publicArchetype'),arc[0]);escText($('#publicChampion'),champ);escText($('#publicKda'),`${n(m.kills)} / ${n(m.deaths)} / ${n(m.assists)}`);
     escText($('#publicImpactTitle'),`Impacto contextual: ${impact}/100`);
     const damage=m.damage?`${(n(m.damage)/1000).toFixed(1)}k de dano`:`${n(m.kills)+n(m.assists)} participações`;
