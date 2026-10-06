@@ -207,9 +207,64 @@
     }finally{clearTimeout(timer);}
   }
 
+  async function fetchTimeline(match) {
+    if(!state.live || !match?.id || String(match.id).startsWith('demo-') || !backend.lolMatchStory) return null;
+    if(state.timelineCache.has(match.id)) return state.timelineCache.get(match.id);
+    const res=await fetch(backend.lolMatchStory,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      matchId:match.id,
+      gameName:state.lookup.gameName,
+      tagLine:state.lookup.tagLine,
+      platform:state.lookup.platform,
+      region:platformRegion(state.lookup.platform)
+    })});
+    let data=null;try{data=await res.json();}catch{}
+    if(!res.ok||data?.error) throw Object.assign(new Error(data?.error||'timeline_failed'),{status:res.status});
+    state.timelineCache.set(match.id,data);
+    return data;
+  }
+
+  function timelineMoment(e,m) {
+    if(!e) return null;
+    if(e.type==='KILL') return {m:e.time,pt:'Eliminação no momento certo',en:'A kill at the right moment',dpt:'Você participou diretamente da pressão ao eliminar um adversário.',den:'You directly added pressure by securing a kill.'};
+    if(e.type==='ASSIST') return {m:e.time,pt:'Você entrou na jogada',en:'You joined the play',dpt:'Sua assistência conectou você a uma eliminação importante.',den:'Your assist connected you to an important takedown.'};
+    if(e.type==='DEATH') return {m:e.time,pt:'A partida cobrou um preço',en:'The match charged a price',dpt:'Uma morte abriu espaço para o adversário e mudou o ritmo por alguns instantes.',den:'A death opened space for the enemy and shifted the pace for a while.'};
+    if(e.type==='OBJECTIVE') return {m:e.time,pt:`Objetivo: ${e.objective||'controle de mapa'}`,en:`Objective: ${e.objective||'map control'}`,dpt:'Seu time converteu pressão em um objetivo real.',den:'Your team converted pressure into a real objective.'};
+    if(e.type==='STRUCTURE') return {m:e.time,pt:'Pressão virou estrutura',en:'Pressure became a structure',dpt:'A vantagem foi convertida em espaço permanente no mapa.',den:'The advantage was converted into permanent map space.'};
+    if(e.type==='MULTI_KILL') return {m:e.time,pt:`Sequência de ${e.count} eliminações`,en:`${e.count}-kill sequence`,dpt:'Esse foi um dos maiores picos de impacto individual da partida.',den:'This was one of the largest individual impact spikes of the match.'};
+    return null;
+  }
+
+  async function loadTimelineForSelected() {
+    const m=state.matches[state.selected]; if(!m) return;
+    const source=$('#timelineSource');
+    if(!state.live || m.context==='ARENA'){
+      source.textContent=locale()==='pt'?'Narrativa contextual do modo.':'Mode-contextual narrative.';
+      return;
+    }
+    source.textContent=locale()==='pt'?'Carregando eventos reais da partida…':'Loading real match events…';
+    try{
+      const data=await fetchTimeline(m);
+      if(!data){source.textContent='';return;}
+      const picks=[];
+      if(data.firstBlood) picks.push(data.firstBlood);
+      if(data.turningPoint && !picks.some(x=>x.timestamp===data.turningPoint.timestamp)) picks.push(data.turningPoint);
+      const last=[...(data.events||[])].reverse().find(x=>x.type==='OBJECTIVE'||x.type==='STRUCTURE'||x.type==='KILL'||x.type==='ASSIST');
+      if(last && !picks.some(x=>x.timestamp===last.timestamp)) picks.push(last);
+      const moments=picks.map(x=>timelineMoment(x,m)).filter(Boolean).slice(0,3);
+      if(moments.length){
+        m.moments=moments;
+        m.timelineReal=true;
+        $('#moments').innerHTML=m.moments.map(x=>`<div class="moment"><span class="moment-time">${x.m}</span><div><strong>${esc(locale()==='pt'?x.pt:x.en)}</strong><p>${esc(locale()==='pt'?x.dpt:x.den)}</p></div></div>`).join('');
+      }
+      source.textContent=locale()==='pt'?'Timeline real do Match-V5.':'Real Match-V5 timeline.';
+    }catch{
+      source.textContent=locale()==='pt'?'Timeline real indisponível; mantendo leitura estimada.':'Real timeline unavailable; keeping estimated narrative.';
+    }
+  }
+
   function renderRail() {
-    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L')}</span><span><strong>${esc(m.championName)}</strong><small>${m.kills}/${m.deaths}/${m.assists}</small></span></button>`).join('');
-    document.querySelectorAll('.match-pill').forEach(b=>b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();}));
+    $('#matchRail').innerHTML=state.matches.map((m,i)=>`<button class="match-pill ${i===state.selected?'active':''}" data-index="${i}"><span class="mini-result ${m.win?'win':'loss'}">${m.context==='ARENA'&&m.placement?'#'+m.placement:(m.win?(locale()==='pt'?'V':'W'):(locale()==='pt'?'D':'L'))}</span><span><strong>${esc(m.championName)}</strong><small>${m.kills}/${m.deaths}/${m.assists}</small></span></button>`).join('');
+    document.querySelectorAll('.match-pill').forEach(b=>b.addEventListener('click',()=>{state.selected=Number(b.dataset.index);renderRail();renderSelected();updateShareUrl();loadTimelineForSelected();}));
   }
 
   function renderSelected() {
