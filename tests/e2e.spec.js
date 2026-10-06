@@ -88,7 +88,7 @@ test('gera card PNG da partida selecionada', async ({ page }) => {
 
 test('home pública não embute Riot ID no HTML', async ({ page }) => {
   await expect(page.locator('#gameName')).not.toHaveAttribute('value', /AlchemyFlames/i);
-  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Game Name ou Nome#TAG');
+  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Nome#TAG');
   await expect(page.locator('#tagLine')).not.toHaveAttribute('value', /BR1/i);
   await expect(page.locator('#tagLine')).toHaveAttribute('placeholder','BR1');
 });
@@ -623,9 +623,9 @@ test('submit aceita Riot ID completo digitado no primeiro campo', async ({ page 
 
 
 test('placeholder do Riot ID acompanha idioma', async ({ page }) => {
-  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Game Name ou Nome#TAG');
+  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Nome#TAG');
   await page.locator('#langBtn').click();
-  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Game Name or Name#TAG');
+  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Name#TAG');
 });
 
 
@@ -682,4 +682,22 @@ test('demo explícita usa título amigável e esconde atualização de dados', a
   await expect(page.locator('#playerTitle')).toHaveText('História demonstrativa');
   await expect(page.locator('#refreshBtn')).toBeHidden();
   await expect(page.locator('#newSearchBtn')).toBeVisible();
+});
+
+
+test('demo usa badge compacto no resultado', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#resultSourceState')).toHaveText('Modo demonstrativo · dados de exemplo.');
+});
+
+test('rail mobile prioriza KDA e oculta modo em cada card', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('.match-pill .match-mode').first()).toBeHidden();
+  await expect(page.locator('.match-pill .match-kda').first()).toContainText('10/3/11');
+});
+
+test('entrada principal usa rótulo curto de Riot ID', async ({ page }) => {
+  await expect(page.locator('#gameName')).toHaveAttribute('placeholder','Nome#TAG');
+  await expect(page.locator('[data-i18n="gameName"]')).toHaveText('Riot ID / Game Name');
 });
