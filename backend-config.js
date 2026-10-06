@@ -7,6 +7,7 @@
   window.LOL_MATCH_STORY_BACKEND = Object.freeze({
     functionsBase,
     lolProfile: existing.lolProfile || functionsBase + '/public-lol-profile',
+    lolMatchStory: existing.lolMatchStory || functionsBase + '/public-lol-match-story',
     source: 'zerotwo-gamer-supabase'
   });
 })();
