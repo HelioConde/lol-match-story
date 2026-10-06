@@ -72,4 +72,6 @@ jobs:
             exit 0
           fi
           git commit -m "chore: update full-page screenshots [skip capture]"
-          git push
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
