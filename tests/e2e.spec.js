@@ -295,3 +295,10 @@ test('história pública envia feedback anônimo estruturado', async ({ page }) 
   expect(feedback.reason).toBe('clear');
   await expect(page.locator('#feedbackStatus')).toContainText('Obrigado');
 });
+
+
+test('anúncios ficam desativados sem configuração real', async ({ page }) => {
+  await expect(page.locator('#adsConsent')).toHaveCount(0);
+  await expect(page.locator('script[data-lms-adsense]')).toHaveCount(0);
+  await expect(page.locator('[data-ad-slot="story"]')).toBeVisible();
+});
