@@ -88,3 +88,26 @@ test('Riot ID padrão de teste é AlchemyFlames#BR1', async ({ page }) => {
   await expect(page.locator('#tagLine')).toHaveValue('BR1');
   await expect(page.locator('#platform')).toHaveValue('br1');
 });
+
+
+test('Arena usa colocação e narrativa específica', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      player: { gameName: 'AlchemyFlames', tagLine: 'BR1' },
+      matches: [{
+        id: 'BR1_3288690697', champion: 'Gragas', context: 'ARENA', queue: 'ARENA',
+        placement: 1, win: true, duration: 26, kills: 4, deaths: 6, assists: 21,
+        gold: 16562, damagePerMin: 820, augments: [101,102,103,104]
+      }]
+    })
+  }));
+
+  await page.getByRole('button', { name: /Criar minha história/i }).click();
+  await expect(page.locator('#championName')).toHaveText('Gragas');
+  await expect(page.locator('#resultBadge')).toHaveText('#1');
+  await expect(page.locator('#archetypeBadge')).toHaveText('CAMPEÃO DA ARENA');
+  await expect(page.locator('#storyTitle')).toContainText(/topo da Arena/i);
+  await expect(page.locator('#highlights')).toContainText('4 augments');
+});
