@@ -412,6 +412,7 @@ test('perfil real mostra ícone e nível do invocador', async ({ page }) => {
   await expect(page.locator('#playerIcon')).toBeVisible();
   await expect(page.locator('#playerIcon')).toHaveAttribute('src',/profileicon\/123\.png/);
   await expect(page.locator('#playerMeta')).toContainText('Nível 77');
+  await expect(page.locator('#playerMeta')).toContainText('Servidor BR');
 });
 
 
