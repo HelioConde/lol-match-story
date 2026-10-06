@@ -796,7 +796,12 @@
   $('#lookupForm').addEventListener('submit',e=>{e.preventDefault();runLookup(false);});
   $('#demoBtn').addEventListener('click',()=>runLookup(true));
   document.querySelector('.preview-demo')?.addEventListener('click',()=>runLookup(true));
-  document.querySelector('.preview-demo-card')?.addEventListener('click',()=>runLookup(true));
+  const previewCard=document.querySelector('.preview-demo-card');
+  previewCard?.addEventListener('click',()=>runLookup(true));
+  previewCard?.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    e.preventDefault();runLookup(true);
+  });
   $('#refreshBtn').addEventListener('click',()=>runLookup(false,state.matches[state.selected]?.id||null));
   $('#newSearchBtn').addEventListener('click',()=>{
     document.body.classList.remove('results-mode');
