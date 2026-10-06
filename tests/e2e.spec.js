@@ -51,7 +51,9 @@ test('dados reais substituem demo quando public-lol-profile responde', async ({ 
   await expect(page.locator('#storyApp')).toBeVisible();
   await expect(page.locator('#playerTitle')).toHaveText('RealPlayer#BR1');
   await expect(page.locator('#championName')).toHaveText('Lux');
-  await expect(page.locator('#sourceState')).toContainText('Dados Riot carregados');\n  await expect(page.locator('#storyKicker')).toContainText('32:00');\n  await expect(page.locator('#archetypeBadge')).toHaveText('CARRY');
+  await expect(page.locator('#sourceState')).toContainText('Dados Riot carregados');
+  await expect(page.locator('#storyKicker')).toContainText('32:00');
+  await expect(page.locator('#archetypeBadge')).toHaveText('CARRY');
 });
 
 test('falha do backend mantém fallback demonstrativo identificado', async ({ page }) => {
@@ -78,4 +80,11 @@ test('gera card PNG da partida selecionada', async ({ page }) => {
   await page.getByRole('button', { name: /Baixar card PNG/i }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^lol-match-story-ahri\.png$/);
+});
+
+
+test('Riot ID padrão de teste é AlchemyFlames#BR1', async ({ page }) => {
+  await expect(page.locator('#gameName')).toHaveValue('AlchemyFlames');
+  await expect(page.locator('#tagLine')).toHaveValue('BR1');
+  await expect(page.locator('#platform')).toHaveValue('br1');
 });
