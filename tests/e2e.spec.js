@@ -940,3 +940,23 @@ test('home mobile não renderiza resultado antes de qualquer ação', async ({ p
   await expect(page.locator('.product-preview')).toBeVisible();
   await expect(page.locator('body')).not.toHaveClass(/results-mode/);
 });
+
+
+test('comparação sinaliza ganhos e perdas de forma semântica', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  const items=page.locator('#comparison .comparison-item');
+  await expect(items).toHaveCount(3);
+  await expect(items.nth(0)).toHaveClass(/tone-positive/);
+  await expect(items.nth(1)).toHaveClass(/tone-positive/);
+  await expect(items.nth(2)).toHaveClass(/tone-negative/);
+});
+
+test('barra mobile mostra os quatro capítulos ao mesmo tempo', async ({ page }) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#demoBtn').click();
+  const nav=page.locator('.chapter-nav');
+  await expect(nav.locator('a')).toHaveCount(4);
+  const overflow=await nav.evaluate(el=>el.scrollWidth-el.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await expect(nav.locator('a').nth(3)).toBeVisible();
+});

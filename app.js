@@ -525,10 +525,15 @@
     renderMatchDetails(m);
   }
 
-  function metricDelta(value,avg,suffix=''){
-    if(!Number.isFinite(value)||!Number.isFinite(avg)||avg===0) return '—';
+  function metricDeltaInfo(value,avg,{inverse=false}={}){
+    if(!Number.isFinite(value)||!Number.isFinite(avg)||avg===0) return {text:'—',tone:'neutral'};
     const pct=Math.round((value-avg)/Math.abs(avg)*100);
-    return (pct>0?'+':'')+pct+'%'+suffix;
+    const better=inverse?pct<0:pct>0;
+    const worse=inverse?pct>0:pct<0;
+    return {
+      text:(pct>0?'+':'')+pct+'%',
+      tone:better?'positive':worse?'negative':'neutral'
+    };
   }
 
   function renderComparison(m){
@@ -538,12 +543,28 @@
     const avg=k=>peers.reduce((a,x)=>a+Number(x[k]||0),0)/peers.length;
     const kda=(m.kills+m.assists)/Math.max(1,m.deaths);
     const peerKda=peers.reduce((a,x)=>a+((x.kills+x.assists)/Math.max(1,x.deaths)),0)/peers.length;
+    const impact=metricDeltaInfo(m.score,avg('score'));
+    const kdaDelta=metricDeltaInfo(kda,peerKda);
+    let third;
+    if(m.context==='ARENA'){
+      const avgPlacement=avg('placement');
+      const placement=Number(m.placement||0);
+      const placementInfo=metricDeltaInfo(placement,avgPlacement,{inverse:true});
+      third={
+        label:locale()==='pt'?'Colocação':'Placement',
+        value:placement?(`#${placement} · ${locale()==='pt'?'média':'avg'} #${avgPlacement.toFixed(1)}`):'—',
+        tone:placementInfo.tone
+      };
+    }else{
+      const dpm=metricDeltaInfo(m.damagePerMin,avg('damagePerMin'));
+      third={label:'DPM',value:dpm.text,tone:dpm.tone};
+    }
     const items=[
-      [locale()==='pt'?'Impacto vs média':'Impact vs avg',metricDelta(m.score,avg('score'))],
-      [locale()==='pt'?'KDA vs média':'KDA vs avg',metricDelta(kda,peerKda)],
-      [m.context==='ARENA'?(locale()==='pt'?'Colocação':'Placement'):'DPM',m.context==='ARENA'?(m.placement?('#'+m.placement):'—'):metricDelta(m.damagePerMin,avg('damagePerMin'))]
+      {label:locale()==='pt'?'Impacto vs média':'Impact vs avg',value:impact.text,tone:impact.tone},
+      {label:locale()==='pt'?'KDA vs média':'KDA vs avg',value:kdaDelta.text,tone:kdaDelta.tone},
+      third
     ];
-    box.innerHTML=`<div class="chapter-label">${locale()==='pt'?'COMPARAÇÃO COM PARTIDAS DO MESMO MODO':'COMPARISON WITH SAME-MODE MATCHES'}</div><div class="comparison-grid">${items.map(([a,b])=>`<div class="comparison-item"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+    box.innerHTML=`<div class="chapter-label">${locale()==='pt'?'COMPARAÇÃO COM PARTIDAS DO MESMO MODO':'COMPARISON WITH SAME-MODE MATCHES'}</div><div class="comparison-grid">${items.map(item=>`<div class="comparison-item tone-${item.tone}"><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong></div>`).join('')}</div>`;
   }
 
   async function loadGameAssets(){
