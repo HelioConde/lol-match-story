@@ -6,6 +6,7 @@ on:
     paths:
       - "index.html"
       - "style.css"
+      - "visual-assets.css"
       - "app.js"
       - "i18n.js"
       - "backend-config.js"
