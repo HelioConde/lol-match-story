@@ -246,13 +246,16 @@ test('mostra recordes persistentes das histórias publicadas', async ({ page }) 
         kda:{champion:'Lux',value:8.5},
         kills:{champion:'Jinx',value:19},
         arena:{champion:'Gragas',value:1}
-      }
+      },
+      monthlyStories:[{matchId:'BR1_70',champion:'Ahri',context:'RANKED',win:true,placement:null}]
     })});
   });
   await page.getByRole('button',{name:/Criar minha história/i}).click();
   await expect(page.locator('#historicalRecords')).toContainText('Recordes persistentes');
   await expect(page.locator('#historicalRecords')).toContainText('1012');
   await expect(page.locator('#historicalRecords')).toContainText('#1');
+  await expect(page.locator('#historicalRecords')).toContainText('últimos 30 dias');
+  await expect(page.locator('#historicalRecords a')).toHaveAttribute('href','./story.html?match=BR1_70');
 });
 
 
