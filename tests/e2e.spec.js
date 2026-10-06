@@ -170,3 +170,40 @@ test('manifest PWA está disponível', async ({ page }) => {
   expect(manifest.name).toBe('LoL Match Story');
   expect(manifest.icons.length).toBeGreaterThan(0);
 });
+
+
+test('publica snapshot seguro antes de copiar link', async ({ page }) => {
+  await page.route('**/public-lol-profile', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({player:{gameName:'AlchemyFlames',tagLine:'BR1'},matches:[
+      {id:'BR1_99',champion:'Ahri',context:'RANKED',queue:'RANKED SOLO/DUO',win:true,duration:30,kills:8,deaths:2,assists:11}
+    ]})
+  }));
+  await page.route('**/public-lol-match-story', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));
+  await page.route('**/public-lol-story', async route => {
+    const body=route.request().postDataJSON();
+    expect(body.action).toBe('publish');
+    expect(body.matchId).toBe('BR1_99');
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,matchId:'BR1_99',publicPath:'story.html?match=BR1_99'})});
+  });
+  await page.getByRole('button',{name:/Criar minha história/i}).click();
+  await page.locator('#copyLinkBtn').click();
+  await expect.poll(()=>page.evaluate(()=>navigator.clipboard.readText())).toContain('story.html?match=BR1_99');
+});
+
+test('página pública renderiza snapshot persistido', async ({ page }) => {
+  await page.route('**/public-lol-story', async route => {
+    const body=route.request().postDataJSON();
+    expect(body.action).toBe('get');
+    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({story:{
+      match_id:'BR1_123',
+      riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{id:'BR1_123',champion:'Ahri',context:'RANKED',win:true,durationSeconds:1800,kills:10,deaths:2,assists:9,cs:220,vision:28,gold:13000,damage:28000,damagePerMin:933,killParticipation:65,largestKillingSpree:6}}
+    }})});
+  });
+  await page.goto('/story.html?match=BR1_123');
+  await expect(page.locator('#publicStory')).toBeVisible();
+  await expect(page.locator('#publicChampion')).toHaveText('Ahri');
+  await expect(page.locator('#publicKicker')).toContainText('AlchemyFlames#BR1');
+  await expect(page.locator('#publicResult')).toHaveText('VITÓRIA');
+});
