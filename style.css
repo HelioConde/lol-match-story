@@ -266,3 +266,17 @@
   .mini-result{width:24px;height:24px;font-size:10px}
   .lookup-card label span{letter-spacing:.08em}
 }
+
+.share-actions{display:grid;gap:10px;min-width:min(100%,360px)}
+.share-primary{width:100%;min-height:46px}
+.share-tools{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.share-tools .ghost,.share-format{min-height:40px}
+@media(max-width:700px){
+  .share-actions{width:100%;min-width:0}
+  .share-tools{display:grid;grid-template-columns:72px 1fr 1fr;gap:8px}
+  .share-tools>*{width:100%;min-width:0}
+}
+@media(max-width:380px){
+  .share-tools{grid-template-columns:1fr 1fr}
+  .share-format{grid-column:1/-1}
+}
