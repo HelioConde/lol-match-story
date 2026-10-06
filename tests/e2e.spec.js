@@ -374,3 +374,10 @@ test('detalhes técnicos ficam recolhidos por padrão', async ({ page }) => {
   await details.locator('summary').click();
   await expect(details).toHaveAttribute('open','');
 });
+
+
+test('modo resultado esconde demo redundante e placeholder de anúncio', async ({ page }) => {
+  await page.locator('#demoBtn').click();
+  await expect(page.locator('#demoBtn')).toBeHidden();
+  await expect(page.locator('[data-ad-slot="story"]')).toBeHidden();
+});
