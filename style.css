@@ -174,3 +174,11 @@
 
 .mini-result.placement{background:#3a311b;color:#f0cf70}
 .result.placement{color:#f0c866}
+
+@media(min-width:341px) and (max-width:640px){
+  .share-actions{grid-template-columns:1fr 1fr}
+  .share-actions .share-format,
+  .share-actions .ghost,
+  .share-actions .primary{width:100%;min-width:0}
+  .share-actions .primary{font-size:12px;padding-inline:10px}
+}
