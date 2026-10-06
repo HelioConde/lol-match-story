@@ -71,7 +71,6 @@ async function capture(page, file) {
     await page.locator('#storyApp:not(.hidden)').waitFor({ state: 'visible' });
     await settle(page);
     await capture(page, 'latest-story-full.png');
-    await desktop.close();
 
     let publicStoryState='unknown';
     await page.goto(BASE_URL + '/story.html?match=BR1_3288690697', { waitUntil: 'domcontentloaded' });
@@ -84,8 +83,9 @@ async function capture(page, file) {
     await settle(page);
     publicStoryState = await page.locator('#publicStory').evaluate(el => el.classList.contains('hidden') ? 'unavailable' : 'loaded').catch(()=> 'unavailable');
     await capture(page, 'latest-public-story-full.png');
+    await desktop.close();
 
-        const mobile = await browser.newContext({
+    const mobile = await browser.newContext({
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 1,
       isMobile: true,
