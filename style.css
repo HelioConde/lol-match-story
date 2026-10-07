@@ -732,3 +732,54 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
   .public-topbar .brand{gap:0}
   .public-topbar .brand-mark{flex:0 0 34px}
 }
+
+
+/* Cross-project polish — 07/10/2026 */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:40;
+  background:rgba(8,11,18,.88);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(38,50,71,.62);
+}
+.lookup-card{box-shadow:0 28px 80px rgba(0,0,0,.36)}
+.lookup-card label{min-width:0}
+.lookup-card input,.lookup-card select{font-size:14px}
+.hero-proof span{min-height:78px}
+.hero-proof em{font-size:12px}
+.hero-proof small{line-height:1.4}
+.product-preview{padding-top:28px}
+.preview-card,.story-card{box-shadow:0 28px 80px rgba(0,0,0,.28)}
+.story-head{align-items:center}
+.story-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.chapter h3{line-height:1.15}
+.chapter>p,.chapter div>p{line-height:1.65}
+.share-block{border-top:1px solid var(--line)}
+.footer a{color:#c3cad5}
+.footer a:hover{color:#f1cf82}
+@media(max-width:760px){
+  .topbar{height:auto;min-height:62px;padding:10px 0}
+  .lookup-card{grid-template-columns:1fr 1fr}
+  .lookup-card .primary{grid-column:1/-1}
+  .story-head{align-items:flex-start;flex-direction:column}
+  .story-head-actions{width:100%}
+  .story-head-actions .ghost{flex:1}
+  .chapter-nav{overflow-x:auto;scrollbar-width:none}
+  .chapter-nav::-webkit-scrollbar{display:none}
+  .chapter-nav a{min-width:116px}
+}
+@media(max-width:520px){
+  .shell{width:min(100% - 22px,1160px)}
+  .hero{padding-top:48px}
+  .hero h1{font-size:clamp(40px,12vw,56px)}
+  .hero>p{font-size:15px}
+  .lookup-card{grid-template-columns:1fr;padding:10px}
+  .lookup-card .primary{grid-column:auto}
+  .hero-proof{grid-template-columns:1fr}
+  .preview-copy h2{font-size:30px}
+  .story-body{padding-inline:16px}
+  .score-panel{grid-template-columns:1fr 1fr}
+  .share-actions{width:100%}
+  .share-primary{width:100%}
+}
