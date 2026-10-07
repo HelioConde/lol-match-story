@@ -37,7 +37,7 @@ O frontend pede Riot ID e consome apenas o endpoint server-side. Em falha de red
 
 ## Estado atual
 
-**MVP navegável iniciado em 06/10/2026.**
+**MVP 1.0 tecnicamente concluído em 07/10/2026. O projeto entra em validação pós-MVP e manutenção.**
 
 Já contém:
 
@@ -75,4 +75,13 @@ Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora u
 - acessibilidade com axe-core no CI;
 - anúncios desligados por padrão e carregados somente após configuração + consentimento.
 
-O que resta para fechar produto não é mais núcleo técnico: são respostas de usuários reais e credenciais definitivas do provedor de anúncios.
+O núcleo técnico do MVP 1.0 está encerrado. A partir daqui, novas features ficam congeladas até existir feedback real, bug P0/P1, requisito de segurança/compliance ou evidência clara de uso. Permanecem como validação pós-MVP: testar mais Riot IDs/regiões reais, coletar feedback de usuários e ativar AdSense somente quando houver credenciais/aprovação definitivas.
+
+
+## Política pós-MVP
+
+- **Status:** MVP 1.0 concluído tecnicamente / validação.
+- Não adicionar novas features por refinamento visual ou conveniência sem evidência de necessidade.
+- Priorizar apenas bugs P0/P1, segurança, regressões, compatibilidade Riot e feedback real.
+- AdSense é dependência externa e não bloqueia o encerramento técnico do MVP.
+- A rodada humana com Riot IDs adicionais é validação de produto, não implementação pesada.
