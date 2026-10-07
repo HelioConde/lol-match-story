@@ -675,3 +675,42 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
   }
   body:not(.results-mode) .product-preview .preview-card{order:-1}
 }
+
+
+/* Public story mobile polish — 2026-10-07 */
+@media(max-width:640px){
+  .public-story-page{width:calc(100% - 20px);padding-top:18px}
+  .public-story-page .story-card{border-radius:20px}
+  .public-story-page .story-body{padding-inline:20px;padding-bottom:24px}
+  .public-story-page .chapter{padding-block:34px}
+  .public-story-page .highlight-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .public-story-page .highlight{
+    min-width:0;
+    padding:14px 12px;
+    font-size:13px;
+    line-height:1.3;
+    overflow-wrap:anywhere;
+  }
+  .feedback-block{padding:18px}
+  .feedback-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .feedback-actions .ghost{
+    width:100%;
+    min-height:44px;
+    padding-inline:10px;
+  }
+  .public-story-page .share-block{padding:20px;margin-top:8px}
+  .public-story-page .share-block h3{font-size:22px;line-height:1.08}
+  .topbar .public-back{white-space:nowrap}
+}
+
+@media(max-width:360px){
+  .public-story-page .highlight-grid{grid-template-columns:1fr}
+  .feedback-actions{grid-template-columns:1fr}
+}
