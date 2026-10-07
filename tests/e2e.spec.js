@@ -1227,3 +1227,19 @@ test('história pública também carrega a camada visual compartilhada', async (
   const frame=await page.locator('#publicStory .story-card').evaluate(el=>getComputedStyle(el,'::after').backgroundImage);
   expect(frame).toContain('riot-legacy/assets/ui/panel-frame.png');
 });
+
+test('história pública não renderiza escapes de template como texto', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_607',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Ahri',context:'RANKED',win:true,durationSeconds:1800,kills:8,deaths:2,assists:10}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_607');
+  await expect(page.locator('#publicStory')).toBeVisible();
+  const mainText=await page.locator('main').innerText();
+  expect(mainText).not.toContain('\\n');
+  await expect(page.locator('#publicStory > .story-card')).toHaveCount(1);
+});
+
