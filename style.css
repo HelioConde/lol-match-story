@@ -714,3 +714,21 @@ body,.shell,.topbar,.hero,.lookup-card,.hero-proof,.product-preview,.preview-car
   .public-story-page .highlight-grid{grid-template-columns:1fr}
   .feedback-actions{grid-template-columns:1fr}
 }
+
+
+/* Public topbar capture polish — 2026-10-07 */
+@media(max-width:640px){
+  .public-story-page .highlight{
+    font-size:11px;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+  .public-topbar .top-actions{gap:6px}
+  .public-topbar .ghost{padding-inline:12px}
+}
+
+@media(max-width:420px){
+  .public-topbar .brand-short{display:none!important}
+  .public-topbar .brand{gap:0}
+  .public-topbar .brand-mark{flex:0 0 34px}
+}
