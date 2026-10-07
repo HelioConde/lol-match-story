@@ -18,10 +18,10 @@
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
   <header class="topbar">
     <a class="brand" href="./" aria-label="LoL Match Story"><span class="brand-mark">MS</span><span class="brand-long">LoL Match Story</span><span class="brand-short">Match Story</span></a>
-    <a class="ghost public-back" href="./">Criar minha história</a>
+    <div class="top-actions"><button id="publicLangBtn" class="ghost" type="button" aria-label="Change language">EN</button><a class="ghost public-back" href="./" data-public-i18n="createOwn">Criar minha história</a></div>
   </header>
   <main class="shell public-story-page">
-    <div id="publicStatus" class="source-state loading" role="status" aria-live="polite">Carregando história…</div>
+    <div id="publicStatus" class="source-state loading" role="status" aria-live="polite" data-public-i18n="loading">Carregando história…</div>
     <div id="publicStory" class="hidden">
       <article class="story-card">
       <div id="publicCover" class="story-cover public-cover">
@@ -42,7 +42,7 @@
         <section class="chapter intro-grid">
           <div>
             <div class="chapter-number">01</div>
-            <p class="chapter-label">O RETRATO DA PARTIDA</p>
+            <p class="chapter-label" data-public-i18n="portrait">O RETRATO DA PARTIDA</p>
             <h3 id="publicImpactTitle"></h3>
             <p id="publicImpactText"></p>
           </div>
@@ -50,33 +50,33 @@
         </section>
         <section class="chapter">
           <div class="chapter-number">02</div>
-          <p class="chapter-label">DESTAQUES</p>
+          <p class="chapter-label" data-public-i18n="highlights">DESTAQUES</p>
           <div id="publicHighlights" class="highlight-grid"></div>
         </section>
         <section id="feedbackBlock" class="feedback-block hidden" aria-labelledby="feedbackTitle">
-          <span class="eyebrow">AJUDE A MELHORAR</span>
-          <h3 id="feedbackTitle">Essa história ajudou você a entender a partida?</h3>
+          <span class="eyebrow" data-public-i18n="helpImprove">AJUDE A MELHORAR</span>
+          <h3 id="feedbackTitle" data-public-i18n="feedbackTitle">Essa história ajudou você a entender a partida?</h3>
           <div id="feedbackChoices" class="feedback-actions">
-            <button type="button" class="ghost" data-helpful="true">Sim, ficou claro</button>
-            <button type="button" class="ghost" data-helpful="false">Ainda não</button>
+            <button type="button" class="ghost" data-helpful="true" data-public-i18n="feedbackYes">Sim, ficou claro</button>
+            <button type="button" class="ghost" data-helpful="false" data-public-i18n="feedbackNo">Ainda não</button>
           </div>
           <div id="feedbackReasons" class="feedback-reasons hidden">
-            <span>O que faltou?</span>
-            <button type="button" data-reason="too_generic">Ficou genérica</button>
-            <button type="button" data-reason="wrong_context">Contexto incorreto</button>
-            <button type="button" data-reason="missing_event">Faltou um evento importante</button>
+            <span data-public-i18n="whatMissing">O que faltou?</span>
+            <button type="button" data-reason="too_generic" data-public-i18n="tooGeneric">Ficou genérica</button>
+            <button type="button" data-reason="wrong_context" data-public-i18n="wrongContext">Contexto incorreto</button>
+            <button type="button" data-reason="missing_event" data-public-i18n="missingEvent">Faltou um evento importante</button>
           </div>
           <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
         </section>
         <section class="share-block">
           <div>
             <span class="eyebrow">LOL MATCH STORY</span>
-            <h3>Quer transformar sua própria partida em história?</h3>
-            <p>Busque seu Riot ID e gere uma narrativa visual das suas partidas recentes.</p>
+            <h3 data-public-i18n="shareTitle">Quer transformar sua própria partida em história?</h3>
+            <p data-public-i18n="shareText">Busque seu Riot ID e gere uma narrativa visual das suas partidas recentes.</p>
           </div>
           <div class="public-share-actions">
-            <button id="publicShareBtn" class="ghost" type="button">Compartilhar esta história</button>
-            <a class="primary public-cta" href="./">Criar minha história →</a>
+            <button id="publicShareBtn" class="ghost" type="button" data-public-i18n="shareStory">Compartilhar esta história</button>
+            <a class="primary public-cta" href="./" data-public-i18n="createOwnArrow">Criar minha história →</a>
           </div>
         </section>
       </div>
@@ -85,7 +85,7 @@
   </main>
   <footer class="shell footer">
     <span>LoL Match Story</span>
-    <span>Produto independente. Não afiliado à Riot Games.</span>
+    <span data-public-i18n="footerDisclaimer">Produto independente. Não afiliado à Riot Games.</span>
   </footer>
   <script src="./backend-config.js"></script>
   <script src="./story-public.js"></script>

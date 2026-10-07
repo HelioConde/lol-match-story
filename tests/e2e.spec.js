@@ -1243,3 +1243,21 @@ test('história pública não renderiza escapes de template como texto', async (
   await expect(page.locator('#publicStory > .story-card')).toHaveCount(1);
 });
 
+
+
+test('história pública respeita a troca de idioma', async ({ page }) => {
+  await page.route('**/public-lol-story', route => route.fulfill({
+    status:200,contentType:'application/json',
+    body:JSON.stringify({story:{
+      match_id:'BR1_608',riot_id:'AlchemyFlames#BR1',
+      story_data:{match:{champion:'Ahri',context:'RANKED',win:true,durationSeconds:1800,kills:8,deaths:2,assists:10,killParticipation:62}}
+    }})
+  }));
+  await page.goto('/story.html?match=BR1_608');
+  await expect(page.locator('#publicStory')).toBeVisible();
+  await page.locator('#publicLangBtn').click();
+  await expect(page.locator('html')).toHaveAttribute('lang','en');
+  await expect(page.locator('.public-back')).toHaveText('Create my story');
+  await expect(page.locator('#publicImpactTitle')).toContainText('Contextual impact');
+  await expect(page.locator('#publicShareBtn')).toHaveText('Share this story');
+});
