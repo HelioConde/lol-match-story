@@ -1,6 +1,6 @@
 # Implementation Status — LoL Match Story
 
-Atualizado em 06/10/2026.
+Atualizado em 07/10/2026.
 
 Legenda: ✅ concluído · 🟡 implementado, mas depende de validação/terceiros · ⏳ pendente externo
 
@@ -43,7 +43,7 @@ Legenda: ✅ concluído · 🟡 implementado, mas depende de validação/terceir
 37. 🟡 Acessibilidade: skip link, landmarks, status, tab semantics, reduced-motion e CI com axe-core; resultado final depende de manter o workflow verde.
 38. ✅ Direção visual cinematográfica preservada; métricas entram apenas quando explicam a história.
 39. 🟡 Validação com usuários: infraestrutura de feedback anônimo estruturado está ativa; ainda faltam respostas de usuários reais.
-40. 🟡 MVP 1.0 tecnicamente implementado; fechamento de produto depende de validação real e, para monetização, credenciais/consentimento final do AdSense.
+40. ✅ MVP 1.0 tecnicamente concluído; validação real e ativação de monetização seguem como pós-MVP e não bloqueiam o encerramento da implementação pesada.
 
 ## Pendências que dependem de terceiros
 
@@ -55,3 +55,10 @@ Legenda: ✅ concluído · 🟡 implementado, mas depende de validação/terceir
 ## Critério de manutenção
 
 Nenhuma feature é considerada estável se Static QA, Browser E2E, Live Update QA, Pages deploy/smoke e Live Riot Data Smoke não estiverem verdes.
+
+
+## Gate de encerramento
+
+**MVP 1.0 = CONCLUÍDO TECNICAMENTE.**
+
+A partir de 07/10/2026, o repositório entra em validação/manutenção. Não abrir nova frente de features até que feedback real, bug crítico, segurança/compliance ou mudança relevante da Riot justifique o retorno à implementação.
