@@ -5,7 +5,7 @@ window.MATCH_STORY_I18N = {
     gameName:'Riot ID / Game Name', riotIdHint:'Pode colar Nome#TAG completo.', gameNamePlaceholder:'Nome#TAG', server:'Servidor', createStory:'Criar minha história', recentMatches:'PARTIDAS RECENTES', railHint:'← deslize para escolher →', refresh:'Atualizar dados', newSearch:'Nova busca', loadingStory:'Buscando partidas e montando sua história…', loadingStepProfile:'Riot ID', loadingStepProfileText:'Validando identificação', loadingStepMatches:'Partidas', loadingStepMatchesText:'Buscando histórico recente', loadingStepStory:'História', loadingStepStoryText:'Montando os capítulos',
     chapterOpening:'ABERTURA', navOpening:'Abertura', navMoments:'Momentos', navImpact:'Impacto', navFinal:'Final', vision:'Visão', gold:'Ouro', turningPoints:'MOMENTOS QUE MUDARAM O JOGO', impact:'SEU IMPACTO',
     finalChapter:'CAPÍTULO FINAL', shareEyebrow:'GUARDE ESSA PARTIDA', shareTitle:'Uma história que cabe em um card.',
-    shareText:'Compartilhe o resumo sem transformar sua partida em uma planilha.', share:'Compartilhar história', download:'Baixar PNG', copyLink:'Copiar link',
+    shareText:'Compartilhe o resumo sem transformar sua partida em uma planilha.', share:'Compartilhar história', download:'Baixar PNG', copyLink:'Copiar link', card45:'4:5 · Feed', card916:'9:16 · Story', card11:'1:1 · Quadrado',
     proofTimeline:'Timeline real', proofTimelineText:'Eventos Match-V5 quando disponíveis', proofNoLogin:'Sem login', proofNoLoginText:'Só seu Riot ID', proofPostGame:'Pós-partida', proofPostGameText:'Leitura narrativa, não assistência ao vivo',
     ad:'Espaço reservado para anúncio', footer:'Produto independente. Não afiliado à Riot Games.'
   },
@@ -15,7 +15,7 @@ window.MATCH_STORY_I18N = {
     gameName:'Riot ID / Game Name', gameNamePlaceholder:'Name#TAG', server:'Server', createStory:'Create my story', recentMatches:'RECENT MATCHES', railHint:'← swipe to choose →', refresh:'Refresh data', newSearch:'New search', loadingStory:'Loading matches and building your story…', loadingStepProfile:'Riot ID', loadingStepProfileText:'Validating identity', loadingStepMatches:'Matches', loadingStepMatchesText:'Loading recent history', loadingStepStory:'Story', loadingStepStoryText:'Building the chapters',
     chapterOpening:'OPENING', navOpening:'Opening', navMoments:'Moments', navImpact:'Impact', navFinal:'Final', vision:'Vision', gold:'Gold', turningPoints:'MOMENTS THAT CHANGED THE GAME', impact:'YOUR IMPACT',
     finalChapter:'FINAL CHAPTER', shareEyebrow:'KEEP THIS MATCH', shareTitle:'A whole story that fits in one card.',
-    shareText:'Share the summary without turning your match into a spreadsheet.', share:'Share story', download:'Download PNG', copyLink:'Copy link',
+    shareText:'Share the summary without turning your match into a spreadsheet.', share:'Share story', download:'Download PNG', copyLink:'Copy link', card45:'4:5 · Feed', card916:'9:16 · Story', card11:'1:1 · Square',
     proofTimeline:'Real timeline', proofTimelineText:'Match-V5 events when available', proofNoLogin:'No login', proofNoLoginText:'Just your Riot ID', proofPostGame:'Post-game', proofPostGameText:'Narrative review, never live assistance',
     ad:'Reserved ad space', footer:'Independent product. Not affiliated with Riot Games.'
   }
