@@ -28,7 +28,6 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Install Chromium browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
       - run: npm run test:e2e
