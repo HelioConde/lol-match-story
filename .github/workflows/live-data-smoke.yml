@@ -8,6 +8,9 @@ on:
       - "supabase/functions/**"
       - "supabase/migrations/**"
       - "backend-config.js"
+      - "service-worker.js"
+      - "live-update.js"
+      - "tests/pwa-cache.spec.js"
   workflow_dispatch:
 
 jobs:
