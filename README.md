@@ -37,7 +37,7 @@ O frontend pede Riot ID e consome apenas o endpoint server-side. Em falha de red
 
 ## Estado atual
 
-**MVP 1.0 tecnicamente concluído em 07/10/2026. O projeto entra em validação pós-MVP e manutenção.**
+**LoL Match Story 1.0: desenvolvimento principal concluído e publicado.** A auditoria final de 09/10/2026 confirmou dados reais da Riot, segurança do backend e corrigiu o isolamento de cache do PWA. O produto entra em **beta controlado**, mantendo apenas validação humana e anúncios como pendências externas. Consulte o [relatório técnico de lançamento 1.0](RELEASE_V1.md).
 
 Já contém:
 
