@@ -36,14 +36,18 @@ test('PWA nunca armazena Riot ID ou token da URL e preserva caches de outros pro
 test('atualização do PWA remove somente caches de versões antigas do LoL Match Story', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(async () => {
+    // The homepage itself registers a worker on load. Force a *new* installation
+    // so the legacy cache exists before the activation lifecycle runs.
+    const previous = await navigator.serviceWorker.getRegistration();
+    if (previous) await previous.unregister();
     await caches.open('lol-match-story-v2');
     await caches.open('chibi-gg-offline-sentinel');
-    await navigator.serviceWorker.register('./service-worker.js');
+    await navigator.serviceWorker.register('./service-worker.js?qa=upgrade', { scope: './' });
     await navigator.serviceWorker.ready;
   });
+  await expect.poll(() => page.evaluate(() => caches.keys())).toContain('lol-match-story-v4');
+  await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('lol-match-story-v2');
   const names = await page.evaluate(() => caches.keys());
-  expect(names).toContain('lol-match-story-v4');
-  expect(names).not.toContain('lol-match-story-v2');
   expect(names).toContain('chibi-gg-offline-sentinel');
 });
 
