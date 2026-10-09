@@ -30,8 +30,8 @@
 - [x] Alinhado o pacote para versão `1.0.0`, com dependências de QA fixadas.
 - [x] Deploy de código atualizado para GitHub Pages e smoke HTTP do site aprovados.
 - [x] Static QA e Live Update QA aprovados no novo código.
-- [ ] Marcar como concluído apenas quando o último Browser E2E terminar sem falhas.
-- [ ] Marcar como concluído apenas quando a última captura automática terminar sem falhas.
+- [x] Browser E2E completo aprovado: **102/102 testes passaram** após a correção da simulação de atualização do PWA.
+- [x] Capturas full-page desktop/tablet/mobile aprovadas; revisão do Chromium instalada corretamente pelo CI.
 
 ### Evidências
 
@@ -40,8 +40,8 @@
 - [Site em produção — smoke aprovado](https://github.com/HelioConde/lol-match-story/actions/runs/37924292429)
 - [Static QA](https://github.com/HelioConde/lol-match-story/actions/runs/37924242028)
 - [Live Update QA](https://github.com/HelioConde/lol-match-story/actions/runs/37924241981)
-- [Browser E2E — nova execução](https://github.com/HelioConde/lol-match-story/actions/runs/37924242011)
-- [Capturas visuais — nova execução](https://github.com/HelioConde/lol-match-story/actions/runs/37924236851)
+- [Browser E2E — 102 testes aprovados](https://github.com/HelioConde/lol-match-story/actions/runs/37924528423)
+- [Capturas visuais — workflow aprovado](https://github.com/HelioConde/lol-match-story/actions/runs/37924236851)
 
 ## Critérios pendentes de validação humana/terceiros
 
