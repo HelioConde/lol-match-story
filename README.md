@@ -1,99 +1,71 @@
-# LoL Match Story
+<div align="center">
+  <h1>📖 LoL Match Story</h1>
+  <p><strong>Transforme partidas recentes de League of Legends em histórias visuais com contexto, momentos decisivos e desfecho.</strong></p>
+  <p><img alt="Status" src="https://img.shields.io/badge/status-beta%20controlado-64748b"> <img alt="Dados" src="https://img.shields.io/badge/Riot%20API-backend-334155"></p>
+  <p><a href="RELEASE_V1.md"><strong>Relatório técnico</strong></a> · <a href="IMPLEMENTATION_STATUS.md"><strong>Implementação</strong></a> · <a href="#executar-localmente"><strong>Executar</strong></a></p>
+</div>
 
-**Uma leitura visual e compartilhável de partidas de League of Legends: contexto, acontecimentos marcantes e desfecho.**
+## O que o projeto faz
 
-**A experiência:** pesquise por Riot ID, selecione uma partida recente e explore capítulos criados a partir dos dados disponíveis, com fallback demonstrativo identificado.
+**LoL Match Story** apresenta uma partida como uma pequena narrativa, com começo, capítulos, eventos e resultado. Em vez de criar outro tracker de tabelas, o usuário consulta seu **Riot ID**, escolhe uma partida e explora os acontecimentos disponíveis.
 
-[**Sobre o produto**](#direção-do-produto) · [**Estado técnico**](#estado-atual)
+**Estado:** MVP técnico publicado e documentado como **beta controlado**. O lançamento amplo ainda depende de validação humana, requisitos de uso da Riot e acompanhamento da integração em produção.
 
-> A análise é limitada pelo histórico e pela timeline retornados pelas APIs. Projeto não oficial, independente de Riot Games.
+## Como funciona
 
-![Status](https://img.shields.io/badge/status-em%20evolução-64748b)
+```text
+Riot ID + região
+      ↓
+Histórico recente disponível
+      ↓
+Seleção de uma partida
+      ↓
+Resumo e timeline quando disponíveis
+      ↓
+4 capítulos + destaques + compartilhamento
+```
 
----
+| Parte | Descrição |
+| --- | --- |
+| **Resumo** | Resultado, contexto e estatísticas relevantes |
+| **Capítulos** | Quatro partes organizando a partida |
+| **Momentos-chave** | Eventos obtidos ou derivados da timeline disponível |
+| **Impacto** | Indicador heurístico de 0 a 100, baseado em sinais observáveis |
+| **Compartilhamento** | Card/visão pública conforme opções da interface |
+| **Idiomas** | Português e inglês |
+| **Indisponibilidade** | Estados de erro e fallback demonstrativo identificado |
 
-Transforma partidas recentes de **League of Legends** em histórias visuais com começo, momentos importantes, impacto e desfecho.
+**Não há geração livre de fatos:** a narrativa é limitada aos dados de Match-V5, timeline e histórico retornados pela integração. Um valor de impacto não é uma medição universal da contribuição de um jogador nem explica sozinho a vitória.
 
-## Direção do produto
+## Fontes e privacidade
 
-Não é um tracker genérico. O foco é explicar **o que aconteceu naquela partida** de forma visual, emocional e compartilhável.
+O frontend usa o backend gamer por funções como `public-lol-profile` e `public-lol-match-story`. Os dados reais podem estar indisponíveis por rate limit, ausência de timeline ou falha da rede.
 
-Fluxo principal:
+**A Riot API key não deve ser incluída no frontend.** Dados de demonstração precisam permanecer identificados. Regras de privacidade e publicação de páginas compartilháveis exigem atenção antes de abrir o produto ao público amplo.
 
-1. usuário informa Riot ID;
-2. o frontend consulta o backend gamer já existente;
-3. usuário escolhe uma partida recente;
-4. a partida é apresentada em capítulos;
-5. o resumo pode ser compartilhado.
+## Executar localmente
 
-## Regras obrigatórias
+Requer Node.js e npm:
 
-- PT-BR é o idioma principal e fallback;
-- English é o segundo idioma;
-- monetização preparada por anúncios sem interromper o fluxo principal;
-- mobile e desktop;
-- atualização automática quando uma nova versão for publicada;
-- nenhuma Riot API key no navegador;
-- usar o Supabase gamer ZeroTwo.gg já existente;
-- nunca usar o `pizzaria-db` para dados gamer.
+```bash
+git clone https://github.com/HelioConde/lol-match-story.git
+cd lol-match-story
+npm install
+npm run dev
+```
 
-## Backend
+Abra `http://localhost:4173` (porta definida no script). Para QA:
 
-Supabase gamer: `bieihhaobdztjyoweewa`
+```bash
+npm run check
+npm run test:e2e
+npm run check:visual
+```
 
-Edge Function reutilizada:
+Os comandos dependem dos ambientes necessários, incluindo Playwright para testes de navegador. **Esta revisão do README não executou o build nem os testes.**
 
-- `public-lol-profile`\n- `public-lol-match-story` — timeline Match-V5, ponto de virada e fluxo de ouro
+## Documentação
 
-O frontend pede Riot ID e consome apenas o endpoint server-side. Em falha de rede, rate limit ou ausência temporária de dados, mantém fallback demonstrativo claramente identificado.
+[Relatório de versão](RELEASE_V1.md) · [Estado de implementação](IMPLEMENTATION_STATUS.md) · [Contrato de perfil](PROFILE_CONTRACT.md) · [Política de API](RIOT_API.md) · [Histórico completo do README](docs/README_HISTORY_2026-10-25.md)
 
-## Estado atual
-
-**LoL Match Story 1.0: desenvolvimento principal concluído e publicado.** A auditoria final de 09/10/2026 confirmou dados reais da Riot, segurança do backend e corrigiu o isolamento de cache do PWA. O produto entra em **beta controlado**, mantendo apenas validação humana e anúncios como pendências externas. Consulte o [relatório técnico de lançamento 1.0](RELEASE_V1.md).
-
-Já contém:
-
-- busca por Riot ID;
-- seletor de servidor;
-- PT-BR / EN;
-- rail de partidas recentes;
-- história em 4 capítulos;
-- momentos-chave;
-- impacto 0–100;
-- highlights;
-- compartilhamento;
-- fallback demo;
-- slot de anúncio;
-- responsividade;
-- atualização automática de versão.
-
-Contrato real de `public-lol-profile` validado em 06/10/2026. O frontend agora usa sinais reais como dano/min, participação, first blood, multi-kills, spree, objetivos, torres e visão para classificar o arquétipo da partida e enriquecer a narrativa. Card PNG e cobertura E2E também foram adicionados. A timeline real do Match-V5 já está integrada. O projeto também possui ponto de virada por swing de ouro, capítulos variáveis, comparação por modo, histórico local, cards sociais em múltiplos formatos, PWA e GitHub Pages com smoke test. O backlog atualizado está em `IMPLEMENTATION_STATUS.md`.
-
-
-## Conta padrão de teste
-- Riot ID: `AlchemyFlames#BR1`
-- Plataforma: `br1`
-- Região Match-V5: `americas`
-- A conta é usada apenas para validação funcional; a Riot API key continua somente no backend.
-
-
-## Estado atual do MVP 1.0
-- timeline Match-V5 real e ponto de virada;
-- Arena com janelas de combate detectadas pela timeline;
-- histórias públicas persistentes;
-- links sociais com Open Graph dinâmico via `public-lol-story-page`;
-- recordes persistentes e coleção de 30 dias;
-- feedback anônimo estruturado para validação com usuários;
-- acessibilidade com axe-core no CI;
-- anúncios desligados por padrão e carregados somente após configuração + consentimento.
-
-O núcleo técnico do MVP 1.0 está encerrado. A partir daqui, novas features ficam congeladas até existir feedback real, bug P0/P1, requisito de segurança/compliance ou evidência clara de uso. Permanecem como validação pós-MVP: testar mais Riot IDs/regiões reais, coletar feedback de usuários e ativar AdSense somente quando houver credenciais/aprovação definitivas.
-
-
-## Política pós-MVP
-
-- **Status:** MVP 1.0 concluído tecnicamente / validação.
-- Não adicionar novas features por refinamento visual ou conveniência sem evidência de necessidade.
-- Priorizar apenas bugs P0/P1, segurança, regressões, compatibilidade Riot e feedback real.
-- AdSense é dependência externa e não bloqueia o encerramento técnico do MVP.
-- A rodada humana com Riot IDs adicionais é validação de produto, não implementação pesada.
+Projeto independente, não oficial, sem afiliação à Riot Games. Desenvolvido por [Hélio Conde](https://github.com/HelioConde).
