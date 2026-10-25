@@ -1,5 +1,17 @@
 # LoL Match Story
 
+**Uma leitura visual e compartilhável de partidas de League of Legends: contexto, acontecimentos marcantes e desfecho.**
+
+**A experiência:** pesquise por Riot ID, selecione uma partida recente e explore capítulos criados a partir dos dados disponíveis, com fallback demonstrativo identificado.
+
+[**Sobre o produto**](#direção-do-produto) · [**Estado técnico**](#estado-atual)
+
+> A análise é limitada pelo histórico e pela timeline retornados pelas APIs. Projeto não oficial, independente de Riot Games.
+
+![Status](https://img.shields.io/badge/status-em%20evolução-64748b)
+
+---
+
 Transforma partidas recentes de **League of Legends** em histórias visuais com começo, momentos importantes, impacto e desfecho.
 
 ## Direção do produto
